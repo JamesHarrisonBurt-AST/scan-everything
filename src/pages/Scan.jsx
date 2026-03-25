@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { base44 } from '@/api/base44Client';
 import ScanModeSelector from '../components/scan/ScanModeSelector';
 import ScannerViewfinder from '../components/scan/ScannerViewfinder';
+import CameraCapture from '../components/scan/CameraCapture';
 import ShimmerLoader from '../components/ShimmerLoader';
 
 export default function Scan() {
@@ -14,6 +15,7 @@ export default function Scan() {
   const fileInputRef = useRef(null);
   const [mode, setMode] = useState('camera');
   const [isScanning, setIsScanning] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [manualQuery, setManualQuery] = useState('');
   const [observedPrice, setObservedPrice] = useState('');
@@ -133,11 +135,12 @@ export default function Scan() {
   };
 
   const handleSimulateScan = () => {
-    setIsScanning(true);
-    setTimeout(() => {
-      setIsScanning(false);
-      fileInputRef.current?.click();
-    }, 1500);
+    setCameraOpen(true);
+  };
+
+  const handleCameraCapture = async (file) => {
+    setCameraOpen(false);
+    await processScan({ file });
   };
 
   return (
@@ -149,6 +152,13 @@ export default function Scan() {
         </button>
         <h1 className="font-heading text-lg font-bold text-foreground">Scan</h1>
       </div>
+
+      {cameraOpen && (
+        <CameraCapture
+          onCapture={handleCameraCapture}
+          onClose={() => setCameraOpen(false)}
+        />
+      )}
 
       <ScanModeSelector activeMode={mode} onModeChange={setMode} />
 
