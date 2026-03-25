@@ -1,41 +1,92 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Smartphone, ShoppingBag, Package, Cpu, Shirt, Wrench, Sparkles, Store } from 'lucide-react';
 
 const categories = [
-  { icon: Smartphone, label: 'Electronics', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-  { icon: ShoppingBag, label: 'Fashion', color: 'text-violet-400', bg: 'bg-violet-500/10' },
-  { icon: Package, label: 'Home', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  { icon: Cpu, label: 'Tech', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  { icon: Shirt, label: 'Apparel', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-  { icon: Wrench, label: 'Tools', color: 'text-violet-400', bg: 'bg-violet-500/10' },
-  { icon: Sparkles, label: 'Collectibles', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  { icon: Store, label: 'Thrift', color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  { icon: Smartphone, label: 'Electronics', color: '#00d4ff', glow: 'hsl(190 100% 50% / 0.25)' },
+  { icon: ShoppingBag, label: 'Fashion', color: '#8b5cf6', glow: 'hsl(263 70% 58% / 0.25)' },
+  { icon: Package, label: 'Home', color: '#10b981', glow: 'hsl(160 84% 39% / 0.25)' },
+  { icon: Cpu, label: 'Tech', color: '#f59e0b', glow: 'hsl(38 92% 50% / 0.25)' },
+  { icon: Shirt, label: 'Apparel', color: '#00d4ff', glow: 'hsl(190 100% 50% / 0.25)' },
+  { icon: Wrench, label: 'Tools', color: '#8b5cf6', glow: 'hsl(263 70% 58% / 0.25)' },
+  { icon: Sparkles, label: 'Collectibles', color: '#10b981', glow: 'hsl(160 84% 39% / 0.25)' },
+  { icon: Store, label: 'Thrift', color: '#f59e0b', glow: 'hsl(38 92% 50% / 0.25)' },
 ];
+
+function CategoryTile({ cat, index }) {
+  const ref = useRef(null);
+  const rawX = useSpring(0, { stiffness: 250, damping: 20 });
+  const rawY = useSpring(0, { stiffness: 250, damping: 20 });
+  const rotateX = useTransform(rawY, [-1, 1], [6, -6]);
+  const rotateY = useTransform(rawX, [-1, 1], [-8, 8]);
+  const Icon = cat.icon;
+
+  return (
+    <motion.div
+      style={{ perspective: '400px' }}
+      initial={{ opacity: 0, scale: 0.75, y: 12 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ delay: 0.08 + index * 0.04, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <Link to={`/scan?category=${cat.label.toLowerCase()}`}>
+        <motion.div
+          ref={ref}
+          onMouseMove={(e) => {
+            const rect = ref.current.getBoundingClientRect();
+            rawX.set(((e.clientX - rect.left) / rect.width - 0.5) * 2);
+            rawY.set(((e.clientY - rect.top) / rect.height - 0.5) * 2);
+          }}
+          onMouseLeave={() => { rawX.set(0); rawY.set(0); }}
+          className="flex flex-col items-center gap-2"
+          style={{ transformStyle: 'preserve-3d', rotateX, rotateY }}
+          whileTap={{ scale: 0.88 }}
+          whileHover={{ y: -3 }}
+        >
+          {/* Icon tile */}
+          <motion.div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center relative overflow-hidden"
+            style={{
+              background: `linear-gradient(145deg, ${cat.color}18, ${cat.color}08)`,
+              border: `1px solid ${cat.color}28`,
+              boxShadow: `0 6px 20px ${cat.glow}, 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 ${cat.color}18`,
+              transform: 'translateZ(12px)',
+            }}
+          >
+            {/* Glossy top-left sheen */}
+            <div className="absolute top-0 left-0 right-0 h-1/2 rounded-t-2xl"
+              style={{ background: `linear-gradient(to bottom, ${cat.color}12, transparent)` }}
+            />
+            <div className="absolute inset-0"
+              style={{ background: `radial-gradient(circle at 30% 25%, ${cat.color}20, transparent 55%)` }}
+            />
+            <Icon className="w-6 h-6 relative z-10" style={{ color: cat.color }} />
+          </motion.div>
+
+          <span className="text-[10px] font-medium tracking-wide" style={{ color: 'hsl(220 10% 55%)' }}>
+            {cat.label}
+          </span>
+        </motion.div>
+      </Link>
+    </motion.div>
+  );
+}
 
 export default function ScanCategories() {
   return (
-    <div className="px-4 mt-6">
-      <h3 className="font-heading text-base font-semibold text-foreground mb-3">Scan Categories</h3>
-      <div className="grid grid-cols-4 gap-3">
-        {categories.map((cat, i) => {
-          const Icon = cat.icon;
-          return (
-            <motion.div
-              key={cat.label}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1 + i * 0.05 }}
-            >
-              <Link to={`/scan?category=${cat.label.toLowerCase()}`} className="flex flex-col items-center gap-1.5">
-                <div className={`w-12 h-12 rounded-xl ${cat.bg} flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 ${cat.color}`} />
-                </div>
-                <span className="text-[10px] text-muted-foreground">{cat.label}</span>
-              </Link>
-            </motion.div>
-          );
-        })}
+    <div className="px-4 mt-8">
+      <h3 className="font-heading text-base font-bold mb-4" style={{
+        background: 'linear-gradient(90deg, hsl(210 20% 92%), hsl(220 10% 65%))',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      }}>
+        Categories
+      </h3>
+      <div className="grid grid-cols-4 gap-4">
+        {categories.map((cat, i) => (
+          <CategoryTile key={cat.label} cat={cat} index={i} />
+        ))}
       </div>
     </div>
   );
