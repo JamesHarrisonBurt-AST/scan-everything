@@ -8,6 +8,7 @@ import PricePanel from '../components/result/PricePanel';
 import ListingsPanel from '../components/result/ListingsPanel';
 import ValuePanel from '../components/result/ValuePanel';
 import ResultActions from '../components/result/ResultActions';
+import ListingDraftPanel from '../components/result/ListingDraftPanel';
 import ShimmerLoader from '../components/ShimmerLoader';
 
 export default function ScanResult() {
@@ -100,6 +101,7 @@ export default function ScanResult() {
       <PricePanel priceSummary={priceSummary} />
       <ListingsPanel listings={listings} />
       <ValuePanel assessment={valueAssessment} />
+      <ListingDraftPanel item={item} priceSummary={priceSummary} assessment={valueAssessment} />
       <ResultActions item={item} priceSummary={priceSummary} />
     </div>
   );
