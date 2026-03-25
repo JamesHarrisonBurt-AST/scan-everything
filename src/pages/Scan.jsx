@@ -111,6 +111,18 @@ export default function Scan() {
 
     await base44.entities.ScanSession.update(session.id, { status: 'complete' });
 
+    // Save to Vault automatically
+    await base44.entities.VaultItem.create({
+      identified_item_id: item.id,
+      status: 'scanned',
+      item_title: item.title,
+      item_image_url: imageUrl || '',
+      best_price_found: ps.lowest_price || undefined,
+      value_label: ps.recommendation_label || '',
+      category: identified.category || '',
+      favorited: false,
+    });
+
     setIsProcessing(false);
     navigate(`/scan-result/${item.id}`);
   };

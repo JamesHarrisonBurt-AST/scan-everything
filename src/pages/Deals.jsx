@@ -27,8 +27,13 @@ export default function Deals() {
 
   const getItem = (itemId) => items.find(i => i.id === itemId);
 
+  // Only show genuine deals: score >= 65 OR recommendation label signals a deal
+  const dealLabels = ['great deal', 'good deal', 'excellent deal', 'below market', 'hot deal'];
   const sortedDeals = summaries
-    .filter(s => s.deal_score > 0)
+    .filter(s =>
+      (s.deal_score >= 65) ||
+      (s.recommendation_label && dealLabels.some(l => s.recommendation_label.toLowerCase().includes(l)))
+    )
     .sort((a, b) => (b.deal_score || 0) - (a.deal_score || 0));
 
   return (
