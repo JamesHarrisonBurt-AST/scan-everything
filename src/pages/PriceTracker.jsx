@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bell, BellOff, TrendingDown, TrendingUp, Target, ChevronRight, X, Check, Layers } from 'lucide-react';
+import { ArrowLeft, Bell, BellOff, TrendingDown, TrendingUp, Target, ChevronRight, X, Check, Layers, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 
@@ -233,19 +233,45 @@ export default function PriceTracker() {
   const [showAddPicker, setShowAddPicker] = useState(false);
 
   const load = async () => {
-    const [wl, identified] = await Promise.all([
+    const [wl, identified, summariesAll] = await Promise.all([
       base44.entities.WatchlistItem.list('-created_date', 50),
       base44.entities.IdentifiedItem.list('-created_date', 100),
+      base44.entities.PriceSummary.list('-updated_date', 100),
     ]);
     setWatchlist(wl);
     setAllIdentified(identified);
     const itemMap = {};
     identified.forEach(i => { itemMap[i.id] = i; });
     setItems(itemMap);
-    await Promise.all(wl.map(async (w) => {
-      const res = await base44.entities.PriceSummary.filter({ identified_item_id: w.identified_item_id });
-      if (res[0]) setSummaries(p => ({ ...p, [w.identified_item_id]: res[0] }));
-    }));
+    const sumMap = {};
+    summariesAll.forEach(s => { sumMap[s.identified_item_id] = s; });
+    setSummaries(sumMap);
+
+    // Browser notifications for triggered alerts
+    if ('Notification' in window && Notification.permission === 'granted') {
+      wl.forEach(w => {
+        const s = sumMap[w.identified_item_id];
+        if (w.active && s?.lowest_price && w.target_price && s.lowest_price <= w.target_price) {
+          new Notification('Price Alert! 🎯', {
+            body: `${w.item_title} dropped to $${s.lowest_price.toFixed(2)} (your target: $${w.target_price.toFixed(2)})`,
+            icon: w.item_image_url || undefined,
+          });
+        }
+        // Great deal alert
+        if (w.active && s?.deal_score >= 75 && s?.recommendation_label) {
+          const label = s.recommendation_label.toLowerCase();
+          if (label.includes('great') || label.includes('hot') || label.includes('below market')) {
+            new Notification('🔥 Great Deal Detected!', {
+              body: `${w.item_title} — Deal Score ${s.deal_score}/100: ${s.recommendation_label}`,
+              icon: w.item_image_url || undefined,
+            });
+          }
+        }
+      });
+    } else if ('Notification' in window && Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
+
     setLoading(false);
   };
 
@@ -259,6 +285,13 @@ export default function PriceTracker() {
   const alerts = watchlist.filter(w => {
     const s = summaries[w.identified_item_id];
     return w.active && s?.lowest_price && w.target_price && s.lowest_price <= w.target_price;
+  });
+
+  const greatDeals = watchlist.filter(w => {
+    const s = summaries[w.identified_item_id];
+    if (!w.active || !s) return false;
+    const label = (s.recommendation_label || '').toLowerCase();
+    return s.deal_score >= 75 && (label.includes('great') || label.includes('hot') || label.includes('below market'));
   });
 
   const notTracked = allIdentified.filter(i => !watchlist.some(w => w.identified_item_id === i.id));
@@ -302,6 +335,22 @@ export default function PriceTracker() {
         </div>
       ) : (
         <div className="relative z-10 px-4 space-y-3">
+          {/* Great deals banner */}
+          {greatDeals.length > 0 && (
+            <motion.div className="rounded-2xl p-4 flex items-center gap-3"
+              style={{ background: 'linear-gradient(135deg, hsl(38 92% 50% / 0.12), hsl(38 92% 50% / 0.04))', border: '1px solid hsl(38 92% 50% / 0.35)', boxShadow: '0 8px 24px hsl(38 92% 50% / 0.08)' }}
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'hsl(38 92% 50% / 0.2)', border: '1px solid hsl(38 92% 50% / 0.3)' }}>
+                <Zap className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-amber-400">🔥 {greatDeals.length} Great Deal{greatDeals.length > 1 ? 's' : ''} Detected!</p>
+                <p className="text-xs text-amber-400/70">{greatDeals.map(d => d.item_title).join(', ')}</p>
+              </div>
+            </motion.div>
+          )}
+
           {/* Active alerts banner */}
           {alerts.length > 0 && (
             <motion.div className="rounded-2xl p-4 flex items-center gap-3"
