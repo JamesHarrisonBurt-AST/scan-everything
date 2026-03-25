@@ -18,7 +18,7 @@ export default function BottomTabBar() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40">
-      <div className="glass-card border-t border-border/50 px-2 pb-6 pt-2">
+      <div className="glass-card border-t border-border/50 px-2 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}>
         <nav className="flex items-center justify-around max-w-md mx-auto">
           {tabs.map((tab) => {
             const isActive = tab.path === '/' 
@@ -44,7 +44,7 @@ export default function BottomTabBar() {
             }
 
             return (
-              <Link key={tab.path} to={tab.path} className="flex flex-col items-center py-1 px-3">
+              <Link key={tab.path} to={tab.path} className="flex flex-col items-center py-1 px-3 touch-target">
                 <div className="relative">
                   <Icon
                     className={`w-5 h-5 transition-colors ${

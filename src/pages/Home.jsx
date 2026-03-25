@@ -34,7 +34,7 @@ export default function Home() {
         transition={{ duration: 0.5 }}
       >
         {/* Header */}
-        <div className="px-4 pt-12 pb-2">
+        <div className="px-4 pb-2 pt-safe-12">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}

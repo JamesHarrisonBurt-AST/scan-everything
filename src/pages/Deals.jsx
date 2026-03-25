@@ -34,7 +34,7 @@ export default function Deals() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="px-4 pt-12 pb-4">
+      <div className="px-4 pb-4 pt-safe-12">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-heading text-2xl font-bold text-foreground flex items-center gap-2">
