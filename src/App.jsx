@@ -14,6 +14,8 @@ import Vault from './pages/Vault';
 import Profile from './pages/Profile';
 import Search from './pages/Search';
 import Premium from './pages/Premium';
+import Compare from './pages/Compare';
+import PriceTracker from './pages/PriceTracker';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -47,6 +49,8 @@ const AuthenticatedApp = () => {
       <Route path="/scan-result/:id" element={<ScanResult />} />
       <Route path="/search" element={<Search />} />
       <Route path="/premium" element={<Premium />} />
+      <Route path="/compare" element={<Compare />} />
+      <Route path="/price-tracker" element={<PriceTracker />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
