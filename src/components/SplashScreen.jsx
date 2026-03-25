@@ -1,159 +1,238 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Particle = ({ delay, x, y }) => (
+const GridLine = ({ x, y, isVertical, delay }) => (
   <motion.div
-    className="absolute w-1 h-1 rounded-full bg-cyan-500"
-    initial={{ opacity: 0, scale: 0, x, y }}
-    animate={{
-      opacity: [0, 0.8, 0],
-      scale: [0, 1.5, 0],
-      x: x + (Math.random() - 0.5) * 100,
-      y: y + (Math.random() - 0.5) * 100,
-    }}
-    transition={{ duration: 2, delay, ease: 'easeOut' }}
+    className={`absolute ${isVertical ? 'w-px h-full top-0' : 'h-px w-full left-0'} bg-cyan-500/10`}
+    style={isVertical ? { left: `${x}%` } : { top: `${y}%` }}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: [0, 0.5, 0] }}
+    transition={{ duration: 3, delay, repeat: Infinity, repeatDelay: 2 }}
   />
 );
 
-const ScannerBracket = ({ position, delay }) => {
-  const positions = {
-    tl: 'top-0 left-0 border-t-2 border-l-2 rounded-tl-lg',
-    tr: 'top-0 right-0 border-t-2 border-r-2 rounded-tr-lg',
-    bl: 'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-lg',
-    br: 'bottom-0 right-0 border-b-2 border-r-2 rounded-br-lg',
-  };
+const Orb = ({ color, x, y, size, delay }) => (
+  <motion.div
+    className="absolute rounded-full"
+    style={{
+      left: `${x}%`,
+      top: `${y}%`,
+      width: size,
+      height: size,
+      background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+      transform: 'translate(-50%, -50%)',
+    }}
+    initial={{ opacity: 0, scale: 0.3 }}
+    animate={{ opacity: [0, 0.6, 0.3, 0.6], scale: [0.3, 1.2, 1, 1.3] }}
+    transition={{ duration: 4, delay, ease: 'easeOut' }}
+  />
+);
 
+const ScanCorner = ({ pos, delay }) => {
+  const corners = {
+    tl: 'top-0 left-0 border-t-[2px] border-l-[2px] rounded-tl-2xl',
+    tr: 'top-0 right-0 border-t-[2px] border-r-[2px] rounded-tr-2xl',
+    bl: 'bottom-0 left-0 border-b-[2px] border-l-[2px] rounded-bl-2xl',
+    br: 'bottom-0 right-0 border-b-[2px] border-r-[2px] rounded-br-2xl',
+  };
   return (
     <motion.div
-      className={`absolute w-8 h-8 border-cyan-500 ${positions[position]}`}
-      initial={{ opacity: 0, scale: 1.5 }}
+      className={`absolute w-10 h-10 border-cyan-400 ${corners[pos]}`}
+      initial={{ opacity: 0, scale: 1.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, delay }}
+      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
     />
   );
 };
+
+const DataLine = ({ top, delay }) => (
+  <motion.div
+    className="absolute left-0 right-0 flex justify-end pr-4"
+    style={{ top }}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: [0, 0.7, 0] }}
+    transition={{ duration: 2, delay }}
+  >
+    <span className="font-body text-[8px] tracking-widest text-cyan-500/50 font-light">
+      {Math.random().toString(36).substring(2, 10).toUpperCase()}
+    </span>
+  </motion.div>
+);
 
 export default function SplashScreen({ onComplete }) {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 300),
-      setTimeout(() => setPhase(2), 1000),
-      setTimeout(() => setPhase(3), 1800),
-      setTimeout(() => setPhase(4), 2600),
-      setTimeout(() => onComplete(), 3800),
+      setTimeout(() => setPhase(1), 200),
+      setTimeout(() => setPhase(2), 900),
+      setTimeout(() => setPhase(3), 1700),
+      setTimeout(() => setPhase(4), 2400),
+      setTimeout(() => setPhase(5), 3200),
+      setTimeout(() => onComplete(), 4400),
     ];
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
-  const particles = Array.from({ length: 30 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 300 - 150,
-    y: Math.random() * 400 - 200,
-    delay: Math.random() * 1.5,
-  }));
-
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background overflow-hidden"
-        exit={{ opacity: 0, filter: 'blur(20px)' }}
-        transition={{ duration: 0.8 }}
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
+        style={{ background: 'hsl(240 15% 3%)' }}
+        exit={{ opacity: 0, filter: 'blur(30px)', scale: 1.05 }}
+        transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
       >
-        {/* Particles */}
+        {/* Grid lines */}
+        {phase >= 1 && [12, 25, 50, 75, 88].map((x, i) => (
+          <GridLine key={`v${i}`} x={x} isVertical delay={i * 0.1} />
+        ))}
+        {phase >= 1 && [15, 30, 50, 70, 85].map((y, i) => (
+          <GridLine key={`h${i}`} y={y} isVertical={false} delay={0.3 + i * 0.1} />
+        ))}
+
+        {/* Floating data snippets */}
+        {phase >= 2 && [
+          { top: '22%', delay: 0.2 },
+          { top: '35%', delay: 0.5 },
+          { top: '65%', delay: 0.3 },
+          { top: '78%', delay: 0.7 },
+        ].map((d, i) => <DataLine key={i} {...d} />)}
+
+        {/* Deep orbs */}
         {phase >= 1 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            {particles.map((p) => (
-              <Particle key={p.id} delay={p.delay} x={p.x} y={p.y} />
-            ))}
-          </div>
+          <>
+            <Orb color="hsl(190 100% 50% / 0.15)" x={20} y={30} size="350px" delay={0} />
+            <Orb color="hsl(263 70% 58% / 0.12)" x={80} y={70} size="300px" delay={0.5} />
+            <Orb color="hsl(190 100% 50% / 0.08)" x={60} y={20} size="250px" delay={0.8} />
+          </>
         )}
 
-        {/* Radial glow */}
-        <motion.div
-          className="absolute w-64 h-64 rounded-full"
-          style={{
-            background: 'radial-gradient(circle, hsl(190 100% 50% / 0.15) 0%, transparent 70%)',
-          }}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={phase >= 1 ? { scale: 3, opacity: 1 } : {}}
-          transition={{ duration: 2, ease: 'easeOut' }}
-        />
-
-        {/* Scanner beam */}
+        {/* Scanner frame */}
         {phase >= 2 && (
           <motion.div
-            className="absolute left-1/2 -translate-x-1/2 w-48 h-[2px]"
-            style={{
-              background: 'linear-gradient(90deg, transparent, hsl(190 100% 50% / 0.8), transparent)',
-            }}
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: [- 100, 100], opacity: [0, 1, 1, 0] }}
-            transition={{ duration: 1.2, ease: 'easeInOut' }}
-          />
-        )}
+            className="relative w-44 h-44 mb-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            <ScanCorner pos="tl" delay={0} />
+            <ScanCorner pos="tr" delay={0.08} />
+            <ScanCorner pos="bl" delay={0.16} />
+            <ScanCorner pos="br" delay={0.24} />
 
-        {/* Scanner brackets */}
-        {phase >= 2 && (
-          <div className="relative w-32 h-32 mb-8">
-            <ScannerBracket position="tl" delay={0} />
-            <ScannerBracket position="tr" delay={0.1} />
-            <ScannerBracket position="bl" delay={0.2} />
-            <ScannerBracket position="br" delay={0.3} />
+            {/* Scan beam */}
+            <motion.div
+              className="absolute left-4 right-4 h-[1px] overflow-visible"
+              style={{ background: 'linear-gradient(90deg, transparent, hsl(190 100% 60% / 0.9), transparent)' }}
+              initial={{ y: 0, opacity: 0 }}
+              animate={{ y: [0, 144, 0], opacity: [0, 1, 1, 1, 0] }}
+              transition={{ duration: 1.8, ease: 'easeInOut', delay: 0.3 }}
+            >
+              <div
+                className="absolute inset-x-0 h-8 -top-4"
+                style={{ background: 'linear-gradient(180deg, transparent, hsl(190 100% 50% / 0.06), transparent)' }}
+              />
+            </motion.div>
 
-            {/* Inner scan icon */}
+            {/* Center icon */}
             <motion.div
               className="absolute inset-0 flex items-center justify-center"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="w-12 h-12 rounded-lg border border-cyan-500/50 flex items-center justify-center glow-cyan">
+              <div className="relative">
                 <motion.div
-                  className="w-6 h-6 rounded-sm bg-gradient-to-br from-cyan-500 to-violet-500"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                />
+                  className="w-16 h-16 rounded-2xl border border-cyan-500/30 flex items-center justify-center"
+                  style={{ background: 'hsl(240 15% 6%)' }}
+                  animate={{ borderColor: ['hsl(190 100% 50% / 0.3)', 'hsl(190 100% 50% / 0.6)', 'hsl(190 100% 50% / 0.3)'] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <motion.div
+                    className="w-8 h-8 rounded-xl"
+                    style={{ background: 'linear-gradient(135deg, hsl(190 100% 50%), hsl(263 70% 58%))' }}
+                    animate={{ rotate: [0, 90, 180, 270, 360] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                  />
+                </motion.div>
+                {/* Pulse rings */}
+                {[1, 2, 3].map(i => (
+                  <motion.div
+                    key={i}
+                    className="absolute inset-0 rounded-2xl border border-cyan-500/20"
+                    initial={{ scale: 1, opacity: 0.4 }}
+                    animate={{ scale: 1 + i * 0.4, opacity: 0 }}
+                    transition={{ duration: 2, delay: i * 0.3, repeat: Infinity, ease: 'easeOut' }}
+                  />
+                ))}
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
 
         {/* App name */}
         {phase >= 3 && (
-          <motion.h1
-            className="font-heading text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 via-foreground to-violet-400 bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: 20 }}
+          <motion.div
+            className="text-center relative"
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           >
-            Scan Everything
-          </motion.h1>
+            {/* Glow text shadow */}
+            <div
+              className="absolute inset-0 font-heading text-4xl font-extrabold tracking-tight text-transparent select-none blur-2xl"
+              style={{ color: 'hsl(190 100% 70%)' }}
+              aria-hidden
+            >
+              Scan Everything
+            </div>
+            <h1 className="font-heading text-4xl font-extrabold tracking-tight relative"
+              style={{
+                background: 'linear-gradient(135deg, hsl(190 100% 75%) 0%, hsl(210 30% 95%) 40%, hsl(263 70% 75%) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              Scan Everything
+            </h1>
+          </motion.div>
         )}
 
         {/* Tagline */}
         {phase >= 4 && (
+          <motion.div
+            className="mt-4 text-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <p className="font-body text-[11px] tracking-[0.35em] uppercase text-muted-foreground font-light">
+              See it · Price it · Value it
+            </p>
+          </motion.div>
+        )}
+
+        {/* Bottom progress line */}
+        {phase >= 4 && (
+          <motion.div
+            className="absolute bottom-16 left-1/2 -translate-x-1/2 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"
+            initial={{ width: 0 }}
+            animate={{ width: 120 }}
+            transition={{ duration: 1.2, ease: 'easeOut' }}
+          />
+        )}
+
+        {/* Version */}
+        {phase >= 5 && (
           <motion.p
-            className="mt-3 text-sm text-muted-foreground tracking-widest uppercase font-body"
+            className="absolute bottom-10 font-body text-[9px] tracking-widest text-muted-foreground/30 uppercase"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
           >
-            See it. Price it. Value it.
+            v1.0 · AI-Powered
           </motion.p>
-        )}
-
-        {/* Bottom pulse */}
-        {phase >= 3 && (
-          <motion.div
-            className="absolute bottom-20 w-16 h-[1px]"
-            style={{
-              background: 'linear-gradient(90deg, transparent, hsl(190 100% 50% / 0.5), transparent)',
-            }}
-            animate={{ opacity: [0.3, 0.8, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
         )}
       </motion.div>
     </AnimatePresence>
