@@ -69,7 +69,8 @@ export default function ScanResult() {
       {/* Back button overlay */}
       <button
         onClick={() => navigate(-1)}
-        className="fixed top-12 left-4 z-30 w-9 h-9 rounded-full glass-card flex items-center justify-center"
+        style={{ top: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
+        className="fixed left-4 z-30 w-11 h-11 rounded-full glass-card flex items-center justify-center"
       >
         <ArrowLeft className="w-4 h-4 text-foreground" />
       </button>
