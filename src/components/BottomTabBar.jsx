@@ -1,10 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ScanLine, Zap, Archive, User } from 'lucide-react';
+import { Home, ScanLine, BarChart2, Archive, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const tabs = [
   { path: '/', icon: Home, label: 'Home' },
-  { path: '/deals', icon: Zap, label: 'Deals' },
+  { path: '/analytics', icon: BarChart2, label: 'Analytics' },
   { path: '/scan', icon: ScanLine, label: 'Scan', isCenter: true },
   { path: '/vault', icon: Archive, label: 'Vault' },
   { path: '/profile', icon: User, label: 'Profile' },

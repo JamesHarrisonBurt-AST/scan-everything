@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Heart, Bell, Layers3, X } from 'lucide-react';
+import { Archive, Heart, Bell, Layers3, X, FileText } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '../components/GlassCard';
@@ -81,12 +81,11 @@ export default function Vault() {
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">Your scanned finds and watchlist</p>
           </div>
-          {/* Quick action buttons */}
           <div className="flex gap-2 mt-1">
             <Link to="/price-tracker">
               <motion.div
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{ background: 'hsl(190 100% 50% / 0.1)', border: '1px solid hsl(190 100% 50% / 0.25)', boxShadow: '0 4px 12px hsl(190 100% 50% / 0.08)' }}
+                style={{ background: 'hsl(190 100% 50% / 0.1)', border: '1px solid hsl(190 100% 50% / 0.25)' }}
                 whileTap={{ scale: 0.9 }}>
                 <Bell className="w-4 h-4 text-cyan-400" />
               </motion.div>
@@ -97,7 +96,6 @@ export default function Vault() {
               style={{
                 background: compareMode ? 'hsl(263 70% 58% / 0.2)' : 'hsl(263 70% 58% / 0.08)',
                 border: `1px solid ${compareMode ? 'hsl(263 70% 58% / 0.5)' : 'hsl(263 70% 58% / 0.2)'}`,
-                boxShadow: compareMode ? '0 0 16px hsl(263 70% 58% / 0.2)' : 'none',
               }}
               whileTap={{ scale: 0.9 }}>
               <Layers3 className="w-4 h-4 text-violet-400" />
@@ -105,7 +103,7 @@ export default function Vault() {
           </div>
         </div>
 
-        {/* Compare mode bar */}
+        {/* Compare / Report action bar */}
         <AnimatePresence>
           {compareMode && (
             <motion.div className="flex items-center gap-2 mt-3"
@@ -114,15 +112,26 @@ export default function Vault() {
                 {selectedForCompare.length}/4 selected
               </p>
               {selectedForCompare.length >= 2 && (
-                <motion.button
-                  onClick={() => navigate(`/compare?ids=${selectedForCompare.join(',')}`)}
-                  className="ml-auto px-4 py-1.5 rounded-xl text-xs font-bold"
-                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff', boxShadow: '0 4px 14px hsl(263 70% 58% / 0.4)' }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}>
-                  Compare Now →
-                </motion.button>
+                <div className="ml-auto flex gap-2">
+                  <motion.button
+                    onClick={() => navigate(`/vault-report?ids=${selectedForCompare.join(',')}`)}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold"
+                    style={{ background: 'hsl(190 100% 50% / 0.15)', color: '#00d4ff', border: '1px solid hsl(190 100% 50% / 0.3)' }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}>
+                    <FileText className="w-3 h-3" /> Report
+                  </motion.button>
+                  <motion.button
+                    onClick={() => navigate(`/compare?ids=${selectedForCompare.join(',')}`)}
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold"
+                    style={{ background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff' }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}>
+                    Compare →
+                  </motion.button>
+                </div>
               )}
             </motion.div>
           )}
@@ -174,7 +183,6 @@ export default function Vault() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.06 }}
               >
-                {/* Compare checkbox */}
                 {compareMode && (
                   <motion.button
                     onClick={() => toggleCompareSelect(compareId)}
@@ -197,7 +205,7 @@ export default function Vault() {
                   onClick={compareMode ? (e) => { e.preventDefault(); toggleCompareSelect(compareId); } : undefined}
                 >
                   <motion.div
-                    animate={isSelected && compareMode ? { scale: 0.97, borderColor: 'hsl(263 70% 58% / 0.5)' } : { scale: 1 }}
+                    animate={isSelected && compareMode ? { scale: 0.97 } : { scale: 1 }}
                     transition={{ duration: 0.15 }}
                     style={{
                       borderRadius: 16,

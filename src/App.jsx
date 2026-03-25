@@ -16,6 +16,8 @@ import Search from './pages/Search';
 import Premium from './pages/Premium';
 import Compare from './pages/Compare';
 import PriceTracker from './pages/PriceTracker';
+import Analytics from './pages/Analytics';
+import VaultReport from './pages/VaultReport';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -51,6 +53,8 @@ const AuthenticatedApp = () => {
       <Route path="/premium" element={<Premium />} />
       <Route path="/compare" element={<Compare />} />
       <Route path="/price-tracker" element={<PriceTracker />} />
+      <Route path="/analytics" element={<Analytics />} />
+      <Route path="/vault-report" element={<VaultReport />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
