@@ -43,111 +43,48 @@ export default function Scan() {
       status: 'identifying',
     });
 
-    // AI identification
-    const identifyPrompt = file
-      ? `Identify this product/object from the image. Be specific about brand, model, category. If it's a consumer product, identify it precisely for price comparison. If it's an unusual or vintage item, note that. Return JSON: {"title":"","brand":"","model":"","category":"","subcategory":"","description":"","confidence_score":0,"condition_guess":"","attributes":{}}`
-      : `Identify this product based on the description: "${query}". Be specific about brand, model, category. Return JSON: {"title":"","brand":"","model":"","category":"","subcategory":"","description":"","confidence_score":0,"condition_guess":"","attributes":{}}`;
-
-    const identifyResult = await base44.integrations.Core.InvokeLLM({
-      prompt: identifyPrompt,
-      file_urls: imageUrl ? [imageUrl] : undefined,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          title: { type: 'string' },
-          brand: { type: 'string' },
-          model: { type: 'string' },
-          category: { type: 'string' },
-          subcategory: { type: 'string' },
-          description: { type: 'string' },
-          confidence_score: { type: 'number' },
-          condition_guess: { type: 'string' },
-          attributes: { type: 'object' },
-        },
-      },
+    // Call OpenAI backend — GPT-4o vision + gpt-4o-search-preview for real prices
+    const response = await base44.functions.invoke('scanProduct', {
+      image_url: imageUrl || undefined,
+      query: query || undefined,
+      observed_price: observedPrice ? parseFloat(observedPrice) : undefined,
     });
 
+    const { identified, listings, price_summary: ps, value_assessment: va, search_query_used } = response.data;
+
+    // Save identified item
     const item = await base44.entities.IdentifiedItem.create({
       scan_session_id: session.id,
-      title: identifyResult.title || 'Unknown Item',
-      brand: identifyResult.brand || '',
-      model: identifyResult.model || '',
-      category: identifyResult.category || '',
-      subcategory: identifyResult.subcategory || '',
-      description: identifyResult.description || '',
-      confidence_score: identifyResult.confidence_score || 50,
-      condition_guess: identifyResult.condition_guess || '',
-      attributes_json: JSON.stringify(identifyResult.attributes || {}),
+      title: identified.title || 'Unknown Item',
+      brand: identified.brand || '',
+      model: identified.model || '',
+      category: identified.category || '',
+      subcategory: identified.subcategory || '',
+      description: identified.description || '',
+      confidence_score: identified.confidence_score || 50,
+      condition_guess: identified.condition_guess || '',
+      attributes_json: identified.attributes_json || '{}',
       image_primary_url: imageUrl,
-      normalized_search_query: `${identifyResult.brand || ''} ${identifyResult.model || ''} ${identifyResult.title || ''}`.trim(),
-    });
-
-    // Price search using web context
-    const pricePrompt = `Search for current prices of: "${item.title}" by ${item.brand || 'unknown brand'}, model: ${item.model || 'unknown'}. Category: ${item.category || 'general'}.
-    
-Find the best current prices available online. Return JSON with listings and price summary:
-{
-  "listings": [{"source_name":"","listing_title":"","price_amount":0,"condition_label":"","product_url":"","availability_label":"","notes":""}],
-  "price_summary": {"lowest_price":0,"median_price":0,"high_price":0,"average_price":0,"deal_score":0,"recommendation_label":"","notes":""}
-}`;
-
-    const priceResult = await base44.integrations.Core.InvokeLLM({
-      prompt: pricePrompt,
-      add_context_from_internet: true,
-      model: 'gemini_3_flash',
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          listings: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                source_name: { type: 'string' },
-                listing_title: { type: 'string' },
-                price_amount: { type: 'number' },
-                condition_label: { type: 'string' },
-                product_url: { type: 'string' },
-                availability_label: { type: 'string' },
-                notes: { type: 'string' },
-              },
-            },
-          },
-          price_summary: {
-            type: 'object',
-            properties: {
-              lowest_price: { type: 'number' },
-              median_price: { type: 'number' },
-              high_price: { type: 'number' },
-              average_price: { type: 'number' },
-              deal_score: { type: 'number' },
-              recommendation_label: { type: 'string' },
-              notes: { type: 'string' },
-            },
-          },
-        },
-      },
+      normalized_search_query: search_query_used || identified.title,
     });
 
     // Save price results
-    const listings = priceResult.listings || [];
-    for (const listing of listings.slice(0, 8)) {
+    for (const listing of (listings || []).slice(0, 10)) {
       await base44.entities.PriceResult.create({
         identified_item_id: item.id,
         source_name: listing.source_name || 'Unknown',
-        source_type: 'online_retailer',
+        source_type: listing.source_type || 'online_retailer',
         listing_title: listing.listing_title || '',
         price_amount: listing.price_amount || 0,
         currency: 'USD',
         condition_label: listing.condition_label || '',
         product_url: listing.product_url || '',
         availability_label: listing.availability_label || '',
-        confidence_score: 70,
+        confidence_score: 85,
         notes: listing.notes || '',
       });
     }
 
-    const ps = priceResult.price_summary || {};
     const obs = observedPrice ? parseFloat(observedPrice) : null;
     await base44.entities.PriceSummary.create({
       identified_item_id: item.id,
@@ -156,47 +93,20 @@ Find the best current prices available online. Return JSON with listings and pri
       high_price: ps.high_price || 0,
       average_price: ps.average_price || 0,
       observed_price: obs || undefined,
-      difference_from_observed: obs && ps.lowest_price ? obs - ps.lowest_price : undefined,
+      difference_from_observed: ps.difference_from_observed || (obs && ps.lowest_price ? obs - ps.lowest_price : undefined),
       deal_score: ps.deal_score || 50,
-      recommendation_label: ps.recommendation_label || 'Fair price',
-    });
-
-    // Value assessment
-    const valuePrompt = `Assess the value and collectibility potential of: "${item.title}" by ${item.brand || 'unknown'}.
-Category: ${item.category}. Condition: ${item.condition_guess || 'unknown'}.
-Price range: $${ps.lowest_price || 0} - $${ps.high_price || 0}.
-
-Is this item common, resellable, collectible, limited edition, vintage, rare, or worth further research?
-Be conservative. Return JSON:
-{"value_verdict":"","resale_potential_score":0,"collectible_potential_score":0,"rarity_signal_score":0,"research_recommended":false,"reasoning":[""],"cautionary_notes":""}`;
-
-    const valueResult = await base44.integrations.Core.InvokeLLM({
-      prompt: valuePrompt,
-      add_context_from_internet: true,
-      model: 'gemini_3_flash',
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          value_verdict: { type: 'string' },
-          resale_potential_score: { type: 'number' },
-          collectible_potential_score: { type: 'number' },
-          rarity_signal_score: { type: 'number' },
-          research_recommended: { type: 'boolean' },
-          reasoning: { type: 'array', items: { type: 'string' } },
-          cautionary_notes: { type: 'string' },
-        },
-      },
+      recommendation_label: ps.recommendation_label || 'Fair Price',
     });
 
     await base44.entities.ValueAssessment.create({
       identified_item_id: item.id,
-      value_verdict: valueResult.value_verdict || 'Common',
-      resale_potential_score: valueResult.resale_potential_score || 0,
-      collectible_potential_score: valueResult.collectible_potential_score || 0,
-      rarity_signal_score: valueResult.rarity_signal_score || 0,
-      research_recommended: valueResult.research_recommended || false,
-      reasoning_json: JSON.stringify(valueResult.reasoning || []),
-      cautionary_notes: valueResult.cautionary_notes || '',
+      value_verdict: va.value_verdict || 'Common',
+      resale_potential_score: va.resale_potential_score || 0,
+      collectible_potential_score: va.collectible_potential_score || 0,
+      rarity_signal_score: va.rarity_signal_score || 0,
+      research_recommended: va.research_recommended || false,
+      reasoning_json: JSON.stringify(va.reasoning || []),
+      cautionary_notes: va.cautionary_notes || '',
     });
 
     await base44.entities.ScanSession.update(session.id, { status: 'complete' });
