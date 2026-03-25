@@ -5,7 +5,15 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Scan from './pages/Scan';
+import ScanResult from './pages/ScanResult';
+import Deals from './pages/Deals';
+import Vault from './pages/Vault';
+import Profile from './pages/Profile';
+import Search from './pages/Search';
+import Premium from './pages/Premium';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +41,16 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/deals" element={<Deals />} />
+        <Route path="/vault" element={<Vault />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
+      <Route path="/scan" element={<Scan />} />
+      <Route path="/scan-result/:id" element={<ScanResult />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/premium" element={<Premium />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
