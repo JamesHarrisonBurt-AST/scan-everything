@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bell, BellOff, TrendingDown, TrendingUp, Target, ChevronRight, X, Check, Layers, Zap } from 'lucide-react';
+import { ArrowLeft, Bell, BellOff, TrendingDown, TrendingUp, Target, ChevronRight, X, Check, Layers, Zap, BarChart2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 
@@ -120,7 +120,7 @@ function ThresholdEditor({ item, watchlistItem, onSave, onClose }) {
   );
 }
 
-function TrackerCard({ watchlistItem, item, summary, onEdit, onToggle, index }) {
+function TrackerCard({ watchlistItem, item, summary, onEdit, onToggle, onTrends, index }) {
   const isUnderTarget = summary?.lowest_price && watchlistItem.target_price && summary.lowest_price <= watchlistItem.target_price;
   const priceDiff = summary?.lowest_price && watchlistItem.target_price
     ? watchlistItem.target_price - summary.lowest_price : null;
@@ -214,6 +214,13 @@ function TrackerCard({ watchlistItem, item, summary, onEdit, onToggle, index }) 
               whileTap={{ scale: 0.88 }}>
               <Target className="w-3.5 h-3.5 text-violet-400" />
             </motion.button>
+            <motion.button
+              onClick={() => onTrends(item)}
+              className="w-8 h-8 rounded-xl flex items-center justify-center"
+              style={{ background: 'hsl(190 100% 50% / 0.08)', border: '1px solid hsl(190 100% 50% / 0.2)' }}
+              whileTap={{ scale: 0.88 }}>
+              <BarChart2 className="w-3.5 h-3.5 text-cyan-400" />
+            </motion.button>
           </div>
         </div>
       </TiltCard>
@@ -247,29 +254,31 @@ export default function PriceTracker() {
     summariesAll.forEach(s => { sumMap[s.identified_item_id] = s; });
     setSummaries(sumMap);
 
-    // Browser notifications for triggered alerts
-    if ('Notification' in window && Notification.permission === 'granted') {
-      wl.forEach(w => {
-        const s = sumMap[w.identified_item_id];
-        if (w.active && s?.lowest_price && w.target_price && s.lowest_price <= w.target_price) {
-          new Notification('Price Alert! 🎯', {
-            body: `${w.item_title} dropped to $${s.lowest_price.toFixed(2)} (your target: $${w.target_price.toFixed(2)})`,
-            icon: w.item_image_url || undefined,
-          });
-        }
-        // Great deal alert
-        if (w.active && s?.deal_score >= 75 && s?.recommendation_label) {
-          const label = s.recommendation_label.toLowerCase();
-          if (label.includes('great') || label.includes('hot') || label.includes('below market')) {
-            new Notification('🔥 Great Deal Detected!', {
-              body: `${w.item_title} — Deal Score ${s.deal_score}/100: ${s.recommendation_label}`,
+    // Browser push notifications
+    if ('Notification' in window && Notification.permission !== 'denied') {
+      if (Notification.permission === 'default') await Notification.requestPermission();
+      if (Notification.permission === 'granted') {
+        wl.forEach(w => {
+          const s = sumMap[w.identified_item_id];
+          if (!w.active || !s) return;
+          // Price drop below target
+          if (s.lowest_price && w.target_price && s.lowest_price <= w.target_price) {
+            const n = new Notification('Price Alert! 🎯', {
+              body: `${w.item_title} dropped to $${s.lowest_price.toFixed(2)} (target: $${w.target_price.toFixed(2)})`,
               icon: w.item_image_url || undefined,
             });
+            n.onclick = () => { window.focus(); window.location.href = `/scan-result/${w.identified_item_id}`; };
           }
-        }
-      });
-    } else if ('Notification' in window && Notification.permission !== 'denied') {
-      Notification.requestPermission();
+          // Great deal: score > 80
+          if (s.deal_score > 80) {
+            const n = new Notification('🔥 Great Deal Detected!', {
+              body: `${w.item_title} — Deal Score ${s.deal_score}/100. Tap to view.`,
+              icon: w.item_image_url || undefined,
+            });
+            n.onclick = () => { window.focus(); window.location.href = `/scan-result/${w.identified_item_id}`; };
+          }
+        });
+      }
     }
 
     setLoading(false);
@@ -289,9 +298,7 @@ export default function PriceTracker() {
 
   const greatDeals = watchlist.filter(w => {
     const s = summaries[w.identified_item_id];
-    if (!w.active || !s) return false;
-    const label = (s.recommendation_label || '').toLowerCase();
-    return s.deal_score >= 75 && (label.includes('great') || label.includes('hot') || label.includes('below market'));
+    return w.active && s?.deal_score > 80;
   });
 
   const notTracked = allIdentified.filter(i => !watchlist.some(w => w.identified_item_id === i.id));
@@ -387,6 +394,7 @@ export default function PriceTracker() {
                   summary={summaries[w.identified_item_id]}
                   onEdit={(wItem, item) => setEditing({ watchlistItem: wItem, item })}
                   onToggle={toggleActive}
+                  onTrends={(item) => navigate(`/market-trends?id=${item?.id}`)}
                   index={i}
                 />
               ))}

@@ -18,6 +18,7 @@ import Compare from './pages/Compare';
 import PriceTracker from './pages/PriceTracker';
 import Analytics from './pages/Analytics';
 import VaultReport from './pages/VaultReport';
+import MarketTrends from './pages/MarketTrends';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
       <Route path="/price-tracker" element={<PriceTracker />} />
       <Route path="/analytics" element={<Analytics />} />
       <Route path="/vault-report" element={<VaultReport />} />
+      <Route path="/market-trends" element={<MarketTrends />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
