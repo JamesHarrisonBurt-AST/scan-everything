@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { BarChart2, TrendingUp, TrendingDown, Package, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BarChart2, TrendingUp, TrendingDown, Package, ArrowLeft, Globe, RefreshCw, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -30,6 +30,11 @@ export default function Analytics() {
   const [categoryData, setCategoryData] = useState([]);
   const [volatilityData, setVolatilityData] = useState([]);
   const [stats, setStats] = useState({ totalValue: 0, avgDeal: 0, topCategory: '', totalItems: 0 });
+  const [marketPrices, setMarketPrices] = useState([]);
+  const [marketLoading, setMarketLoading] = useState(false);
+  const [marketError, setMarketError] = useState(null);
+  const [topItems, setTopItems] = useState([]);
+  const [expandedItem, setExpandedItem] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -109,9 +114,57 @@ export default function Analytics() {
       setStats({ totalValue, avgDeal: Math.round(avgDeal), topCategory, totalItems: vault.length });
 
       setLoading(false);
+
+      // Keep top items for market price lookup
+      const top = items.slice(0, 8);
+      setTopItems(top);
     }
     load();
   }, []);
+
+  const fetchMarketPrices = async () => {
+    if (topItems.length === 0) return;
+    setMarketLoading(true);
+    setMarketError(null);
+    try {
+      const results = await Promise.all(
+        topItems.map(async (item) => {
+          const query = item.normalized_search_query || `${item.brand || ''} ${item.title}`.trim();
+          const result = await base44.integrations.Core.InvokeLLM({
+            prompt: `Search the web right now for the current market price of: "${query}". 
+Find the lowest price, highest price, and average/typical price available online today across major marketplaces (eBay, Amazon, StockX, Mercari, etc.).
+Return ONLY a JSON object with these fields:
+- lowest_price (number, USD)
+- highest_price (number, USD)  
+- average_price (number, USD)
+- best_source (string, marketplace name where lowest price found)
+- price_range_label (string, short human-readable summary like "$45 - $120")
+- last_updated (string, "today" or date)
+- hot_deal (boolean, true if lowest is significantly below average)`,
+            add_context_from_internet: true,
+            model: 'gemini_3_flash',
+            response_json_schema: {
+              type: 'object',
+              properties: {
+                lowest_price: { type: 'number' },
+                highest_price: { type: 'number' },
+                average_price: { type: 'number' },
+                best_source: { type: 'string' },
+                price_range_label: { type: 'string' },
+                last_updated: { type: 'string' },
+                hot_deal: { type: 'boolean' },
+              },
+            },
+          });
+          return { item, ...result };
+        })
+      );
+      setMarketPrices(results);
+    } catch (e) {
+      setMarketError('Failed to fetch live market prices. Try again.');
+    }
+    setMarketLoading(false);
+  };
 
   const statCards = [
     { label: 'Vault Value', value: `$${stats.totalValue.toFixed(0)}`, icon: TrendingUp, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
@@ -238,6 +291,126 @@ export default function Analytics() {
               </GlassCard>
             </motion.div>
           )}
+
+          {/* Live Market Prices via Web Search */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+            <GlassCard animate={false} className="border border-cyan-500/20">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-cyan-500/10 border border-cyan-500/20">
+                    <Globe className="w-3.5 h-3.5 text-cyan-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-semibold text-sm text-foreground">Live Market Prices</h3>
+                    <p className="text-[10px] text-muted-foreground">AI web search — real-time lowest & highest</p>
+                  </div>
+                </div>
+                <motion.button
+                  onClick={fetchMarketPrices}
+                  disabled={marketLoading || topItems.length === 0}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold"
+                  style={{ background: 'linear-gradient(135deg, hsl(190 100% 50% / 0.15), hsl(263 70% 58% / 0.1))', border: '1px solid hsl(190 100% 50% / 0.3)', color: '#00d4ff' }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <RefreshCw className={`w-3 h-3 ${marketLoading ? 'animate-spin' : ''}`} />
+                  {marketLoading ? 'Searching…' : 'Refresh'}
+                </motion.button>
+              </div>
+
+              {marketError && (
+                <p className="text-xs text-red-400 mb-3">{marketError}</p>
+              )}
+
+              {marketLoading && marketPrices.length === 0 && (
+                <div className="space-y-2">
+                  {[1,2,3].map(i => (
+                    <div key={i} className="h-14 rounded-xl animate-pulse" style={{ background: 'hsl(240 12% 10%)' }} />
+                  ))}
+                </div>
+              )}
+
+              {!marketLoading && marketPrices.length === 0 && !marketError && (
+                <div className="text-center py-6">
+                  <Globe className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-xs text-muted-foreground">Tap Refresh to fetch live prices for your scanned items</p>
+                  {topItems.length === 0 && <p className="text-xs text-muted-foreground/60 mt-1">Scan some items first</p>}
+                </div>
+              )}
+
+              {marketPrices.length > 0 && (
+                <div className="space-y-2">
+                  {marketPrices.map((entry, i) => {
+                    const isExpanded = expandedItem === i;
+                    return (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="rounded-xl overflow-hidden"
+                        style={{ background: 'hsl(240 12% 9%)', border: entry.hot_deal ? '1px solid hsl(160 84% 39% / 0.4)' : '1px solid hsl(240 10% 18%)' }}
+                      >
+                        <button
+                          className="w-full flex items-center gap-3 p-3 text-left"
+                          onClick={() => setExpandedItem(isExpanded ? null : i)}
+                        >
+                          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                            {entry.item.image_primary_url
+                              ? <img src={entry.item.image_primary_url} alt={entry.item.title} className="w-full h-full object-cover" />
+                              : <div className="w-full h-full flex items-center justify-center"><Package className="w-4 h-4 text-muted-foreground/30" /></div>
+                            }
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-foreground truncate">{entry.item.title}</p>
+                            <p className="text-[11px] font-bold text-cyan-400 mt-0.5">{entry.price_range_label || '—'}</p>
+                          </div>
+                          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                            {entry.hot_deal && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">HOT</span>
+                            )}
+                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+                          </div>
+                        </button>
+
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-3 pb-3 border-t border-border/30 pt-3 grid grid-cols-3 gap-2">
+                                <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(240 12% 12%)' }}>
+                                  <p className="text-[10px] text-muted-foreground">Lowest</p>
+                                  <p className="text-sm font-bold text-emerald-400">${entry.lowest_price?.toFixed(2) ?? '—'}</p>
+                                </div>
+                                <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(240 12% 12%)' }}>
+                                  <p className="text-[10px] text-muted-foreground">Average</p>
+                                  <p className="text-sm font-bold text-cyan-400">${entry.average_price?.toFixed(2) ?? '—'}</p>
+                                </div>
+                                <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(240 12% 12%)' }}>
+                                  <p className="text-[10px] text-muted-foreground">Highest</p>
+                                  <p className="text-sm font-bold text-violet-400">${entry.highest_price?.toFixed(2) ?? '—'}</p>
+                                </div>
+                              </div>
+                              {entry.best_source && (
+                                <div className="px-3 pb-3 flex items-center gap-1.5">
+                                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                                  <p className="text-[10px] text-muted-foreground">Best price on <span className="text-cyan-400">{entry.best_source}</span></p>
+                                </div>
+                              )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </GlassCard>
+          </motion.div>
         </div>
       )}
     </div>
