@@ -19,6 +19,9 @@ import PriceTracker from './pages/PriceTracker';
 import Analytics from './pages/Analytics';
 import VaultReport from './pages/VaultReport';
 import MarketTrends from './pages/MarketTrends';
+import BulkScan from './pages/BulkScan';
+import Community from './pages/Community';
+import SellHub from './pages/SellHub';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -57,6 +60,9 @@ const AuthenticatedApp = () => {
       <Route path="/analytics" element={<Analytics />} />
       <Route path="/vault-report" element={<VaultReport />} />
       <Route path="/market-trends" element={<MarketTrends />} />
+      <Route path="/bulk-scan" element={<BulkScan />} />
+      <Route path="/community" element={<Community />} />
+      <Route path="/sell-hub" element={<SellHub />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

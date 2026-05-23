@@ -1,20 +1,20 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ScanLine, BarChart2, Archive, User } from 'lucide-react';
+import { Home, ScanLine, Users, ShoppingBag, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const tabs = [
   { path: '/', icon: Home, label: 'Home' },
-  { path: '/analytics', icon: BarChart2, label: 'Analytics' },
+  { path: '/community', icon: Users, label: 'Community' },
   { path: '/scan', icon: ScanLine, label: 'Scan', isCenter: true },
-  { path: '/vault', icon: Archive, label: 'Vault' },
+  { path: '/sell-hub', icon: ShoppingBag, label: 'Sell' },
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
 export default function BottomTabBar() {
   const location = useLocation();
 
-  // Hide tab bar on scan result pages
-  if (location.pathname.startsWith('/scan-result')) return null;
+  // Hide tab bar on certain pages
+  if (location.pathname.startsWith('/scan-result') || location.pathname.startsWith('/bulk-scan')) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40">

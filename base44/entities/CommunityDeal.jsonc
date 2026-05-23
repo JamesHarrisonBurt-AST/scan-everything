@@ -1,0 +1,52 @@
+{
+  "name": "CommunityDeal",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "price_found": {
+      "type": "number"
+    },
+    "market_value": {
+      "type": "number"
+    },
+    "store_name": {
+      "type": "string"
+    },
+    "location_label": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "upvotes": {
+      "type": "number",
+      "default": 0
+    },
+    "poster_name": {
+      "type": "string"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "deal_score": {
+      "type": "number"
+    },
+    "tags_json": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "category",
+    "price_found"
+  ]
+}

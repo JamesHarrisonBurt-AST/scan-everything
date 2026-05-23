@@ -1,0 +1,15 @@
+{
+  "name": "CategoryFollow",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "category"
+  ]
+}

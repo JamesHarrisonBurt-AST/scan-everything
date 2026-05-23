@@ -1,17 +1,17 @@
 import { useRef } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Smartphone, ShoppingBag, Package, Cpu, Shirt, Wrench, Sparkles, Store } from 'lucide-react';
+import { Smartphone, ShoppingBag, Package, Cpu, Shirt, Wrench, Sparkles, Store, Layers } from 'lucide-react';
 
 const categories = [
-  { icon: Smartphone, label: 'Electronics', color: '#00d4ff', glow: 'hsl(190 100% 50% / 0.25)' },
-  { icon: ShoppingBag, label: 'Fashion', color: '#8b5cf6', glow: 'hsl(263 70% 58% / 0.25)' },
-  { icon: Package, label: 'Home', color: '#10b981', glow: 'hsl(160 84% 39% / 0.25)' },
-  { icon: Cpu, label: 'Tech', color: '#f59e0b', glow: 'hsl(38 92% 50% / 0.25)' },
-  { icon: Shirt, label: 'Apparel', color: '#00d4ff', glow: 'hsl(190 100% 50% / 0.25)' },
-  { icon: Wrench, label: 'Tools', color: '#8b5cf6', glow: 'hsl(263 70% 58% / 0.25)' },
-  { icon: Sparkles, label: 'Collectibles', color: '#10b981', glow: 'hsl(160 84% 39% / 0.25)' },
-  { icon: Store, label: 'Thrift', color: '#f59e0b', glow: 'hsl(38 92% 50% / 0.25)' },
+  { icon: Smartphone, label: 'Electronics', color: '#00d4ff', glow: 'hsl(190 100% 50% / 0.25)', to: '/scan?category=electronics' },
+  { icon: ShoppingBag, label: 'Fashion', color: '#8b5cf6', glow: 'hsl(263 70% 58% / 0.25)', to: '/scan?category=fashion' },
+  { icon: Package, label: 'Home', color: '#10b981', glow: 'hsl(160 84% 39% / 0.25)', to: '/scan?category=home' },
+  { icon: Cpu, label: 'Tech', color: '#f59e0b', glow: 'hsl(38 92% 50% / 0.25)', to: '/scan?category=tech' },
+  { icon: Shirt, label: 'Apparel', color: '#00d4ff', glow: 'hsl(190 100% 50% / 0.25)', to: '/scan?category=apparel' },
+  { icon: Wrench, label: 'Tools', color: '#8b5cf6', glow: 'hsl(263 70% 58% / 0.25)', to: '/scan?category=tools' },
+  { icon: Sparkles, label: 'Collectibles', color: '#10b981', glow: 'hsl(160 84% 39% / 0.25)', to: '/scan?category=collectibles' },
+  { icon: Layers, label: 'Bulk Scan', color: '#f59e0b', glow: 'hsl(38 92% 50% / 0.25)', to: '/bulk-scan' },
 ];
 
 function CategoryTile({ cat, index }) {
@@ -29,7 +29,7 @@ function CategoryTile({ cat, index }) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ delay: 0.08 + index * 0.04, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
-      <Link to={`/scan?category=${cat.label.toLowerCase()}`}>
+      <Link to={cat.to}>
         <motion.div
           ref={ref}
           onMouseMove={(e) => {
