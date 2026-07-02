@@ -21,6 +21,7 @@ import MarketTrends from './pages/MarketTrends';
 import BulkScan from './pages/BulkScan';
 import Community from './pages/Community';
 import SellHub from './pages/SellHub';
+import ARView from './pages/ARView';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -61,6 +62,7 @@ const AuthenticatedApp = () => {
       <Route path="/bulk-scan" element={<BulkScan />} />
       <Route path="/community" element={<Community />} />
       <Route path="/sell-hub" element={<SellHub />} />
+      <Route path="/ar-view" element={<ARView />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion';
-import { Heart, Eye, Bookmark, Share2, MessageSquare } from 'lucide-react';
+import { Heart, Eye, Bookmark, Share2, Box } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
 export default function ResultActions({ item, priceSummary }) {
+  const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
   const [watching, setWatching] = useState(false);
 
@@ -46,9 +48,15 @@ export default function ResultActions({ item, priceSummary }) {
     }
   };
 
+  const handleARView = () => {
+    if (!item.image_primary_url) { toast.error('No image available for AR preview'); return; }
+    navigate(`/ar-view?image=${encodeURIComponent(item.image_primary_url)}&title=${encodeURIComponent(item.title || 'Item')}`);
+  };
+
   const actions = [
     { icon: Bookmark, label: saved ? 'Saved' : 'Save', action: handleSaveToVault, active: saved },
     { icon: Eye, label: watching ? 'Watching' : 'Watch', action: handleAddToWatchlist, active: watching },
+    { icon: Box, label: 'View in AR', action: handleARView, active: false },
     { icon: Share2, label: 'Share', action: handleShare, active: false },
   ];
 

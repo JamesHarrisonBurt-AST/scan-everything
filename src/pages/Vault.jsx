@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Heart, Bell, Layers3, X, FileText } from 'lucide-react';
+import { Archive, Heart, Bell, Layers3, X, FileText, DollarSign, Clock, Tag, Box } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '../components/GlassCard';
+import SellPriorityCard from '../components/vault/SellPriorityCard';
 import { cn } from '@/lib/utils';
+
+const sortOptions = [
+  { id: 'recent', label: 'Recent', icon: Clock },
+  { id: 'profit', label: 'Profit', icon: DollarSign },
+  { id: 'category', label: 'Category', icon: Tag },
+];
 
 const filters = [
   { id: 'all', label: 'All' },
@@ -31,6 +38,7 @@ export default function Vault() {
   const [loading, setLoading] = useState(true);
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState([]);
+  const [sortBy, setSortBy] = useState('recent');
 
   useEffect(() => {
     async function load() {
@@ -57,6 +65,12 @@ export default function Vault() {
     }));
     return vaultItems.filter(v => v.status === activeFilter);
   })();
+
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    if (sortBy === 'profit') return (b.best_price_found || 0) - (a.best_price_found || 0);
+    if (sortBy === 'category') return (a.category || '').localeCompare(b.category || '');
+    return new Date(b.created_date) - new Date(a.created_date);
+  });
 
   const toggleFavorite = async (vaultItem) => {
     await base44.entities.VaultItem.update(vaultItem.id, { favorited: !vaultItem.favorited });
@@ -138,6 +152,30 @@ export default function Vault() {
         </AnimatePresence>
       </div>
 
+      {!loading && <SellPriorityCard vaultItems={vaultItems} />}
+
+      {/* Sort buttons */}
+      <div className="flex gap-2 px-4 mt-4 mb-1">
+        {sortOptions.map((s) => {
+          const Icon = s.icon;
+          const isActive = sortBy === s.id;
+          return (
+            <motion.button
+              key={s.id}
+              onClick={() => setSortBy(s.id)}
+              className="flex items-center gap-1.5 px-3 h-8 rounded-xl text-xs font-semibold"
+              style={{
+                background: isActive ? 'hsl(190 100% 50% / 0.12)' : 'hsl(240 12% 10%)',
+                border: isActive ? '1px solid hsl(190 100% 50% / 0.3)' : '1px solid hsl(240 10% 18%)',
+                color: isActive ? '#00d4ff' : 'hsl(220 10% 55%)',
+              }}
+              whileTap={{ scale: 0.94 }}>
+              <Icon className="w-3 h-3" /> {s.label}
+            </motion.button>
+          );
+        })}
+      </div>
+
       {/* Filters */}
       <div className="flex gap-2 px-4 overflow-x-auto pb-2 scrollbar-none">
         {filters.map((f) => (
@@ -162,7 +200,7 @@ export default function Vault() {
             <div key={i} className="glass-card rounded-xl h-48 animate-pulse" />
           ))}
         </div>
-      ) : filteredItems.length === 0 ? (
+      ) : sortedItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center px-8 mt-20">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
             <Archive className="w-7 h-7 text-muted-foreground/40" />
@@ -172,7 +210,7 @@ export default function Vault() {
         </div>
       ) : (
         <div className="px-4 mt-4 grid grid-cols-2 gap-3">
-          {filteredItems.map((item, i) => {
+          {sortedItems.map((item, i) => {
             const compareId = item.identified_item_id || item.id;
             const isSelected = selectedForCompare.includes(compareId);
             return (
@@ -221,13 +259,25 @@ export default function Vault() {
                             <div className="w-8 h-8 rounded bg-secondary" />
                           </div>
                         )}
-                        {item.favorited !== undefined && !compareMode && (
-                          <button
-                            onClick={(e) => { e.preventDefault(); toggleFavorite(item); }}
-                            className="absolute top-2 right-2 w-7 h-7 rounded-full glass-card flex items-center justify-center"
-                          >
-                            <Heart className={cn('w-3.5 h-3.5', item.favorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground')} />
-                          </button>
+                        {!compareMode && (
+                          <div className="absolute top-2 right-2 flex flex-col gap-1.5">
+                            {item.favorited !== undefined && (
+                              <button
+                                onClick={(e) => { e.preventDefault(); toggleFavorite(item); }}
+                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center"
+                              >
+                                <Heart className={cn('w-3.5 h-3.5', item.favorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground')} />
+                              </button>
+                            )}
+                            {item.item_image_url && (
+                              <button
+                                onClick={(e) => { e.preventDefault(); navigate(`/ar-view?image=${encodeURIComponent(item.item_image_url)}&title=${encodeURIComponent(item.item_title || 'Item')}`); }}
+                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center"
+                              >
+                                <Box className="w-3.5 h-3.5 text-muted-foreground" />
+                              </button>
+                            )}
+                          </div>
                         )}
                       </div>
                       <div className="p-3">
