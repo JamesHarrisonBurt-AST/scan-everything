@@ -1,0 +1,41 @@
+{
+  "name": "ValueAssessment",
+  "type": "object",
+  "properties": {
+    "identified_item_id": {
+      "type": "string",
+      "description": "Reference to IdentifiedItem"
+    },
+    "value_verdict": {
+      "type": "string",
+      "description": "Common, Resellable, Collectible, Limited Edition, Vintage, Rare, Research More"
+    },
+    "resale_potential_score": {
+      "type": "number",
+      "description": "0-100"
+    },
+    "collectible_potential_score": {
+      "type": "number",
+      "description": "0-100"
+    },
+    "rarity_signal_score": {
+      "type": "number",
+      "description": "0-100"
+    },
+    "research_recommended": {
+      "type": "boolean",
+      "default": false
+    },
+    "reasoning_json": {
+      "type": "string",
+      "description": "JSON array of reasoning bullets"
+    },
+    "cautionary_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "identified_item_id",
+    "value_verdict"
+  ]
+}

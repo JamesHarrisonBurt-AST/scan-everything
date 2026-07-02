@@ -45,14 +45,68 @@ export default function Scan() {
       status: 'identifying',
     });
 
-    // Call OpenAI backend — GPT-4o vision + gpt-4o-search-preview for real prices
-    const response = await base44.functions.invoke('scanProduct', {
-      image_url: imageUrl || undefined,
-      query: query || undefined,
-      observed_price: observedPrice ? parseFloat(observedPrice) : undefined,
+    // Call AI directly — vision + web search for real prices
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `You are an expert product identification and pricing AI.
+${file ? 'Analyze the attached photo of a product.' : `Analyze this product description/query: "${query}"`}
+${observedPrice ? `The user saw this item priced at $${observedPrice}.` : ''}
+
+Identify the specific product, then search the web for its current real market prices across major retailers and marketplaces (eBay, Amazon, StockX, Mercari, etc.).
+
+Return a JSON object with:
+- identified: { title, brand, model, category, subcategory, description, confidence_score (0-100), condition_guess, attributes_json (JSON string) }
+- search_query_used: string (the optimized search query you used)
+- listings: array of up to 8 objects, each { source_name, source_type ("online_retailer"|"marketplace"|"auction"|"resale"|"local"), listing_title, price_amount, condition_label, product_url, availability_label, notes }
+- price_summary: { lowest_price, median_price, high_price, average_price, deal_score (0-100), recommendation_label, difference_from_observed }
+- value_assessment: { value_verdict, resale_potential_score (0-100), collectible_potential_score (0-100), rarity_signal_score (0-100), research_recommended (boolean), reasoning (array of strings), cautionary_notes }`,
+      file_urls: file ? [imageUrl] : undefined,
+      add_context_from_internet: true,
+      model: 'gemini_3_flash',
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          identified: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' }, brand: { type: 'string' }, model: { type: 'string' },
+              category: { type: 'string' }, subcategory: { type: 'string' }, description: { type: 'string' },
+              confidence_score: { type: 'number' }, condition_guess: { type: 'string' }, attributes_json: { type: 'string' },
+            },
+          },
+          search_query_used: { type: 'string' },
+          listings: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                source_name: { type: 'string' }, source_type: { type: 'string' }, listing_title: { type: 'string' },
+                price_amount: { type: 'number' }, condition_label: { type: 'string' }, product_url: { type: 'string' },
+                availability_label: { type: 'string' }, notes: { type: 'string' },
+              },
+            },
+          },
+          price_summary: {
+            type: 'object',
+            properties: {
+              lowest_price: { type: 'number' }, median_price: { type: 'number' }, high_price: { type: 'number' },
+              average_price: { type: 'number' }, deal_score: { type: 'number' }, recommendation_label: { type: 'string' },
+              difference_from_observed: { type: 'number' },
+            },
+          },
+          value_assessment: {
+            type: 'object',
+            properties: {
+              value_verdict: { type: 'string' }, resale_potential_score: { type: 'number' },
+              collectible_potential_score: { type: 'number' }, rarity_signal_score: { type: 'number' },
+              research_recommended: { type: 'boolean' }, reasoning: { type: 'array', items: { type: 'string' } },
+              cautionary_notes: { type: 'string' },
+            },
+          },
+        },
+      },
     });
 
-    const { identified, listings, price_summary: ps, value_assessment: va, search_query_used } = response.data;
+    const { identified, listings, price_summary: ps, value_assessment: va, search_query_used } = result;
 
     // Save identified item
     const item = await base44.entities.IdentifiedItem.create({

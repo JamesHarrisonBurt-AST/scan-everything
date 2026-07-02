@@ -1,0 +1,53 @@
+{
+  "name": "VaultItem",
+  "type": "object",
+  "properties": {
+    "identified_item_id": {
+      "type": "string",
+      "description": "Reference to IdentifiedItem"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scanned",
+        "researching",
+        "bought",
+        "passed",
+        "sold",
+        "watching"
+      ],
+      "default": "scanned"
+    },
+    "tags_json": {
+      "type": "string",
+      "description": "JSON array of tags"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "favorited": {
+      "type": "boolean",
+      "default": false
+    },
+    "item_title": {
+      "type": "string",
+      "description": "Denormalized item title for quick display"
+    },
+    "item_image_url": {
+      "type": "string",
+      "description": "Denormalized image URL"
+    },
+    "best_price_found": {
+      "type": "number"
+    },
+    "value_label": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "identified_item_id"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "ScanSession",
+  "type": "object",
+  "properties": {
+    "scan_mode": {
+      "type": "string",
+      "enum": [
+        "camera",
+        "barcode",
+        "text_label",
+        "receipt",
+        "gallery_upload",
+        "manual_search"
+      ],
+      "description": "How the scan was initiated"
+    },
+    "input_source_type": {
+      "type": "string",
+      "enum": [
+        "live_camera",
+        "photo_library",
+        "typed_query",
+        "barcode_reader"
+      ],
+      "description": "Source of the scan input"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL of the scanned image"
+    },
+    "barcode_value": {
+      "type": "string",
+      "description": "Barcode value if scanned"
+    },
+    "extracted_text": {
+      "type": "string",
+      "description": "OCR-extracted text from label/receipt"
+    },
+    "raw_user_query": {
+      "type": "string",
+      "description": "Manual search query if typed"
+    },
+    "current_observed_price": {
+      "type": "number",
+      "description": "Price the user sees in store"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scanning",
+        "identifying",
+        "pricing",
+        "complete",
+        "failed"
+      ],
+      "default": "scanning"
+    }
+  },
+  "required": [
+    "scan_mode",
+    "status"
+  ]
+}
