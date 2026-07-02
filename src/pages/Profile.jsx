@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  User, ScanLine, Gem, Eye, Settings, ChevronRight, LogOut, Crown,
+  User, ScanLine, Gem, Eye, Settings, ChevronRight, LogOut, Star,
   Bell, BellOff, Check, Pencil, X, TrendingUp, Package, BarChart2,
   Calendar, ShieldCheck
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '../components/GlassCard';
+import CategoryPreferencesSheet from '../components/profile/CategoryPreferencesSheet';
 
 function EditNameSheet({ currentName, onSave, onClose }) {
   const [name, setName] = useState(currentName || '');
@@ -68,6 +69,7 @@ export default function Profile() {
   const [stats, setStats] = useState({ scans: 0, vaultItems: 0, watchlistItems: 0, greatDeals: 0, totalValue: 0 });
   const [loading, setLoading] = useState(true);
   const [editingName, setEditingName] = useState(false);
+  const [showPreferences, setShowPreferences] = useState(false);
   const [notifStatus, setNotifStatus] = useState('default');
   const [recentScans, setRecentScans] = useState([]);
 
@@ -143,8 +145,8 @@ export default function Profile() {
               </div>
               <p className="text-xs text-muted-foreground truncate mt-0.5">{user?.email || '—'}</p>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border/50">
-                  Free Tier
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  Free
                 </span>
                 {memberSince && (
                   <span className="text-[10px] text-muted-foreground flex items-center gap-1">
@@ -255,12 +257,11 @@ export default function Profile() {
       <div className="px-4 mt-5">
         <h3 className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-heading">Account</h3>
         <div className="glass-card rounded-xl divide-y divide-border/40 overflow-hidden">
-          <Link to="/premium" className="flex items-center gap-3 px-4 py-3.5">
-            <Crown className="w-4 h-4 text-amber-400" />
-            <span className="flex-1 text-sm text-foreground">Upgrade to Premium</span>
-            <span className="text-xs text-amber-400 font-semibold">Free</span>
+          <button onClick={() => setShowPreferences(true)} className="flex items-center gap-3 px-4 py-3.5 w-full text-left">
+            <Star className="w-4 h-4 text-violet-400" />
+            <span className="flex-1 text-sm text-foreground">Category Preferences</span>
             <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
-          </Link>
+          </button>
           <Link to="/analytics" className="flex items-center gap-3 px-4 py-3.5">
             <BarChart2 className="w-4 h-4 text-muted-foreground" />
             <span className="flex-1 text-sm text-foreground">Analytics</span>
@@ -272,22 +273,6 @@ export default function Profile() {
             <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
           </Link>
         </div>
-      </div>
-
-      {/* Premium banner */}
-      <div className="px-4 mt-4">
-        <Link to="/premium">
-          <motion.div className="rounded-xl p-4 relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, hsl(263 70% 20%) 0%, hsl(190 100% 15%) 100%)', border: '1px solid hsl(263 70% 40% / 0.3)' }}
-            whileTap={{ scale: 0.98 }}>
-            <motion.div className="absolute top-0 right-0 w-32 h-32 rounded-full"
-              style={{ background: 'radial-gradient(circle, hsl(190 100% 50% / 0.15) 0%, transparent 70%)' }}
-              animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 3, repeat: Infinity }} />
-            <Crown className="w-6 h-6 text-amber-400 mb-2" />
-            <p className="font-heading font-bold text-foreground text-sm">Upgrade to Premium</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Unlimited scans, deeper insights &amp; price alerts</p>
-          </motion.div>
-        </Link>
       </div>
 
       {/* Logout */}
@@ -309,6 +294,9 @@ export default function Profile() {
             onSave={(name) => { setUser(u => ({ ...u, full_name: name })); setEditingName(false); }}
             onClose={() => setEditingName(false)}
           />
+        )}
+        {showPreferences && (
+          <CategoryPreferencesSheet user={user} onClose={() => setShowPreferences(false)} />
         )}
       </AnimatePresence>
     </div>

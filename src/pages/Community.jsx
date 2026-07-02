@@ -230,8 +230,27 @@ export default function Community() {
       ]);
       setUser(me);
       setDeals(allDeals);
-      setFollowedCategories(follows.map(f => f.category));
+      const cats = follows.map(f => f.category);
+      setFollowedCategories(cats);
       setLoading(false);
+
+      // Notify about new deals in followed categories
+      if ('Notification' in window && cats.length > 0) {
+        if (Notification.permission === 'default') await Notification.requestPermission();
+        if (Notification.permission === 'granted') {
+          const seenKey = 'community_seen_deal_ids';
+          const seen = JSON.parse(localStorage.getItem(seenKey) || '[]');
+          const newMatches = allDeals.filter(d => !seen.includes(d.id) && cats.includes(d.category));
+          newMatches.forEach(d => {
+            const n = new Notification(`🔥 New ${d.category} Deal!`, {
+              body: `${d.title} — $${d.price_found?.toFixed(2)}`,
+              icon: d.image_url || undefined,
+            });
+            n.onclick = () => window.focus();
+          });
+          localStorage.setItem(seenKey, JSON.stringify(allDeals.map(d => d.id)));
+        }
+      }
     }
     load();
   }, []);

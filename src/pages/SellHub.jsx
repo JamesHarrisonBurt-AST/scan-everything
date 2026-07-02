@@ -273,64 +273,78 @@ function ListingCard({ listing, onDelete, onStatusChange }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl overflow-hidden"
-      style={{ background: 'hsl(240 12% 8%)', border: `1px solid ${st.border}` }}>
-      <div className="flex gap-3 p-4">
-        <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden flex-shrink-0">
-          {listing.image_url
-            ? <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover" />
-            : <div className="w-full h-full flex items-center justify-center"><Package className="w-5 h-5 text-muted-foreground/30" /></div>}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-sm font-bold text-foreground truncate">{listing.title}</p>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
-              style={{ background: st.bg, color: st.color, border: `1px solid ${st.border}` }}>
-              {st.label}
-            </span>
-          </div>
-          <p className="text-lg font-extrabold font-heading text-emerald-400 mt-0.5">${listing.asking_price?.toFixed(2)}</p>
-          <p className="text-[11px] text-muted-foreground capitalize">{listing.condition} condition</p>
+      className="rounded-2xl overflow-hidden flex flex-col"
+      style={{ background: 'hsl(240 12% 8%)', border: `1px solid ${st.border}`, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+
+      {/* Showcase image */}
+      <div className="w-full aspect-square relative overflow-hidden bg-muted">
+        {listing.image_url
+          ? <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover" />
+          : <div className="w-full h-full flex items-center justify-center"><Package className="w-8 h-8 text-muted-foreground/25" /></div>}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+
+        <span className="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm"
+          style={{ background: st.bg, color: st.color, border: `1px solid ${st.border}` }}>
+          {st.label}
+        </span>
+
+        <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between">
+          <p className="text-xl font-extrabold font-heading text-white drop-shadow-md">${listing.asking_price?.toFixed(2)}</p>
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize backdrop-blur-sm"
+            style={{ background: 'hsl(240 15% 6% / 0.65)', color: 'hsl(210 20% 90%)', border: '1px solid hsl(240 10% 40% / 0.4)' }}>
+            {listing.condition}
+          </span>
         </div>
       </div>
 
-      {platforms.length > 0 && (
-        <div className="px-4 pb-3 flex flex-wrap gap-1.5">
-          {platforms.map(p => {
-            const platform = PLATFORMS.find(pl => pl.name === p);
-            return (
-              <span key={p} className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                style={{ background: `${platform?.color || '#666'}15`, color: platform?.color || '#666', border: `1px solid ${platform?.color || '#666'}30` }}>
-                {p}
-              </span>
-            );
-          })}
-        </div>
-      )}
+      <div className="p-3.5 flex-1 flex flex-col">
+        <p className="text-sm font-bold text-foreground truncate">{listing.title}</p>
 
-      <div className="px-4 pb-3 flex items-center gap-2 border-t border-border/30 pt-3">
-        {listing.status !== 'sold' && (
-          <motion.button onClick={() => onStatusChange(listing, 'sold')}
-            className="flex-1 h-9 rounded-xl text-xs font-bold"
-            style={{ background: 'hsl(190 100% 50% / 0.08)', border: '1px solid hsl(190 100% 50% / 0.2)', color: '#00d4ff' }}
-            whileTap={{ scale: 0.94 }}>
-            Mark Sold
-          </motion.button>
+        {platforms.length > 0 ? (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {platforms.slice(0, 3).map(p => {
+              const platform = PLATFORMS.find(pl => pl.name === p);
+              return (
+                <span key={p} className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                  style={{ background: `${platform?.color || '#666'}15`, color: platform?.color || '#666', border: `1px solid ${platform?.color || '#666'}30` }}>
+                  {p}
+                </span>
+              );
+            })}
+            {platforms.length > 3 && (
+              <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full text-muted-foreground" style={{ background: 'hsl(240 12% 13%)' }}>
+                +{platforms.length - 3}
+              </span>
+            )}
+          </div>
+        ) : (
+          <p className="text-[10px] text-muted-foreground mt-2">Not listed anywhere yet</p>
         )}
-        {listing.status === 'draft' && (
-          <motion.button onClick={() => onStatusChange(listing, 'active')}
-            className="flex-1 h-9 rounded-xl text-xs font-bold"
-            style={{ background: 'hsl(160 84% 39% / 0.08)', border: '1px solid hsl(160 84% 39% / 0.2)', color: '#10b981' }}
-            whileTap={{ scale: 0.94 }}>
-            Activate
+
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30">
+          {listing.status !== 'sold' && (
+            <motion.button onClick={() => onStatusChange(listing, 'sold')}
+              className="flex-1 h-8 rounded-lg text-[11px] font-bold"
+              style={{ background: 'hsl(190 100% 50% / 0.08)', border: '1px solid hsl(190 100% 50% / 0.2)', color: '#00d4ff' }}
+              whileTap={{ scale: 0.94 }}>
+              Mark Sold
+            </motion.button>
+          )}
+          {listing.status === 'draft' && (
+            <motion.button onClick={() => onStatusChange(listing, 'active')}
+              className="flex-1 h-8 rounded-lg text-[11px] font-bold"
+              style={{ background: 'hsl(160 84% 39% / 0.08)', border: '1px solid hsl(160 84% 39% / 0.2)', color: '#10b981' }}
+              whileTap={{ scale: 0.94 }}>
+              Activate
+            </motion.button>
+          )}
+          <motion.button onClick={() => onDelete(listing)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ background: 'hsl(0 84% 60% / 0.08)', border: '1px solid hsl(0 84% 60% / 0.2)' }}
+            whileTap={{ scale: 0.92 }}>
+            <Trash2 className="w-3.5 h-3.5 text-red-400" />
           </motion.button>
-        )}
-        <motion.button onClick={() => onDelete(listing)}
-          className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'hsl(0 84% 60% / 0.08)', border: '1px solid hsl(0 84% 60% / 0.2)' }}
-          whileTap={{ scale: 0.92 }}>
-          <Trash2 className="w-3.5 h-3.5 text-red-400" />
-        </motion.button>
+        </div>
       </div>
     </motion.div>
   );
@@ -457,11 +471,11 @@ export default function SellHub() {
         ))}
       </div>
 
-      {/* Listings */}
-      <div className="px-4 space-y-3">
+      {/* Listings — marketplace grid */}
+      <div className="px-4">
         {loading && (
-          <div className="space-y-3">
-            {[1,2,3].map(i => <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ background: 'hsl(240 12% 10%)' }} />)}
+          <div className="grid grid-cols-2 gap-3">
+            {[1,2,3,4].map(i => <div key={i} className="aspect-square rounded-2xl animate-pulse" style={{ background: 'hsl(240 12% 10%)' }} />)}
           </div>
         )}
 
@@ -483,9 +497,13 @@ export default function SellHub() {
           </div>
         )}
 
-        {!loading && filtered.map(listing => (
-          <ListingCard key={listing.id} listing={listing} onDelete={handleDelete} onStatusChange={handleStatusChange} />
-        ))}
+        {!loading && filtered.length > 0 && (
+          <div className="grid grid-cols-2 gap-3">
+            {filtered.map(listing => (
+              <ListingCard key={listing.id} listing={listing} onDelete={handleDelete} onStatusChange={handleStatusChange} />
+            ))}
+          </div>
+        )}
       </div>
 
       <AnimatePresence>
