@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, ScanLine, Gem, Eye, Settings, ChevronRight, LogOut, Star,
   Bell, BellOff, Check, Pencil, X, TrendingUp, Package, BarChart2,
-  Calendar, ShieldCheck
+  Calendar, ShieldCheck, FileText
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -270,6 +270,23 @@ export default function Profile() {
           <Link to="/price-tracker" className="flex items-center gap-3 px-4 py-3.5">
             <Eye className="w-4 h-4 text-muted-foreground" />
             <span className="flex-1 text-sm text-foreground">Price Tracker</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Legal */}
+      <div className="px-4 mt-5">
+        <h3 className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-heading">Legal</h3>
+        <div className="glass-card rounded-xl divide-y divide-border/40 overflow-hidden">
+          <Link to="/privacy-policy" className="flex items-center gap-3 px-4 py-3.5">
+            <ShieldCheck className="w-4 h-4 text-cyan-400" />
+            <span className="flex-1 text-sm text-foreground">Privacy Policy</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+          </Link>
+          <Link to="/terms-of-use" className="flex items-center gap-3 px-4 py-3.5">
+            <FileText className="w-4 h-4 text-violet-400" />
+            <span className="flex-1 text-sm text-foreground">Terms of Use</span>
             <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
           </Link>
         </div>

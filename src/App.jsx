@@ -22,6 +22,8 @@ import BulkScan from './pages/BulkScan';
 import Community from './pages/Community';
 import SellHub from './pages/SellHub';
 import ARView from './pages/ARView';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfUse from './pages/TermsOfUse';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -63,6 +65,8 @@ const AuthenticatedApp = () => {
       <Route path="/community" element={<Community />} />
       <Route path="/sell-hub" element={<SellHub />} />
       <Route path="/ar-view" element={<ARView />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-use" element={<TermsOfUse />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
