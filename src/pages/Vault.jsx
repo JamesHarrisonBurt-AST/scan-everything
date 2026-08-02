@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '../components/GlassCard';
 import SellPriorityCard from '../components/vault/SellPriorityCard';
+import VaultDashboard from '../components/vault/VaultDashboard';
+import CompareSummaryTable from '../components/vault/CompareSummaryTable';
 import { cn } from '@/lib/utils';
 
 const sortOptions = [
@@ -152,7 +154,12 @@ export default function Vault() {
         </AnimatePresence>
       </div>
 
+      {!loading && <VaultDashboard vaultItems={vaultItems} />}
       {!loading && <SellPriorityCard vaultItems={vaultItems} />}
+
+      {compareMode && selectedForCompare.length >= 2 && (
+        <CompareSummaryTable selectedIds={selectedForCompare} vaultItems={vaultItems} />
+      )}
 
       {/* Sort buttons */}
       <div className="flex gap-2 px-4 mt-4 mb-1">
