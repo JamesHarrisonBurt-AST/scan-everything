@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Heart, Bell, Layers3, X, FileText, DollarSign, Clock, Tag, Box } from 'lucide-react';
+import { Archive, Heart, Bell, Layers3, X, FileText, DollarSign, Clock, Tag, Box, Zap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '../components/GlassCard';
 import SellPriorityCard from '../components/vault/SellPriorityCard';
 import VaultDashboard from '../components/vault/VaultDashboard';
 import CompareSummaryTable from '../components/vault/CompareSummaryTable';
+import QuickActionsSheet from '../components/vault/QuickActionsSheet';
+import VaultExportButton from '../components/vault/VaultExportButton';
 import { cn } from '@/lib/utils';
 
 const sortOptions = [
@@ -41,19 +43,38 @@ export default function Vault() {
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState([]);
   const [sortBy, setSortBy] = useState('recent');
+  const [quickActionItems, setQuickActionItems] = useState(null);
+  const pressTimerRef = useRef(null);
+  const longPressFiredRef = useRef(false);
 
-  useEffect(() => {
-    async function load() {
-      const [vault, watchlist] = await Promise.all([
-        base44.entities.VaultItem.list('-created_date', 50),
-        base44.entities.WatchlistItem.filter({ active: true }, '-created_date', 20),
-      ]);
-      setVaultItems(vault);
-      setWatchlistItems(watchlist);
-      setLoading(false);
-    }
-    load();
-  }, []);
+  const existingFolders = [...new Set(vaultItems.map(v => v.folder).filter(Boolean))];
+
+  const handlePressStart = (item) => {
+    longPressFiredRef.current = false;
+    pressTimerRef.current = setTimeout(() => {
+      longPressFiredRef.current = true;
+      setQuickActionItems([item]);
+    }, 500);
+  };
+  const handlePressEnd = () => {
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+  };
+  const handleBulkActions = () => {
+    const selected = vaultItems.filter(v => selectedForCompare.includes(v.identified_item_id || v.id));
+    setQuickActionItems(selected);
+  };
+
+  const load = async () => {
+    const [vault, watchlist] = await Promise.all([
+      base44.entities.VaultItem.list('-created_date', 50),
+      base44.entities.WatchlistItem.filter({ active: true }, '-created_date', 20),
+    ]);
+    setVaultItems(vault);
+    setWatchlistItems(watchlist);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
 
   const filteredItems = (() => {
     if (activeFilter === 'all') return vaultItems;
@@ -98,6 +119,7 @@ export default function Vault() {
             <p className="text-xs text-muted-foreground mt-0.5">Your scanned finds and watchlist</p>
           </div>
           <div className="flex gap-2 mt-1">
+            {!loading && vaultItems.length > 0 && <VaultExportButton vaultItems={vaultItems} />}
             <Link to="/price-tracker">
               <motion.div
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -127,8 +149,17 @@ export default function Vault() {
               <p className="text-xs font-medium" style={{ color: 'hsl(263 70% 70%)' }}>
                 {selectedForCompare.length}/4 selected
               </p>
-              {selectedForCompare.length >= 2 && (
+              {selectedForCompare.length >= 1 && (
                 <div className="ml-auto flex gap-2">
+                  <motion.button
+                    onClick={handleBulkActions}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold"
+                    style={{ background: 'hsl(38 92% 50% / 0.15)', color: '#fbbf24', border: '1px solid hsl(38 92% 50% / 0.3)' }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}>
+                    <Zap className="w-3 h-3" /> Quick Actions
+                  </motion.button>
                   <motion.button
                     onClick={() => navigate(`/vault-report?ids=${selectedForCompare.join(',')}`)}
                     className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold"
@@ -227,6 +258,9 @@ export default function Vault() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.06 }}
+                onPointerDown={() => !compareMode && handlePressStart(item)}
+                onPointerUp={handlePressEnd}
+                onPointerLeave={handlePressEnd}
               >
                 {compareMode && (
                   <motion.button
@@ -247,7 +281,7 @@ export default function Vault() {
 
                 <Link
                   to={compareMode ? '#' : (item.identified_item_id ? `/scan-result/${item.identified_item_id}` : '#')}
-                  onClick={compareMode ? (e) => { e.preventDefault(); toggleCompareSelect(compareId); } : undefined}
+                  onClick={compareMode ? (e) => { e.preventDefault(); toggleCompareSelect(compareId); } : (e) => { if (longPressFiredRef.current) e.preventDefault(); }}
                 >
                   <motion.div
                     animate={isSelected && compareMode ? { scale: 0.97 } : { scale: 1 }}
@@ -310,6 +344,17 @@ export default function Vault() {
           })}
         </div>
       )}
+
+      <AnimatePresence>
+        {quickActionItems && (
+          <QuickActionsSheet
+            items={quickActionItems}
+            existingFolders={existingFolders}
+            onClose={() => setQuickActionItems(null)}
+            onDone={() => { setQuickActionItems(null); load(); }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -22,6 +22,11 @@
       "type": "string",
       "description": "JSON array of tags"
     },
+    "folder": {
+      "type": "string",
+      "description": "Folder name for organization",
+      "default": ""
+    },
     "notes": {
       "type": "string"
     },
