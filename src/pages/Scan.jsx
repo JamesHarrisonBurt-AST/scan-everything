@@ -8,7 +8,6 @@ import { base44 } from '@/api/base44Client';
 import ScanModeSelector from '../components/scan/ScanModeSelector';
 import ScannerViewfinder from '../components/scan/ScannerViewfinder';
 import CameraCapture from '../components/scan/CameraCapture';
-import ShimmerLoader from '../components/ShimmerLoader';
 
 export default function Scan() {
   const navigate = useNavigate();
@@ -220,37 +219,86 @@ Return a JSON object with:
         {isProcessing ? (
           <motion.div
             key="processing"
-            className="flex flex-col items-center justify-center px-6 mt-16"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="flex flex-col items-center justify-center px-6 mt-20"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4 }}
           >
-            <motion.div
-              className="w-20 h-20 rounded-full border-2 border-cyan-500/30 flex items-center justify-center mb-6"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            >
-              <div className="w-14 h-14 rounded-full border-2 border-t-cyan-400 border-r-transparent border-b-transparent border-l-transparent animate-spin" />
-            </motion.div>
+            {/* Pulsing rings + central glow */}
+            <div className="relative w-32 h-32 flex items-center justify-center mb-8">
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{ border: '1px solid hsl(190 100% 50% / 0.3)' }}
+                animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut' }}
+              />
+              <motion.div
+                className="absolute inset-2 rounded-full"
+                style={{ border: '1px solid hsl(263 70% 58% / 0.3)' }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut', delay: 0.5 }}
+              />
+              <motion.div
+                className="w-20 h-20 rounded-full flex items-center justify-center"
+                style={{
+                  background: 'radial-gradient(circle, hsl(190 100% 50% / 0.15) 0%, hsl(263 70% 58% / 0.08) 100%)',
+                  border: '1px solid hsl(190 100% 50% / 0.25)',
+                  boxShadow: '0 0 40px hsl(190 100% 50% / 0.15), inset 0 0 20px hsl(190 100% 50% / 0.05)',
+                }}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <motion.div
+                  className="w-12 h-12 rounded-full border-2 border-cyan-400/40 border-t-cyan-400"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                />
+              </motion.div>
+            </div>
+
             <motion.p
-              className="text-sm text-foreground font-medium mb-2"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              className="text-sm font-heading font-semibold text-foreground mb-1"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
             >
-              Analyzing your scan...
+              Analyzing your scan
             </motion.p>
-            <ShimmerLoader className="w-48 mt-4" />
-            <div className="mt-6 space-y-2">
-              {['Identifying object...', 'Searching prices online...', 'Checking value potential...'].map((text, i) => (
-                <motion.p
-                  key={text}
-                  className="text-xs text-muted-foreground text-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 3 }}
+            <motion.p
+              className="text-xs text-muted-foreground mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              AI vision + live web search
+            </motion.p>
+
+            {/* Staggered step cards */}
+            <div className="space-y-2.5 w-full max-w-xs">
+              {['Identifying object', 'Searching prices online', 'Checking value potential'].map((label, i) => (
+                <motion.div
+                  key={label}
+                  className="flex items-center gap-3 px-4 py-2.5 rounded-xl"
+                  style={{ background: 'hsl(240 12% 9%)', border: '1px solid hsl(240 10% 16%)' }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 + i * 0.8, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  {text}
-                </motion.p>
+                  <motion.div
+                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'hsl(190 100% 50% / 0.1)', border: '1px solid hsl(190 100% 50% / 0.2)' }}
+                    animate={{ background: ['hsl(190 100% 50% / 0.1)', 'hsl(190 100% 50% / 0.25)', 'hsl(190 100% 50% / 0.1)'] }}
+                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }}
+                  >
+                    <motion.div
+                      className="w-2 h-2 rounded-full bg-cyan-400"
+                      animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }}
+                    />
+                  </motion.div>
+                  <span className="text-xs text-muted-foreground">{label}...</span>
+                </motion.div>
               ))}
             </div>
           </motion.div>

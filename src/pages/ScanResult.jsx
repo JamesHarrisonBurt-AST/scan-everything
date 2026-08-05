@@ -11,6 +11,7 @@ import ResultActions from '../components/result/ResultActions';
 import ListingDraftPanel from '../components/result/ListingDraftPanel';
 import ProfitCalculator from '../components/result/ProfitCalculator';
 import ShimmerLoader from '../components/ShimmerLoader';
+import DepthReveal from '../components/result/DepthReveal';
 
 export default function ScanResult() {
   const navigate = useNavigate();
@@ -99,12 +100,24 @@ export default function ScanResult() {
         </motion.div>
       )}
 
-      <PricePanel priceSummary={priceSummary} />
-      <ListingsPanel listings={listings} />
-      <ValuePanel assessment={valueAssessment} />
-      <ProfitCalculator priceSummary={priceSummary} />
-      <ListingDraftPanel item={item} priceSummary={priceSummary} assessment={valueAssessment} />
-      <ResultActions item={item} priceSummary={priceSummary} />
+      <DepthReveal delay={0.4}>
+        <PricePanel priceSummary={priceSummary} />
+      </DepthReveal>
+      <DepthReveal delay={0.5}>
+        <ListingsPanel listings={listings} />
+      </DepthReveal>
+      <DepthReveal delay={0.6}>
+        <ValuePanel assessment={valueAssessment} />
+      </DepthReveal>
+      <DepthReveal delay={0.7}>
+        <ProfitCalculator priceSummary={priceSummary} />
+      </DepthReveal>
+      <DepthReveal delay={0.8}>
+        <ListingDraftPanel item={item} priceSummary={priceSummary} assessment={valueAssessment} />
+      </DepthReveal>
+      <DepthReveal delay={0.9}>
+        <ResultActions item={item} priceSummary={priceSummary} />
+      </DepthReveal>
     </div>
   );
 }
