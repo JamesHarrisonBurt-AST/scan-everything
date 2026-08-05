@@ -274,14 +274,14 @@ function ListingCard({ listing, onDelete, onStatusChange }) {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl overflow-hidden flex flex-col"
-      style={{ background: 'hsl(240 12% 8%)', border: `1px solid ${st.border}`, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+      style={{ background: 'hsl(240 12% 8%)', border: `1px solid ${st.border}`, boxShadow: '0 12px 36px rgba(0,0,0,0.45), inset 0 1px 0 hsl(240 10% 20% / 0.3)' }}>
 
       {/* Showcase image */}
-      <div className="w-full aspect-square relative overflow-hidden bg-muted">
+      <div className="w-full aspect-[4/5] relative overflow-hidden bg-muted">
         {listing.image_url
           ? <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover" />
           : <div className="w-full h-full flex items-center justify-center"><Package className="w-8 h-8 text-muted-foreground/25" /></div>}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 45%, transparent 70%)' }} />
 
         <span className="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm"
           style={{ background: st.bg, color: st.color, border: `1px solid ${st.border}` }}>
@@ -289,7 +289,10 @@ function ListingCard({ listing, onDelete, onStatusChange }) {
         </span>
 
         <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between">
-          <p className="text-xl font-extrabold font-heading text-white drop-shadow-md">${listing.asking_price?.toFixed(2)}</p>
+          <div className="flex flex-col">
+            <span className="text-[9px] text-white/60 uppercase tracking-wider">Price</span>
+            <p className="text-2xl font-extrabold font-heading text-white drop-shadow-md leading-none">${listing.asking_price?.toFixed(2)}</p>
+          </div>
           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize backdrop-blur-sm"
             style={{ background: 'hsl(240 15% 6% / 0.65)', color: 'hsl(210 20% 90%)', border: '1px solid hsl(240 10% 40% / 0.4)' }}>
             {listing.condition}

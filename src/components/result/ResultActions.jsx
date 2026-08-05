@@ -1,14 +1,17 @@
 import { motion } from 'framer-motion';
-import { Heart, Eye, Bookmark, Share2, Box } from 'lucide-react';
+import { Heart, Eye, Bookmark, Share2, Box, Link2, ImageDown } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import ShareCardModal from './ShareCard';
 
 export default function ResultActions({ item, priceSummary }) {
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
   const [watching, setWatching] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleSaveToVault = async () => {
     await base44.entities.VaultItem.create({
@@ -46,6 +49,14 @@ export default function ResultActions({ item, priceSummary }) {
       await navigator.clipboard.writeText(text);
       toast.success('Copied to clipboard');
     }
+  };
+
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}/scan-result/${item.id}`;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast.success('Direct link copied to clipboard');
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleARView = () => {
@@ -87,6 +98,31 @@ export default function ResultActions({ item, priceSummary }) {
           );
         })}
       </div>
+
+      {/* Share row */}
+      <div className="flex gap-2 mt-2">
+        <motion.button
+          onClick={handleCopyLink}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl glass-card"
+          whileTap={{ scale: 0.97 }}
+        >
+          <Link2 className={`w-4 h-4 ${copied ? 'text-emerald-400' : 'text-muted-foreground'}`} />
+          <span className="text-xs text-muted-foreground">{copied ? 'Link Copied!' : 'Copy Direct Link'}</span>
+        </motion.button>
+        <motion.button
+          onClick={() => setShowShareCard(true)}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl"
+          style={{ background: 'linear-gradient(135deg, hsl(263 70% 58% / 0.15), hsl(190 100% 50% / 0.08))', border: '1px solid hsl(263 70% 58% / 0.25)' }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <ImageDown className="w-4 h-4 text-violet-400" />
+          <span className="text-xs text-violet-400 font-medium">Share Image Card</span>
+        </motion.button>
+      </div>
+
+      {showShareCard && (
+        <ShareCardModal item={item} priceSummary={priceSummary} onClose={() => setShowShareCard(false)} />
+      )}
     </div>
   );
 }
