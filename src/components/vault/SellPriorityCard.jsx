@@ -30,7 +30,7 @@ export default function SellPriorityCard({ vaultItems }) {
         let reason = 'Steady resale demand';
         if (resale > 75) reason = 'High resale potential right now';
         else if (dealScore > 75) reason = 'Bought well below market value';
-        else if (rarity > 70) reason = 'Rare — collectors paying premium';
+        else if (rarity > 70) reason = 'Rare — collectors paying top dollar';
         return { ...v, sellScore, reason, price: s?.lowest_price ?? v.best_price_found };
       }).sort((a, b) => b.sellScore - a.sellScore).slice(0, 5);
 
