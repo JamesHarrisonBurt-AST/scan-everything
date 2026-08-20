@@ -90,8 +90,16 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html, body, #root {
+    overscroll-behavior-y: none;
+  }
   body {
     @apply bg-background text-foreground;
+  }
+  button, a, [role="button"], .touch-target {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const PLATFORMS = [
   { name: 'eBay', color: '#0064d2', hint: 'Best for electronics & collectibles' },
@@ -194,11 +195,17 @@ function ListingForm({ vaultItems, onClose, onSaved }) {
                     className="w-full pl-8 pr-3 py-3 rounded-xl text-sm text-foreground outline-none"
                     style={{ background: 'hsl(240 12% 10%)', border: '1px solid hsl(240 10% 18%)' }} />
                 </div>
-                <select value={form.condition} onChange={e => setForm(f => ({ ...f, condition: e.target.value }))}
-                  className="px-4 py-3 rounded-xl text-sm text-foreground outline-none capitalize"
-                  style={{ background: 'hsl(240 12% 10%)', border: '1px solid hsl(240 10% 18%)' }}>
-                  {CONDITIONS.map(c => <option key={c} value={c} className="bg-background capitalize">{c}</option>)}
-                </select>
+                <Select value={form.condition} onValueChange={(v) => setForm(f => ({ ...f, condition: v }))}>
+                  <SelectTrigger className="px-4 py-3 rounded-xl text-sm text-foreground outline-none capitalize h-12"
+                    style={{ background: 'hsl(240 12% 10%)', border: '1px solid hsl(240 10% 18%)' }}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent style={{ background: 'hsl(240 14% 10%)', border: '1px solid hsl(240 10% 20%)' }}>
+                    {CONDITIONS.map(c => (
+                      <SelectItem key={c} value={c} className="capitalize text-foreground focus:bg-violet-500/15 focus:text-violet-300">{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <motion.button onClick={() => setStep(3)}

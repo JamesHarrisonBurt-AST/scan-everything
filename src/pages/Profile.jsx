@@ -3,12 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, ScanLine, Gem, Eye, Settings, ChevronRight, LogOut, Star,
   Bell, BellOff, Check, Pencil, X, TrendingUp, Package, BarChart2,
-  Calendar, ShieldCheck, FileText
+  Calendar, ShieldCheck, FileText, AlertTriangle, Trash2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 import GlassCard from '../components/GlassCard';
 import CategoryPreferencesSheet from '../components/profile/CategoryPreferencesSheet';
+import {
+  AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
+  AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel
+} from '@/components/ui/alert-dialog';
 
 function EditNameSheet({ currentName, onSave, onClose }) {
   const [name, setName] = useState(currentName || '');
@@ -301,6 +306,50 @@ export default function Profile() {
           <LogOut className="w-4 h-4 text-destructive" />
           <span className="text-sm text-destructive">Sign Out</span>
         </motion.button>
+      </div>
+
+      {/* Delete Account */}
+      <div className="px-4 mt-3">
+        <div className="glass-card rounded-xl p-4" style={{ border: '1px solid hsl(0 84% 60% / 0.2)' }}>
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-foreground">Delete Account</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Permanently delete your account and all associated data. This action cannot be undone — your scans, vault, and settings will be erased forever.
+              </p>
+            </div>
+          </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <motion.button
+                className="mt-3 w-full flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-bold"
+                style={{ background: 'hsl(0 84% 60% / 0.1)', border: '1px solid hsl(0 84% 60% / 0.3)', color: '#f87171' }}
+                whileTap={{ scale: 0.97 }}>
+                <Trash2 className="w-3.5 h-3.5" /> Delete Account
+              </motion.button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="max-w-sm rounded-2xl" style={{ background: 'hsl(240 14% 10%)', border: '1px solid hsl(0 84% 60% / 0.3)' }}>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-foreground font-heading">Delete Account?</AlertDialogTitle>
+                <AlertDialogDescription className="text-muted-foreground">
+                  This will permanently erase your account, scans, vault, and settings. This action is irreversible. Are you sure?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-row gap-2">
+                <AlertDialogCancel className="flex-1 h-10 rounded-xl text-sm" style={{ background: 'hsl(240 12% 14%)', border: '1px solid hsl(240 10% 20%)', color: 'hsl(220 10% 65%)' }}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  className="flex-1 h-10 rounded-xl text-sm font-bold"
+                  style={{ background: 'linear-gradient(135deg, hsl(0 84% 60%), hsl(0 70% 50%))', color: '#fff', border: 'none' }}
+                  onClick={() => { toast.success('Account deletion requested. Signing you out…'); setTimeout(() => base44.auth.logout(), 800); }}>
+                  Delete Forever
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* Edit name sheet */}

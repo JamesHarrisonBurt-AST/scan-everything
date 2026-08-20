@@ -96,8 +96,13 @@ export default function Vault() {
   });
 
   const toggleFavorite = async (vaultItem) => {
-    await base44.entities.VaultItem.update(vaultItem.id, { favorited: !vaultItem.favorited });
+    const prevItems = vaultItems;
     setVaultItems(prev => prev.map(v => v.id === vaultItem.id ? { ...v, favorited: !v.favorited } : v));
+    try {
+      await base44.entities.VaultItem.update(vaultItem.id, { favorited: !vaultItem.favorited });
+    } catch {
+      setVaultItems(prevItems);
+    }
   };
 
   const toggleCompareSelect = (id) => {

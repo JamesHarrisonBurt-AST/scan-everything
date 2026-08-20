@@ -268,8 +268,13 @@ export default function Community() {
   };
 
   const handleUpvote = async (deal) => {
-    await base44.entities.CommunityDeal.update(deal.id, { upvotes: (deal.upvotes || 0) + 1 });
+    const prevDeals = deals;
     setDeals(prev => prev.map(d => d.id === deal.id ? { ...d, upvotes: (d.upvotes || 0) + 1 } : d));
+    try {
+      await base44.entities.CommunityDeal.update(deal.id, { upvotes: (deal.upvotes || 0) + 1 });
+    } catch {
+      setDeals(prevDeals);
+    }
   };
 
   const filtered = deals.filter(d => {

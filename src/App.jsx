@@ -52,6 +52,8 @@ const AuthenticatedApp = () => {
         <Route path="/deals" element={<Deals />} />
         <Route path="/vault" element={<Vault />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/sell-hub" element={<SellHub />} />
       </Route>
       <Route path="/scan" element={<Scan />} />
       <Route path="/scan-result/:id" element={<ScanResult />} />
@@ -62,8 +64,6 @@ const AuthenticatedApp = () => {
       <Route path="/vault-report" element={<VaultReport />} />
       <Route path="/market-trends" element={<MarketTrends />} />
       <Route path="/bulk-scan" element={<BulkScan />} />
-      <Route path="/community" element={<Community />} />
-      <Route path="/sell-hub" element={<SellHub />} />
       <Route path="/ar-view" element={<ARView />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-use" element={<TermsOfUse />} />
