@@ -111,7 +111,7 @@ Return JSON:
     "high_price": 0.00,
     "average_price": 0.00,
     "deal_score": 0-100,
-    "recommendation_label": "Great Deal/Good Price/Fair Price/Overpriced/Premium Item",
+    "recommendation_label": "Great Deal/Good Price/Fair Price/Overpriced/High-Value Item",
     "market_notes": "brief market insight"
   },
   "value_assessment": {
