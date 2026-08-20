@@ -5,6 +5,7 @@ import {
   X, Check, Star, ChevronDown, Sparkles, Package
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PullToRefresh from '../components/PullToRefresh';
 
 const CATEGORIES = ['All', 'Electronics', 'Clothing', 'Shoes', 'Toys', 'Books', 'Collectibles', 'Furniture', 'Sports', 'Tools'];
 
@@ -221,39 +222,38 @@ export default function Community() {
   const [user, setUser] = useState(null);
   const [showFollowedOnly, setShowFollowedOnly] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      const [me, allDeals, follows] = await Promise.all([
-        base44.auth.me(),
-        base44.entities.CommunityDeal.list('-upvotes', 50),
-        base44.entities.CategoryFollow.list(),
-      ]);
-      setUser(me);
-      setDeals(allDeals);
-      const cats = follows.map(f => f.category);
-      setFollowedCategories(cats);
-      setLoading(false);
+  const load = async () => {
+    const [me, allDeals, follows] = await Promise.all([
+      base44.auth.me(),
+      base44.entities.CommunityDeal.list('-upvotes', 50),
+      base44.entities.CategoryFollow.list(),
+    ]);
+    setUser(me);
+    setDeals(allDeals);
+    const cats = follows.map(f => f.category);
+    setFollowedCategories(cats);
+    setLoading(false);
 
-      // Notify about new deals in followed categories
-      if ('Notification' in window && cats.length > 0) {
-        if (Notification.permission === 'default') await Notification.requestPermission();
-        if (Notification.permission === 'granted') {
-          const seenKey = 'community_seen_deal_ids';
-          const seen = JSON.parse(localStorage.getItem(seenKey) || '[]');
-          const newMatches = allDeals.filter(d => !seen.includes(d.id) && cats.includes(d.category));
-          newMatches.forEach(d => {
-            const n = new Notification(`🔥 New ${d.category} Deal!`, {
-              body: `${d.title} — $${d.price_found?.toFixed(2)}`,
-              icon: d.image_url || undefined,
-            });
-            n.onclick = () => window.focus();
+    // Notify about new deals in followed categories
+    if ('Notification' in window && cats.length > 0) {
+      if (Notification.permission === 'default') await Notification.requestPermission();
+      if (Notification.permission === 'granted') {
+        const seenKey = 'community_seen_deal_ids';
+        const seen = JSON.parse(localStorage.getItem(seenKey) || '[]');
+        const newMatches = allDeals.filter(d => !seen.includes(d.id) && cats.includes(d.category));
+        newMatches.forEach(d => {
+          const n = new Notification(`🔥 New ${d.category} Deal!`, {
+            body: `${d.title} — $${d.price_found?.toFixed(2)}`,
+            icon: d.image_url || undefined,
           });
-          localStorage.setItem(seenKey, JSON.stringify(allDeals.map(d => d.id)));
-        }
+          n.onclick = () => window.focus();
+        });
+        localStorage.setItem(seenKey, JSON.stringify(allDeals.map(d => d.id)));
       }
     }
-    load();
-  }, []);
+  };
+
+  useEffect(() => { load(); }, []);
 
   const toggleFollow = async (cat) => {
     if (cat === 'All') return;
@@ -284,6 +284,8 @@ export default function Community() {
   });
 
   return (
+    <>
+    <PullToRefresh onRefresh={load}>
     <div className="min-h-screen pb-28" style={{ background: 'hsl(240 15% 4%)' }}>
       {/* Header */}
       <div className="px-4 pb-3 pt-safe-12">
@@ -373,19 +375,21 @@ export default function Community() {
         ))}
       </div>
 
-      <AnimatePresence>
-        {showPost && (
-          <PostDealSheet
-            user={user}
-            onClose={() => setShowPost(false)}
-            onPosted={async () => {
-              setShowPost(false);
-              const fresh = await base44.entities.CommunityDeal.list('-upvotes', 50);
-              setDeals(fresh);
-            }}
-          />
-        )}
-      </AnimatePresence>
     </div>
+    </PullToRefresh>
+    <AnimatePresence>
+      {showPost && (
+        <PostDealSheet
+          user={user}
+          onClose={() => setShowPost(false)}
+          onPosted={async () => {
+            setShowPost(false);
+            const fresh = await base44.entities.CommunityDeal.list('-upvotes', 50);
+            setDeals(fresh);
+          }}
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }

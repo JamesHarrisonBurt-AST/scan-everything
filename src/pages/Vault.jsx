@@ -9,6 +9,7 @@ import VaultDashboard from '../components/vault/VaultDashboard';
 import CompareSummaryTable from '../components/vault/CompareSummaryTable';
 import QuickActionsSheet from '../components/vault/QuickActionsSheet';
 import VaultExportButton from '../components/vault/VaultExportButton';
+import PullToRefresh from '../components/PullToRefresh';
 import { cn } from '@/lib/utils';
 
 const sortOptions = [
@@ -112,6 +113,8 @@ export default function Vault() {
   };
 
   return (
+    <>
+    <PullToRefresh onRefresh={load}>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="px-4 pb-3 pt-safe-12">
@@ -350,16 +353,18 @@ export default function Vault() {
         </div>
       )}
 
-      <AnimatePresence>
-        {quickActionItems && (
-          <QuickActionsSheet
-            items={quickActionItems}
-            existingFolders={existingFolders}
-            onClose={() => setQuickActionItems(null)}
-            onDone={() => { setQuickActionItems(null); load(); }}
-          />
-        )}
-      </AnimatePresence>
     </div>
+    </PullToRefresh>
+    <AnimatePresence>
+      {quickActionItems && (
+        <QuickActionsSheet
+          items={quickActionItems}
+          existingFolders={existingFolders}
+          onClose={() => setQuickActionItems(null)}
+          onDone={() => { setQuickActionItems(null); load(); }}
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }

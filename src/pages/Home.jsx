@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
+import PullToRefresh from '../components/PullToRefresh';
 import HeroScanner from '../components/home/HeroScanner';
 import RecentScansCarousel from '../components/home/RecentScansCarousel';
 import InsightCards from '../components/home/InsightCards';
@@ -13,11 +14,14 @@ export default function Home() {
   });
   const [recentItems, setRecentItems] = useState([]);
 
-  useEffect(() => {
-    base44.entities.IdentifiedItem.list('-created_date', 10)
-      .then(setRecentItems)
-      .catch(() => {});
-  }, []);
+  const loadRecent = async () => {
+    try {
+      const items = await base44.entities.IdentifiedItem.list('-created_date', 10);
+      setRecentItems(items);
+    } catch {}
+  };
+
+  useEffect(() => { loadRecent(); }, []);
 
   const handleSplashComplete = () => {
     sessionStorage.setItem('splash_shown', 'true');
@@ -28,6 +32,7 @@ export default function Home() {
     <>
       {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
 
+      <PullToRefresh onRefresh={loadRecent}>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: showSplash ? 0 : 1 }}
@@ -89,6 +94,7 @@ export default function Home() {
           <div className="h-6" />
         </div>
       </motion.div>
+      </PullToRefresh>
     </>
   );
 }

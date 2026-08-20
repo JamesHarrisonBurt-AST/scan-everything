@@ -1,34 +1,88 @@
+import { Suspense, lazy } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import Scan from './pages/Scan';
-import ScanResult from './pages/ScanResult';
-import Deals from './pages/Deals';
-import Vault from './pages/Vault';
-import Profile from './pages/Profile';
-import Search from './pages/Search';
-import Compare from './pages/Compare';
-import PriceTracker from './pages/PriceTracker';
-import Analytics from './pages/Analytics';
-import VaultReport from './pages/VaultReport';
-import MarketTrends from './pages/MarketTrends';
-import BulkScan from './pages/BulkScan';
-import Community from './pages/Community';
-import SellHub from './pages/SellHub';
-import ARView from './pages/ARView';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsOfUse from './pages/TermsOfUse';
+
+// Lazy load all pages for code splitting
+const ScanResult = lazy(() => import('./pages/ScanResult'));
+const Deals = lazy(() => import('./pages/Deals'));
+const Vault = lazy(() => import('./pages/Vault'));
+const Search = lazy(() => import('./pages/Search'));
+const Compare = lazy(() => import('./pages/Compare'));
+const PriceTracker = lazy(() => import('./pages/PriceTracker'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const VaultReport = lazy(() => import('./pages/VaultReport'));
+const MarketTrends = lazy(() => import('./pages/MarketTrends'));
+const BulkScan = lazy(() => import('./pages/BulkScan'));
+const ARView = lazy(() => import('./pages/ARView'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
+
+const PageLoader = () => (
+  <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'hsl(240 15% 4%)' }}>
+    <div className="w-8 h-8 border-4 border-cyan-500/20 border-t-cyan-400 rounded-full animate-spin"></div>
+  </div>
+);
+
+const PageMotion = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -20 }}
+    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+  >
+    {children}
+  </motion.div>
+);
+
+const LazyRoute = ({ children }) => (
+  <Suspense fallback={<PageLoader />}>
+    <PageMotion>{children}</PageMotion>
+  </Suspense>
+);
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route element={<Layout />}>
+          {/* Tab paths render empty — TabKeepAlive in Layout handles them */}
+          <Route index element={<></>} />
+          <Route path="community" element={<></>} />
+          <Route path="scan" element={<></>} />
+          <Route path="sell-hub" element={<></>} />
+          <Route path="profile" element={<></>} />
+          {/* Non-tab pages */}
+          <Route path="deals" element={<LazyRoute><Deals /></LazyRoute>} />
+          <Route path="vault" element={<LazyRoute><Vault /></LazyRoute>} />
+        </Route>
+        <Route path="/scan-result/:id" element={<LazyRoute><ScanResult /></LazyRoute>} />
+        <Route path="/search" element={<LazyRoute><Search /></LazyRoute>} />
+        <Route path="/compare" element={<LazyRoute><Compare /></LazyRoute>} />
+        <Route path="/price-tracker" element={<LazyRoute><PriceTracker /></LazyRoute>} />
+        <Route path="/analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
+        <Route path="/vault-report" element={<LazyRoute><VaultReport /></LazyRoute>} />
+        <Route path="/market-trends" element={<LazyRoute><MarketTrends /></LazyRoute>} />
+        <Route path="/bulk-scan" element={<LazyRoute><BulkScan /></LazyRoute>} />
+        <Route path="/ar-view" element={<LazyRoute><ARView /></LazyRoute>} />
+        <Route path="/privacy-policy" element={<LazyRoute><PrivacyPolicy /></LazyRoute>} />
+        <Route path="/terms-of-use" element={<LazyRoute><TermsOfUse /></LazyRoute>} />
+        <Route path="*" element={<LazyRoute><PageNotFound /></LazyRoute>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
@@ -37,44 +91,16 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     }
   }
 
-  // Render the main app
-  return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/deals" element={<Deals />} />
-        <Route path="/vault" element={<Vault />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/sell-hub" element={<SellHub />} />
-      </Route>
-      <Route path="/scan" element={<Scan />} />
-      <Route path="/scan-result/:id" element={<ScanResult />} />
-      <Route path="/search" element={<Search />} />
-      <Route path="/compare" element={<Compare />} />
-      <Route path="/price-tracker" element={<PriceTracker />} />
-      <Route path="/analytics" element={<Analytics />} />
-      <Route path="/vault-report" element={<VaultReport />} />
-      <Route path="/market-trends" element={<MarketTrends />} />
-      <Route path="/bulk-scan" element={<BulkScan />} />
-      <Route path="/ar-view" element={<ARView />} />
-      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-      <Route path="/terms-of-use" element={<TermsOfUse />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
-  );
+  return <AnimatedRoutes />;
 };
 
-
 function App() {
-
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
@@ -84,7 +110,7 @@ function App() {
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>
-  )
+  );
 }
 
 export default App

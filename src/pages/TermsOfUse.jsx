@@ -1,9 +1,15 @@
-import { FileText } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { FileText, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function TermsOfUse() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background">
+      <button onClick={() => navigate(-1)}
+        className="fixed left-4 z-30 w-11 h-11 rounded-full glass-card flex items-center justify-center"
+        style={{ top: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}>
+        <ArrowLeft className="w-4 h-4 text-foreground" />
+      </button>
       <div className="max-w-2xl mx-auto px-4 py-12 pt-safe-12">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'hsl(263 70% 58% / 0.1)', border: '1px solid hsl(263 70% 58% / 0.25)' }}>

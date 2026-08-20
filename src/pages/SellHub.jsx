@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShoppingBag, Plus, X, Check, DollarSign, Eye, Archive,
-  ExternalLink, Trash2, Package, Tag, ChevronRight, Zap, Camera
+  ExternalLink, Trash2, Package, Tag, ChevronRight, Zap, Camera, ChevronDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import PullToRefresh from '../components/PullToRefresh';
 
 const PLATFORMS = [
   { name: 'eBay', color: '#0064d2', hint: 'Best for electronics & collectibles' },
@@ -37,6 +38,7 @@ function ListingForm({ vaultItems, onClose, onSaved }) {
   const [imagePreview, setImagePreview] = useState(null);
   const [saving, setSaving] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [conditionDrawerOpen, setConditionDrawerOpen] = useState(false);
 
   const pickVaultItem = (v) => {
     setSelectedVaultItem(v);
@@ -195,17 +197,35 @@ function ListingForm({ vaultItems, onClose, onSaved }) {
                     className="w-full pl-8 pr-3 py-3 rounded-xl text-sm text-foreground outline-none"
                     style={{ background: 'hsl(240 12% 10%)', border: '1px solid hsl(240 10% 18%)' }} />
                 </div>
-                <Select value={form.condition} onValueChange={(v) => setForm(f => ({ ...f, condition: v }))}>
-                  <SelectTrigger className="px-4 py-3 rounded-xl text-sm text-foreground outline-none capitalize h-12"
+                <div>
+                  <button type="button" onClick={() => setConditionDrawerOpen(true)}
+                    className="w-full px-4 py-3 rounded-xl text-sm text-foreground outline-none capitalize flex items-center justify-between h-12"
                     style={{ background: 'hsl(240 12% 10%)', border: '1px solid hsl(240 10% 18%)' }}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent style={{ background: 'hsl(240 14% 10%)', border: '1px solid hsl(240 10% 20%)' }}>
-                    {CONDITIONS.map(c => (
-                      <SelectItem key={c} value={c} className="capitalize text-foreground focus:bg-violet-500/15 focus:text-violet-300">{c}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    {form.condition}
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  <Drawer open={conditionDrawerOpen} onOpenChange={setConditionDrawerOpen}>
+                    <DrawerContent style={{ background: 'hsl(240 14% 9%)', border: '1px solid hsl(240 10% 20%)' }}>
+                      <DrawerHeader>
+                        <DrawerTitle className="text-foreground font-heading">Condition</DrawerTitle>
+                      </DrawerHeader>
+                      <div className="px-4 pb-8 space-y-2">
+                        {CONDITIONS.map(c => (
+                          <button key={c} type="button"
+                            onClick={() => { setForm(f => ({ ...f, condition: c })); setConditionDrawerOpen(false); }}
+                            className="w-full p-3 rounded-xl text-left capitalize text-sm"
+                            style={{
+                              background: form.condition === c ? 'hsl(190 100% 50% / 0.12)' : 'hsl(240 12% 10%)',
+                              border: form.condition === c ? '1px solid hsl(190 100% 50% / 0.3)' : '1px solid hsl(240 10% 18%)',
+                              color: form.condition === c ? '#00d4ff' : 'hsl(220 10% 65%)',
+                            }}>
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                </div>
               </div>
 
               <motion.button onClick={() => setStep(3)}
@@ -391,8 +411,13 @@ export default function SellHub() {
   };
 
   const handleStatusChange = async (listing, status) => {
-    await base44.entities.SellListing.update(listing.id, { status });
+    const prev = listings;
     setListings(prev => prev.map(l => l.id === listing.id ? { ...l, status } : l));
+    try {
+      await base44.entities.SellListing.update(listing.id, { status });
+    } catch {
+      setListings(prev);
+    }
   };
 
   const TABS = [
@@ -406,6 +431,8 @@ export default function SellHub() {
   const totalSold = listings.filter(l => l.status === 'sold').reduce((acc, l) => acc + (l.asking_price || 0), 0);
 
   return (
+    <>
+    <PullToRefresh onRefresh={reload}>
     <div className="min-h-screen pb-28" style={{ background: 'hsl(240 15% 4%)' }}>
       {/* Header */}
       <div className="px-4 pb-3 pt-safe-12">
@@ -516,15 +543,17 @@ export default function SellHub() {
         )}
       </div>
 
-      <AnimatePresence>
-        {showForm && (
-          <ListingForm
-            vaultItems={vaultItems}
-            onClose={() => setShowForm(false)}
-            onSaved={() => { setShowForm(false); reload(); }}
-          />
-        )}
-      </AnimatePresence>
     </div>
+    </PullToRefresh>
+    <AnimatePresence>
+      {showForm && (
+        <ListingForm
+          vaultItems={vaultItems}
+          onClose={() => setShowForm(false)}
+          onSaved={() => { setShowForm(false); reload(); }}
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }

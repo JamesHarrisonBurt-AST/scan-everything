@@ -142,10 +142,10 @@ export default function Profile() {
                 </p>
                 <motion.button
                   onClick={() => setEditingName(true)}
-                  className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                  className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{ background: 'hsl(240 12% 14%)', border: '1px solid hsl(240 10% 22%)' }}
                   whileTap={{ scale: 0.88 }}>
-                  <Pencil className="w-3 h-3 text-muted-foreground" />
+                  <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
                 </motion.button>
               </div>
               <p className="text-xs text-muted-foreground truncate mt-0.5">{user?.email || '—'}</p>
