@@ -127,7 +127,7 @@ export default function HeroScanner() {
                       />
                       <Icon className="w-5 h-5 relative z-10" style={{ color: action.color }} />
                     </div>
-                    <span className="text-[10px] font-medium" style={{ color: 'hsl(220 10% 60%)' }}>{action.label}</span>
+                    <span className="text-[11px] font-medium" style={{ color: 'hsl(220 10% 60%)' }}>{action.label}</span>
                   </motion.div>
                 </Link>
               );

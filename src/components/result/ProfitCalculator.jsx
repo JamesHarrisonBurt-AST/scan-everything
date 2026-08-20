@@ -41,7 +41,7 @@ export default function ProfitCalculator({ priceSummary }) {
 
   const field = (label, value, onChange, prefix = '$', type = 'number') => (
     <div>
-      <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">{label}</p>
+      <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5">{label}</p>
       <div className="flex items-center gap-2 rounded-xl px-3 py-2.5" style={{ background: 'hsl(240 12% 9%)', border: '1px solid hsl(240 10% 20%)' }}>
         {prefix && <span className="text-sm font-bold text-muted-foreground">{prefix}</span>}
         <input
@@ -65,7 +65,7 @@ export default function ProfitCalculator({ priceSummary }) {
             </div>
             <div className="text-left">
               <p className="text-sm font-heading font-semibold text-foreground">Profit Calculator</p>
-              <p className="text-[10px] text-muted-foreground">Net margin after fees & shipping</p>
+              <p className="text-[11px] text-muted-foreground">Net margin after fees & shipping</p>
             </div>
           </div>
           {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -90,7 +90,7 @@ export default function ProfitCalculator({ priceSummary }) {
 
                 {/* Platform selector */}
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">Platform & Fee</p>
+                  <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5">Platform & Fee</p>
                   <div className="flex flex-wrap gap-1.5">
                     {Object.keys(PLATFORM_FEES).map(p => (
                       <button
@@ -136,11 +136,11 @@ export default function ProfitCalculator({ priceSummary }) {
                   </div>
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(240 12% 10%)' }}>
-                      <p className="text-[10px] text-muted-foreground">Margin</p>
+                      <p className="text-[11px] text-muted-foreground">Margin</p>
                       <p className="text-sm font-bold" style={{ color: isProfitable ? '#10b981' : '#f43f5e' }}>{margin.toFixed(1)}%</p>
                     </div>
                     <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(240 12% 10%)' }}>
-                      <p className="text-[10px] text-muted-foreground">ROI</p>
+                      <p className="text-[11px] text-muted-foreground">ROI</p>
                       <p className="text-sm font-bold" style={{ color: isProfitable ? '#10b981' : '#f43f5e' }}>{roi.toFixed(1)}%</p>
                     </div>
                   </div>

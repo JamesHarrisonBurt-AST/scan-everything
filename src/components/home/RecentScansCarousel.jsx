@@ -63,7 +63,7 @@ function ScanCard({ item, index }) {
           {/* Info */}
           <div className="p-2.5" style={{ transform: 'translateZ(10px)' }}>
             <p className="text-xs font-semibold text-foreground truncate leading-tight">{item.title}</p>
-            <p className="text-[10px] mt-0.5 truncate" style={{ color: 'hsl(220 10% 50%)' }}>{item.brand || item.category}</p>
+            <p className="text-[11px] mt-0.5 truncate" style={{ color: 'hsl(220 10% 50%)' }}>{item.brand || item.category}</p>
           </div>
         </motion.div>
       </Link>

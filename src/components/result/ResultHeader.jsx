@@ -79,7 +79,7 @@ export default function ResultHeader({ item, priceSummary }) {
           transition={{ delay: 0.6, duration: 0.5 }}
         >
           {item.confidence_score && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
               {item.confidence_score}% match
             </span>
           )}

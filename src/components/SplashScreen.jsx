@@ -226,7 +226,7 @@ export default function SplashScreen({ onComplete }) {
         {/* Version */}
         {phase >= 5 && (
           <motion.p
-            className="absolute bottom-10 font-body text-[9px] tracking-widest text-muted-foreground/30 uppercase"
+            className="absolute bottom-10 font-body text-[11px] tracking-widest text-muted-foreground/30 uppercase"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}

@@ -95,7 +95,7 @@ Output a JSON object with:
             </div>
             <div className="text-left">
               <p className="text-sm font-heading font-semibold text-foreground">AI Listing Generator</p>
-              <p className="text-[10px] text-muted-foreground">Optimized resale copy + platform tips</p>
+              <p className="text-[11px] text-muted-foreground">Optimized resale copy + platform tips</p>
             </div>
           </div>
           {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -138,13 +138,13 @@ Output a JSON object with:
 
                     {/* Title */}
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">Listing Title</p>
+                      <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5">Listing Title</p>
                       <p className="text-sm font-medium text-foreground leading-snug">{draft.title}</p>
                     </div>
 
                     {/* Description */}
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">Description</p>
+                      <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5">Description</p>
                       <p className="text-xs text-muted-foreground leading-relaxed">{draft.description}</p>
                       {draft.urgency_hook && (
                         <p className="text-xs text-amber-400 mt-2 font-medium">⚡ {draft.urgency_hook}</p>
@@ -154,10 +154,10 @@ Output a JSON object with:
                     {/* Hashtags */}
                     {draft.hashtags?.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Hashtags</p>
+                        <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-2">Hashtags</p>
                         <div className="flex flex-wrap gap-1.5">
                           {draft.hashtags.map(tag => (
-                            <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: 'hsl(263 70% 58% / 0.12)', color: 'hsl(263 70% 70%)', border: '1px solid hsl(263 70% 58% / 0.25)' }}>
+                            <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full font-medium" style={{ background: 'hsl(263 70% 58% / 0.12)', color: 'hsl(263 70% 70%)', border: '1px solid hsl(263 70% 58% / 0.25)' }}>
                               #{tag}
                             </span>
                           ))}
@@ -168,7 +168,7 @@ Output a JSON object with:
                     {/* Recommended Platforms */}
                     {draft.platforms?.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Best Platforms</p>
+                        <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-2">Best Platforms</p>
                         <div className="space-y-2">
                           {draft.platforms.map(p => {
                             const style = PLATFORMS[p] || { color: '#00d4ff', bg: '#00d4ff12' };
@@ -178,7 +178,7 @@ Output a JSON object with:
                                 <div>
                                   <p className="text-xs font-semibold" style={{ color: style.color }}>{p}</p>
                                   {draft.platform_tips?.[p] && (
-                                    <p className="text-[10px] text-muted-foreground mt-0.5">{draft.platform_tips[p]}</p>
+                                    <p className="text-[11px] text-muted-foreground mt-0.5">{draft.platform_tips[p]}</p>
                                   )}
                                 </div>
                               </div>

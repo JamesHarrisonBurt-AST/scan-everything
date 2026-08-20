@@ -49,19 +49,19 @@ export default function PricePanel({ priceSummary }) {
         <h3 className="text-sm font-medium text-foreground mb-3">Price Range</h3>
         <div className="grid grid-cols-3 gap-3">
           <div className="text-center">
-            <p className="text-[10px] text-emerald-400 uppercase tracking-wider mb-1">Low</p>
+            <p className="text-[11px] text-emerald-400 uppercase tracking-wider mb-1">Low</p>
             <p className="text-lg font-heading font-bold text-foreground">
               <CountUpNumber value={priceSummary.lowest_price} />
             </p>
           </div>
           <div className="text-center">
-            <p className="text-[10px] text-cyan-400 uppercase tracking-wider mb-1">Median</p>
+            <p className="text-[11px] text-cyan-400 uppercase tracking-wider mb-1">Median</p>
             <p className="text-lg font-heading font-bold text-foreground">
               <CountUpNumber value={priceSummary.median_price} />
             </p>
           </div>
           <div className="text-center">
-            <p className="text-[10px] text-amber-400 uppercase tracking-wider mb-1">High</p>
+            <p className="text-[11px] text-amber-400 uppercase tracking-wider mb-1">High</p>
             <p className="text-lg font-heading font-bold text-foreground">
               <CountUpNumber value={priceSummary.high_price} />
             </p>
@@ -71,8 +71,8 @@ export default function PricePanel({ priceSummary }) {
         {/* Deal score bar */}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] text-muted-foreground">Deal Score</span>
-            <span className="text-[10px] text-cyan-400 font-medium">{priceSummary.deal_score || 0}/100</span>
+            <span className="text-[11px] text-muted-foreground">Deal Score</span>
+            <span className="text-[11px] text-cyan-400 font-medium">{priceSummary.deal_score || 0}/100</span>
           </div>
           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
             <motion.div

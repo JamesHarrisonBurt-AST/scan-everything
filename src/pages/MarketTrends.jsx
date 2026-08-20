@@ -74,7 +74,7 @@ function VolatilityBadge({ volatility }) {
   const level = volatility > 30 ? 'High' : volatility > 15 ? 'Medium' : 'Low';
   const color = volatility > 30 ? '#f43f5e' : volatility > 15 ? '#f59e0b' : '#10b981';
   return (
-    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${color}20`, color, border: `1px solid ${color}40` }}>
+    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${color}20`, color, border: `1px solid ${color}40` }}>
       {level} Volatility
     </span>
   );
@@ -246,10 +246,10 @@ Return JSON with:
         <div className="flex-1 min-w-0">
           <h1 className="font-heading text-lg font-extrabold text-foreground truncate">{item.title}</h1>
           <div className="flex items-center gap-2 mt-0.5">
-            <p className="text-[10px] tracking-widest uppercase text-muted-foreground">Market Trends</p>
+            <p className="text-[11px] tracking-widest uppercase text-muted-foreground">Market Trends</p>
             {stats && <VolatilityBadge volatility={stats.volatility} />}
             {stats?.sentiment && (
-              <span className="text-[10px] font-semibold" style={{ color: sentimentColor[stats.sentiment] || '#00d4ff' }}>
+              <span className="text-[11px] font-semibold" style={{ color: sentimentColor[stats.sentiment] || '#00d4ff' }}>
                 {stats.sentiment === 'Falling' ? '↓' : stats.sentiment === 'Rising' ? '↑' : '→'} {stats.sentiment}
               </span>
             )}
@@ -280,7 +280,7 @@ Return JSON with:
           </div>
           <motion.button
             onClick={() => navigate(`/scan-result/${item.id}`)}
-            className="text-[10px] font-semibold px-2.5 py-1.5 rounded-lg"
+            className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg"
             style={{ background: 'hsl(190 100% 50% / 0.1)', color: '#00d4ff', border: '1px solid hsl(190 100% 50% / 0.2)' }}
             whileTap={{ scale: 0.95 }}>
             View Scan
@@ -328,10 +328,10 @@ Return JSON with:
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="font-heading font-semibold text-sm text-foreground">Price History</h3>
-                    <p className="text-[10px] text-muted-foreground">7-week market data via AI web search</p>
+                    <p className="text-[11px] text-muted-foreground">7-week market data via AI web search</p>
                   </div>
                   {lastFetched && (
-                    <p className="text-[10px] text-muted-foreground">Updated {lastFetched.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    <p className="text-[11px] text-muted-foreground">Updated {lastFetched.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                   )}
                 </div>
                 <ResponsiveContainer width="100%" height={200}>
@@ -352,7 +352,7 @@ Return JSON with:
                   {[{ c: '#10b981', l: 'Low' }, { c: '#00d4ff', l: 'Avg' }, { c: '#8b5cf6', l: 'High' }].map(x => (
                     <div key={x.l} className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full" style={{ background: x.c }} />
-                      <span className="text-[10px] text-muted-foreground">{x.l}</span>
+                      <span className="text-[11px] text-muted-foreground">{x.l}</span>
                     </div>
                   ))}
                 </div>
@@ -370,7 +370,7 @@ Return JSON with:
                     { label: 'Highest Ever', value: `$${stats.highestEver?.toFixed(2) ?? '—'}`, color: '#f43f5e' },
                   ].map(s => (
                     <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'hsl(240 12% 9%)', border: '1px solid hsl(240 10% 17%)' }}>
-                      <p className="text-[10px] text-muted-foreground mb-1">{s.label}</p>
+                      <p className="text-[11px] text-muted-foreground mb-1">{s.label}</p>
                       <p className="text-sm font-bold font-heading" style={{ color: s.color }}>{s.value}</p>
                     </div>
                   ))}
@@ -382,7 +382,7 @@ Return JSON with:
                 <div className="flex items-center gap-3 rounded-xl p-3" style={{ background: 'hsl(240 12% 9%)', border: '1px solid hsl(240 10% 17%)' }}>
                   <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
                   <div>
-                    <p className="text-[10px] text-muted-foreground">Best Platform to Buy</p>
+                    <p className="text-[11px] text-muted-foreground">Best Platform to Buy</p>
                     <p className="text-sm font-semibold text-foreground">{stats.bestPlatform}</p>
                   </div>
                 </div>

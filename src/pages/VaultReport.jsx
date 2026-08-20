@@ -108,7 +108,7 @@ export default function VaultReport() {
           className="rounded-2xl p-5 relative overflow-hidden"
           style={{ background: 'linear-gradient(135deg, hsl(263 70% 12%) 0%, hsl(190 100% 8%) 100%)', border: '1px solid hsl(263 70% 30% / 0.3)' }}
         >
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Vault Intelligence Report</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-widest mb-1">Vault Intelligence Report</p>
           <h2 className="font-heading text-xl font-bold text-foreground">{reportItems.length} Items Analyzed</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Generated {generatedAt}</p>
 
@@ -120,7 +120,7 @@ export default function VaultReport() {
             ].map(s => (
               <div key={s.label} className="glass-card rounded-xl p-3 text-center">
                 <p className="font-heading font-bold text-lg" style={{ color: s.color }}>{s.value}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -147,12 +147,12 @@ export default function VaultReport() {
                   {r.item.brand && <p className="text-xs text-muted-foreground">{r.item.brand} {r.item.model}</p>}
                   <div className="flex items-center gap-2 mt-1.5">
                     {r.assess?.value_verdict && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: `${verdictColor[r.assess.value_verdict] || '#8b9db0'}20`, color: verdictColor[r.assess.value_verdict] || '#8b9db0', border: `1px solid ${verdictColor[r.assess.value_verdict] || '#8b9db0'}40` }}>
+                      <span className="text-[11px] px-2 py-0.5 rounded-full font-medium" style={{ background: `${verdictColor[r.assess.value_verdict] || '#8b9db0'}20`, color: verdictColor[r.assess.value_verdict] || '#8b9db0', border: `1px solid ${verdictColor[r.assess.value_verdict] || '#8b9db0'}40` }}>
                         {r.assess.value_verdict}
                       </span>
                     )}
                     {r.vault?.status && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground capitalize">{r.vault.status}</span>
+                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground capitalize">{r.vault.status}</span>
                     )}
                   </div>
                 </div>
@@ -167,7 +167,7 @@ export default function VaultReport() {
                 ].map(p => (
                   <div key={p.label} className="p-3 text-center">
                     <p className="font-heading font-bold text-sm" style={{ color: p.color }}>{p.value}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{p.label}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{p.label}</p>
                   </div>
                 ))}
               </div>
@@ -179,7 +179,7 @@ export default function VaultReport() {
                     <TrendingUp className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-semibold text-emerald-400">Est. Profit Potential: +${r.potentialProfit}</p>
-                      <p className="text-[10px] text-muted-foreground">Buy low at ${r.summary?.lowest_price?.toFixed(2)}, sell at market avg ${r.summary?.median_price?.toFixed(2)}</p>
+                      <p className="text-[11px] text-muted-foreground">Buy low at ${r.summary?.lowest_price?.toFixed(2)}, sell at market avg ${r.summary?.median_price?.toFixed(2)}</p>
                     </div>
                   </div>
                 )}
@@ -201,7 +201,7 @@ export default function VaultReport() {
                 <div className="flex items-start gap-2.5 p-3 rounded-xl" style={{ background: `${r.condTip.color}12`, border: `1px solid ${r.condTip.color}30` }}>
                   <Tag className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: r.condTip.color }} />
                   <div>
-                    <p className="text-[10px] font-semibold mb-0.5" style={{ color: r.condTip.color }}>
+                    <p className="text-[11px] font-semibold mb-0.5" style={{ color: r.condTip.color }}>
                       Condition: {r.item.condition_guess || r.condTip.label}
                     </p>
                     <p className="text-[11px] text-muted-foreground">{r.condTip.tip}</p>

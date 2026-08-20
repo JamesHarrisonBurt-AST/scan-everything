@@ -60,7 +60,7 @@ export default function SellPriorityCard({ vaultItems }) {
                   {item.item_image_url
                     ? <img src={item.item_image_url} alt={item.item_title} className="w-full h-full object-cover" />
                     : <div className="w-full h-full" />}
-                  <span className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                  <span className="absolute top-1.5 left-1.5 text-[11px] font-bold px-1.5 py-0.5 rounded-full"
                     style={{ background: 'hsl(160 84% 39% / 0.85)', color: '#04140c' }}>
                     #{i + 1} · {item.sellScore}
                   </span>
@@ -68,7 +68,7 @@ export default function SellPriorityCard({ vaultItems }) {
                 <div className="p-2.5">
                   <p className="text-[11px] font-semibold text-foreground truncate">{item.item_title}</p>
                   {item.price != null && <p className="text-xs text-emerald-400 font-bold mt-0.5">${item.price.toFixed(2)}</p>}
-                  <p className="text-[9px] text-muted-foreground mt-1 leading-snug">{item.reason}</p>
+                  <p className="text-[11px] text-muted-foreground mt-1 leading-snug">{item.reason}</p>
                 </div>
               </motion.div>
             </Link>

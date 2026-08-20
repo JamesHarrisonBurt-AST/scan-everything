@@ -91,7 +91,7 @@ export default function ResultActions({ item, priceSummary }) {
               transition={{ delay: 0.3 + i * 0.1 }}
             >
               <Icon className={`w-5 h-5 ${act.active ? 'text-cyan-400' : 'text-muted-foreground'}`} />
-              <span className={`text-[10px] ${act.active ? 'text-cyan-400 font-medium' : 'text-muted-foreground'}`}>
+              <span className={`text-[11px] ${act.active ? 'text-cyan-400 font-medium' : 'text-muted-foreground'}`}>
                 {act.label}
               </span>
             </motion.button>

@@ -78,7 +78,7 @@ export default function VaultDashboard({ vaultItems }) {
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
             <Wallet className="w-4 h-4 text-violet-400" />
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Collection Value</p>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Collection Value</p>
           </div>
           <div className="flex items-end gap-3">
             <h2 className="font-heading text-3xl font-extrabold text-foreground">${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</h2>
@@ -89,7 +89,7 @@ export default function VaultDashboard({ vaultItems }) {
               </span>
             </div>
           </div>
-          <p className="text-[10px] text-muted-foreground">vs prior 30-day period · {activeItems.length} items</p>
+          <p className="text-[11px] text-muted-foreground">vs prior 30-day period · {activeItems.length} items</p>
         </div>
       </motion.div>
 
@@ -103,10 +103,10 @@ export default function VaultDashboard({ vaultItems }) {
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'hsl(160 84% 39% / 0.12)' }}>
               <Coins className="w-3.5 h-3.5 text-emerald-400" />
             </div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Sold Profit</p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sold Profit</p>
           </div>
           <p className="font-heading text-xl font-bold text-emerald-400">${soldProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-          <p className="text-[10px] text-muted-foreground mt-0.5">{soldListings.length} sold · ${soldRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })} revenue</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{soldListings.length} sold · ${soldRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })} revenue</p>
         </motion.div>
 
         <motion.div
@@ -117,10 +117,10 @@ export default function VaultDashboard({ vaultItems }) {
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'hsl(190 100% 50% / 0.12)' }}>
               <PieChart className="w-3.5 h-3.5 text-cyan-400" />
             </div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Asset Classes</p>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Asset Classes</p>
           </div>
           <p className="font-heading text-xl font-bold text-cyan-400">{categories.length}</p>
-          <p className="text-[10px] text-muted-foreground mt-0.5">categories tracked</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">categories tracked</p>
         </motion.div>
       </div>
 
@@ -130,7 +130,7 @@ export default function VaultDashboard({ vaultItems }) {
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="rounded-2xl p-4 mt-3"
           style={{ background: 'hsl(240 12% 9%)', border: '1px solid hsl(240 10% 18%)' }}>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Asset Class Breakdown</p>
+          <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Asset Class Breakdown</p>
           <div className="space-y-2.5">
             {categories.map((cat, i) => (
               <div key={cat.name}>
@@ -141,7 +141,7 @@ export default function VaultDashboard({ vaultItems }) {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-foreground">{fmt(cat.value)}</span>
-                    <span className="text-[10px] text-muted-foreground w-9 text-right">{cat.pct.toFixed(0)}%</span>
+                    <span className="text-[11px] text-muted-foreground w-9 text-right">{cat.pct.toFixed(0)}%</span>
                   </div>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'hsl(240 10% 14%)' }}>

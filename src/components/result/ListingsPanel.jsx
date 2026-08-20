@@ -26,9 +26,9 @@ export default function ListingsPanel({ listings }) {
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-xs text-cyan-400 font-semibold">${listing.price_amount?.toFixed(2)}</span>
-                  <span className="text-[10px] text-muted-foreground">{listing.source_name}</span>
+                  <span className="text-[11px] text-muted-foreground">{listing.source_name}</span>
                   {listing.condition_label && (
-                    <span className="text-[10px] text-muted-foreground">• {listing.condition_label}</span>
+                    <span className="text-[11px] text-muted-foreground">• {listing.condition_label}</span>
                   )}
                 </div>
               </div>

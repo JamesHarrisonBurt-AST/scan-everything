@@ -28,7 +28,7 @@ export default function ScanModeSelector({ activeMode, onModeChange }) {
             whileTap={{ scale: 0.95 }}
           >
             <Icon className={cn('w-5 h-5', isActive ? 'text-cyan-400' : 'text-muted-foreground')} />
-            <span className={cn('text-[10px]', isActive ? 'text-cyan-400 font-medium' : 'text-muted-foreground')}>
+            <span className={cn('text-[11px]', isActive ? 'text-cyan-400 font-medium' : 'text-muted-foreground')}>
               {mode.label}
             </span>
           </motion.button>

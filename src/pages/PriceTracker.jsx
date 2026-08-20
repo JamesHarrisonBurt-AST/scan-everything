@@ -187,7 +187,7 @@ function TrackerCard({ watchlistItem, item, summary, onEdit, onToggle, onTrends,
               )}
             </div>
             {priceDiff !== null && (
-              <p className="text-[10px] mt-1" style={{ color: isUnderTarget ? '#10b981' : 'hsl(220 10% 50%)' }}>
+              <p className="text-[11px] mt-1" style={{ color: isUnderTarget ? '#10b981' : 'hsl(220 10% 50%)' }}>
                 {isUnderTarget ? `✓ $${priceDiff.toFixed(2)} under your target!` : `$${Math.abs(priceDiff).toFixed(2)} above target`}
               </p>
             )}
@@ -325,7 +325,7 @@ export default function PriceTracker() {
             style={{ background: 'linear-gradient(135deg, hsl(190 100% 75%), #fff, hsl(263 70% 78%))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             Price Tracker
           </h1>
-          <p className="text-[10px] tracking-widest uppercase text-muted-foreground">Follow & alert</p>
+          <p className="text-[11px] tracking-widest uppercase text-muted-foreground">Follow & alert</p>
         </div>
         <motion.button onClick={() => setShowAddPicker(true)}
           className="ml-auto flex items-center gap-2 px-4 h-10 rounded-2xl text-sm font-semibold"

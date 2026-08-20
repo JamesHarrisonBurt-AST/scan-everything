@@ -156,12 +156,12 @@ export default function ARView() {
                   onChange={e => setRotation(parseFloat(e.target.value))}
                   className="flex-1" />
               </div>
-              <p className="text-[10px] text-white/50 text-center flex items-center justify-center gap-1">
+              <p className="text-[11px] text-white/50 text-center flex items-center justify-center gap-1">
                 <Move className="w-3 h-3" /> Drag the item to position it in your space
               </p>
               {showDims && (
                 <div className="pt-3 border-t border-white/10">
-                  <p className="text-[10px] text-white/60 mb-2 flex items-center gap-1"><Ruler className="w-3 h-3" /> Estimated dimensions (inches)</p>
+                  <p className="text-[11px] text-white/60 mb-2 flex items-center gap-1"><Ruler className="w-3 h-3" /> Estimated dimensions (inches)</p>
                   <div className="flex gap-2">
                     <input type="number" value={dims.w} onChange={e => setDims(d => ({ ...d, w: e.target.value }))} placeholder="W" className="w-full px-2 py-1.5 rounded-lg text-xs text-white text-center bg-white/10 outline-none" />
                     <input type="number" value={dims.h} onChange={e => setDims(d => ({ ...d, h: e.target.value }))} placeholder="H" className="w-full px-2 py-1.5 rounded-lg text-xs text-white text-center bg-white/10 outline-none" />

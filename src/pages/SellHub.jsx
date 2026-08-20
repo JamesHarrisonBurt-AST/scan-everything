@@ -105,7 +105,7 @@ function ListingForm({ vaultItems, onClose, onSaved }) {
           <div className="w-10 h-1 rounded-full bg-muted absolute top-2 left-1/2 -translate-x-1/2" />
           <div>
             <p className="font-heading font-bold text-foreground">New Listing</p>
-            <p className="text-[10px] text-muted-foreground">Step {step} of 3</p>
+            <p className="text-[11px] text-muted-foreground">Step {step} of 3</p>
           </div>
           <div className="flex items-center gap-2">
             {[1,2,3].map(s => (
@@ -181,7 +181,7 @@ function ListingForm({ vaultItems, onClose, onSaved }) {
                   className="w-full px-4 py-3 rounded-xl text-sm text-foreground outline-none resize-none"
                   style={{ background: 'hsl(240 12% 10%)', border: '1px solid hsl(240 10% 18%)' }} />
                 <motion.button onClick={generateDescription} disabled={!form.title || aiLoading}
-                  className="absolute right-3 bottom-3 flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold"
+                  className="absolute right-3 bottom-3 flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold"
                   style={{ background: 'hsl(190 100% 50% / 0.1)', color: '#00d4ff', border: '1px solid hsl(190 100% 50% / 0.2)' }}
                   whileTap={{ scale: 0.9 }}>
                   {aiLoading ? <div className="w-3 h-3 rounded-full border border-cyan-400 border-t-transparent animate-spin" /> : <Zap className="w-3 h-3" />}
@@ -255,7 +255,7 @@ function ListingForm({ vaultItems, onClose, onSaved }) {
                         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: p.color }} />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold text-foreground">{p.name}</p>
-                          <p className="text-[9px] text-muted-foreground truncate">{p.hint}</p>
+                          <p className="text-[11px] text-muted-foreground truncate">{p.hint}</p>
                         </div>
                         {sel && <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: p.color }} />}
                       </motion.button>
@@ -310,17 +310,17 @@ function ListingCard({ listing, onDelete, onStatusChange }) {
           : <div className="w-full h-full flex items-center justify-center"><Package className="w-8 h-8 text-muted-foreground/25" /></div>}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 45%, transparent 70%)' }} />
 
-        <span className="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm"
+        <span className="absolute top-2.5 left-2.5 text-[11px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm"
           style={{ background: st.bg, color: st.color, border: `1px solid ${st.border}` }}>
           {st.label}
         </span>
 
         <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between">
           <div className="flex flex-col">
-            <span className="text-[9px] text-white/60 uppercase tracking-wider">Price</span>
+            <span className="text-[11px] text-white/60 uppercase tracking-wider">Price</span>
             <p className="text-2xl font-extrabold font-heading text-white drop-shadow-md leading-none">${listing.asking_price?.toFixed(2)}</p>
           </div>
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize backdrop-blur-sm"
+          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full capitalize backdrop-blur-sm"
             style={{ background: 'hsl(240 15% 6% / 0.65)', color: 'hsl(210 20% 90%)', border: '1px solid hsl(240 10% 40% / 0.4)' }}>
             {listing.condition}
           </span>
@@ -335,20 +335,20 @@ function ListingCard({ listing, onDelete, onStatusChange }) {
             {platforms.slice(0, 3).map(p => {
               const platform = PLATFORMS.find(pl => pl.name === p);
               return (
-                <span key={p} className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                <span key={p} className="text-[11px] font-bold px-1.5 py-0.5 rounded-full"
                   style={{ background: `${platform?.color || '#666'}15`, color: platform?.color || '#666', border: `1px solid ${platform?.color || '#666'}30` }}>
                   {p}
                 </span>
               );
             })}
             {platforms.length > 3 && (
-              <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full text-muted-foreground" style={{ background: 'hsl(240 12% 13%)' }}>
+              <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full text-muted-foreground" style={{ background: 'hsl(240 12% 13%)' }}>
                 +{platforms.length - 3}
               </span>
             )}
           </div>
         ) : (
-          <p className="text-[10px] text-muted-foreground mt-2">Not listed anywhere yet</p>
+          <p className="text-[11px] text-muted-foreground mt-2">Not listed anywhere yet</p>
         )}
 
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30">
@@ -441,7 +441,7 @@ export default function SellHub() {
             <h1 className="font-heading text-2xl font-extrabold text-foreground flex items-center gap-2">
               <ShoppingBag className="w-6 h-6 text-emerald-400" /> Sell Hub
             </h1>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">Manage your selling channels</p>
+            <p className="text-[11px] text-muted-foreground uppercase tracking-widest mt-0.5">Manage your selling channels</p>
           </div>
           <motion.button onClick={() => setShowForm(true)}
             className="flex items-center gap-1.5 px-3 h-9 rounded-xl text-xs font-bold"
@@ -463,7 +463,7 @@ export default function SellHub() {
             <div key={s.label} className="rounded-xl p-3 text-center"
               style={{ background: 'hsl(240 12% 9%)', border: '1px solid hsl(240 10% 17%)' }}>
               <p className="text-lg font-extrabold font-heading" style={{ color: s.color }}>{s.value}</p>
-              <p className="text-[10px] text-muted-foreground">{s.label}</p>
+              <p className="text-[11px] text-muted-foreground">{s.label}</p>
             </div>
           ))}
         </div>
@@ -471,7 +471,7 @@ export default function SellHub() {
 
       {/* Platform quick links */}
       <div className="px-4 mb-4">
-        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">Selling Channels</p>
+        <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2">Selling Channels</p>
         <div className="overflow-x-auto">
           <div className="flex gap-2 pb-1" style={{ minWidth: 'max-content' }}>
             {PLATFORMS.map(p => (
@@ -499,7 +499,7 @@ export default function SellHub() {
             whileTap={{ scale: 0.94 }}>
             {tab.label}
             {tab.count > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full"
                 style={{ background: activeTab === tab.key ? 'hsl(190 100% 50% / 0.2)' : 'hsl(240 12% 14%)', color: 'inherit' }}>
                 {tab.count}
               </span>

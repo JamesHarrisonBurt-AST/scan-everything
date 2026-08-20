@@ -206,7 +206,7 @@ Return ONLY a JSON object with these fields:
                       <Icon className={`w-4 h-4 ${s.color}`} />
                     </div>
                     <p className={`font-heading font-bold ${s.small ? 'text-sm' : 'text-xl'} text-foreground truncate`}>{s.value}</p>
-                    <p className="text-[10px] text-muted-foreground">{s.label}</p>
+                    <p className="text-[11px] text-muted-foreground">{s.label}</p>
                   </GlassCard>
                 </motion.div>
               );
@@ -242,7 +242,7 @@ Return ONLY a JSON object with these fields:
                 {[{c:'#00d4ff',l:'Low'},{c:'#10b981',l:'Avg'},{c:'#8b5cf6',l:'High'}].map(x => (
                   <div key={x.l} className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full" style={{background: x.c}} />
-                    <span className="text-[10px] text-muted-foreground">{x.l}</span>
+                    <span className="text-[11px] text-muted-foreground">{x.l}</span>
                   </div>
                 ))}
               </div>
@@ -253,7 +253,7 @@ Return ONLY a JSON object with these fields:
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
             <GlassCard animate={false}>
               <h3 className="font-heading font-semibold text-sm text-foreground mb-1">Category Volatility</h3>
-              <p className="text-[10px] text-muted-foreground mb-4">Price spread as % of average</p>
+              <p className="text-[11px] text-muted-foreground mb-4">Price spread as % of average</p>
               <ResponsiveContainer width="100%" height={160}>
                 <BarChart data={volatilityData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 10% 16%)" vertical={false} />
@@ -302,7 +302,7 @@ Return ONLY a JSON object with these fields:
                   </div>
                   <div>
                     <h3 className="font-heading font-semibold text-sm text-foreground">Live Market Prices</h3>
-                    <p className="text-[10px] text-muted-foreground">AI web search — real-time lowest & highest</p>
+                    <p className="text-[11px] text-muted-foreground">AI web search — real-time lowest & highest</p>
                   </div>
                 </div>
                 <motion.button
@@ -366,7 +366,7 @@ Return ONLY a JSON object with these fields:
                           </div>
                           <div className="flex flex-col items-end gap-1 flex-shrink-0">
                             {entry.hot_deal && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">HOT</span>
+                              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">HOT</span>
                             )}
                             {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
                           </div>
@@ -383,22 +383,22 @@ Return ONLY a JSON object with these fields:
                             >
                               <div className="px-3 pb-3 border-t border-border/30 pt-3 grid grid-cols-3 gap-2">
                                 <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(240 12% 12%)' }}>
-                                  <p className="text-[10px] text-muted-foreground">Lowest</p>
+                                  <p className="text-[11px] text-muted-foreground">Lowest</p>
                                   <p className="text-sm font-bold text-emerald-400">${entry.lowest_price?.toFixed(2) ?? '—'}</p>
                                 </div>
                                 <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(240 12% 12%)' }}>
-                                  <p className="text-[10px] text-muted-foreground">Average</p>
+                                  <p className="text-[11px] text-muted-foreground">Average</p>
                                   <p className="text-sm font-bold text-cyan-400">${entry.average_price?.toFixed(2) ?? '—'}</p>
                                 </div>
                                 <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(240 12% 12%)' }}>
-                                  <p className="text-[10px] text-muted-foreground">Highest</p>
+                                  <p className="text-[11px] text-muted-foreground">Highest</p>
                                   <p className="text-sm font-bold text-violet-400">${entry.highest_price?.toFixed(2) ?? '—'}</p>
                                 </div>
                               </div>
                               {entry.best_source && (
                                 <div className="px-3 pb-3 flex items-center gap-1.5">
                                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
-                                  <p className="text-[10px] text-muted-foreground">Best price on <span className="text-cyan-400">{entry.best_source}</span></p>
+                                  <p className="text-[11px] text-muted-foreground">Best price on <span className="text-cyan-400">{entry.best_source}</span></p>
                                 </div>
                               )}
                             </motion.div>

@@ -418,10 +418,10 @@ export default function Vault() {
                           {item.best_price_found ? (
                             <span className="text-xs text-cyan-400 font-semibold">${item.best_price_found.toFixed(2)}</span>
                           ) : (
-                            <span className="text-[10px] text-muted-foreground">No price</span>
+                            <span className="text-[11px] text-muted-foreground">No price</span>
                           )}
                           {item.status && (
-                            <span className={cn('text-[9px] px-1.5 py-0.5 rounded-full', statusColors[item.status] || statusColors.scanned)}>
+                            <span className={cn('text-[11px] px-1.5 py-0.5 rounded-full', statusColors[item.status] || statusColors.scanned)}>
                               {item.status}
                             </span>
                           )}

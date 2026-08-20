@@ -91,13 +91,13 @@ export default function CompareSummaryTable({ selectedIds, vaultItems }) {
                   <table className="w-full text-xs" style={{ minWidth: 320 }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid hsl(240 10% 18%)' }}>
-                        <th className="text-left py-2.5 px-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Item</th>
-                        <th className="text-right py-2.5 px-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Market Low</th>
-                        <th className="text-right py-2.5 px-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Avg</th>
-                        <th className="text-right py-2.5 px-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">High</th>
-                        <th className="text-right py-2.5 px-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Deal</th>
-                        <th className="text-right py-2.5 px-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Resale</th>
-                        <th className="text-right py-2.5 px-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Profit</th>
+                        <th className="text-left py-2.5 px-2 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Item</th>
+                        <th className="text-right py-2.5 px-2 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Market Low</th>
+                        <th className="text-right py-2.5 px-2 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Avg</th>
+                        <th className="text-right py-2.5 px-2 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">High</th>
+                        <th className="text-right py-2.5 px-2 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Deal</th>
+                        <th className="text-right py-2.5 px-2 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Resale</th>
+                        <th className="text-right py-2.5 px-2 text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Profit</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -113,7 +113,7 @@ export default function CompareSummaryTable({ selectedIds, vaultItems }) {
                               </div>
                               <div className="min-w-0">
                                 <p className="text-[11px] font-semibold text-foreground truncate max-w-[100px]">{r.title}</p>
-                                <p className="text-[9px] text-muted-foreground truncate">{r.category}</p>
+                                <p className="text-[11px] text-muted-foreground truncate">{r.category}</p>
                               </div>
                             </div>
                           </td>
@@ -140,7 +140,7 @@ export default function CompareSummaryTable({ selectedIds, vaultItems }) {
                     </tbody>
                   </table>
                 )}
-                <p className="text-[10px] text-muted-foreground mt-3 text-center">Highlighted values indicate the best option in each column</p>
+                <p className="text-[11px] text-muted-foreground mt-3 text-center">Highlighted values indicate the best option in each column</p>
               </div>
             </motion.div>
           </motion.div>

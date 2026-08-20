@@ -25,13 +25,13 @@ function DealCard({ deal, onUpvote, followedCategories }) {
           <img src={deal.image_url} alt={deal.title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           {deal.deal_score > 80 && (
-            <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold"
+            <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold"
               style={{ background: 'hsl(160 84% 39% / 0.85)', color: '#fff' }}>
               <Sparkles className="w-3 h-3" /> HOT DEAL
             </div>
           )}
           {deal.verified && (
-            <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold"
+            <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold"
               style={{ background: 'hsl(190 100% 50% / 0.85)', color: '#061218' }}>
               <Check className="w-3 h-3" /> Verified
             </div>
@@ -43,12 +43,12 @@ function DealCard({ deal, onUpvote, followedCategories }) {
           <div className="flex-1 min-w-0">
             <p className="font-heading font-bold text-foreground truncate">{deal.title}</p>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="text-[10px] px-2 py-0.5 rounded-full"
+              <span className="text-[11px] px-2 py-0.5 rounded-full"
                 style={{ background: isFollowed ? 'hsl(263 70% 58% / 0.15)' : 'hsl(240 12% 14%)', color: isFollowed ? '#a78bfa' : 'hsl(220 10% 55%)', border: isFollowed ? '1px solid hsl(263 70% 58% / 0.3)' : '1px solid hsl(240 10% 20%)' }}>
                 {deal.category}
               </span>
               {deal.location_label && (
-                <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                   <MapPin className="w-2.5 h-2.5" />{deal.location_label}
                 </span>
               )}
@@ -56,7 +56,7 @@ function DealCard({ deal, onUpvote, followedCategories }) {
           </div>
           <div className="text-right flex-shrink-0">
             <p className="text-lg font-extrabold font-heading text-emerald-400">${deal.price_found?.toFixed(2)}</p>
-            {savingsPct && <p className="text-[10px] text-muted-foreground">{savingsPct}% off retail</p>}
+            {savingsPct && <p className="text-[11px] text-muted-foreground">{savingsPct}% off retail</p>}
           </div>
         </div>
 
@@ -70,7 +70,7 @@ function DealCard({ deal, onUpvote, followedCategories }) {
 
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-[9px] font-bold text-white">
+            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-[11px] font-bold text-white">
               {deal.poster_name?.[0]?.toUpperCase() || '?'}
             </div>
             <span className="text-[11px] text-muted-foreground">{deal.poster_name || 'Anonymous'}</span>
@@ -294,7 +294,7 @@ export default function Community() {
             <h1 className="font-heading text-2xl font-extrabold text-foreground flex items-center gap-2">
               <Users className="w-6 h-6 text-violet-400" /> Community
             </h1>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">Hot deals found by real people</p>
+            <p className="text-[11px] text-muted-foreground uppercase tracking-widest mt-0.5">Hot deals found by real people</p>
           </div>
           <motion.button onClick={() => setShowPost(true)}
             className="flex items-center gap-1.5 px-3 h-9 rounded-xl text-xs font-bold"

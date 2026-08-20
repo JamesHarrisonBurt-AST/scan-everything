@@ -63,7 +63,7 @@ function CategoryTile({ cat, index }) {
             <Icon className="w-6 h-6 relative z-10" style={{ color: cat.color }} />
           </motion.div>
 
-          <span className="text-[10px] font-medium tracking-wide" style={{ color: 'hsl(220 10% 55%)' }}>
+          <span className="text-[11px] font-medium tracking-wide" style={{ color: 'hsl(220 10% 55%)' }}>
             {cat.label}
           </span>
         </motion.div>

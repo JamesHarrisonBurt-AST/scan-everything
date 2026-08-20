@@ -148,7 +148,7 @@ Identify as many items as possible. Return at least 1 and up to 20 items.`,
         </motion.button>
         <div>
           <h1 className="font-heading text-xl font-extrabold text-foreground">Bulk Scan</h1>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Scan a shelf or rack — AI finds everything</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-widest">Scan a shelf or rack — AI finds everything</p>
         </div>
       </div>
 
@@ -309,7 +309,7 @@ Identify as many items as possible. Return at least 1 and up to 20 items.`,
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-semibold text-foreground truncate">{it.title}</p>
                         {it.deal_score > 75 && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex-shrink-0">HOT</span>
+                          <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex-shrink-0">HOT</span>
                         )}
                       </div>
                       <p className="text-[11px] text-muted-foreground">{it.brand} · {it.category} · {it.condition}</p>
@@ -317,25 +317,25 @@ Identify as many items as possible. Return at least 1 and up to 20 items.`,
                         <span className="text-xs font-bold" style={{ color: scoreColor(it.deal_score) }}>
                           ${it.price_low?.toFixed(0) ?? '?'} – ${it.price_high?.toFixed(0) ?? '?'}
                         </span>
-                        <span className="text-[10px] text-muted-foreground">avg ${it.price_avg?.toFixed(0) ?? '?'}</span>
-                        <span className="text-[10px] font-bold" style={{ color: scoreColor(it.deal_score) }}>
+                        <span className="text-[11px] text-muted-foreground">avg ${it.price_avg?.toFixed(0) ?? '?'}</span>
+                        <span className="text-[11px] font-bold" style={{ color: scoreColor(it.deal_score) }}>
                           {it.deal_score}/100
                         </span>
                       </div>
-                      {it.notes && <p className="text-[10px] text-muted-foreground mt-1 truncate">{it.notes}</p>}
+                      {it.notes && <p className="text-[11px] text-muted-foreground mt-1 truncate">{it.notes}</p>}
                     </div>
 
                     {/* Action toggle */}
                     {it.selected && (
                       <div className="flex flex-col gap-1.5 flex-shrink-0">
                         <motion.button onClick={() => setAction(it.id, 'vault')}
-                          className="text-[10px] px-2 py-1 rounded-lg font-bold"
+                          className="text-[11px] px-2 py-1 rounded-lg font-bold"
                           style={{ background: it.action === 'vault' ? 'hsl(190 100% 50% / 0.15)' : 'hsl(240 12% 13%)', border: it.action === 'vault' ? '1px solid hsl(190 100% 50% / 0.3)' : '1px solid hsl(240 10% 20%)', color: it.action === 'vault' ? '#00d4ff' : 'hsl(220 10% 50%)' }}
                           whileTap={{ scale: 0.88 }}>
                           Vault
                         </motion.button>
                         <motion.button onClick={() => setAction(it.id, 'watch')}
-                          className="text-[10px] px-2 py-1 rounded-lg font-bold"
+                          className="text-[11px] px-2 py-1 rounded-lg font-bold"
                           style={{ background: it.action === 'watch' ? 'hsl(263 70% 58% / 0.12)' : 'hsl(240 12% 13%)', border: it.action === 'watch' ? '1px solid hsl(263 70% 58% / 0.3)' : '1px solid hsl(240 10% 20%)', color: it.action === 'watch' ? '#a78bfa' : 'hsl(220 10% 50%)' }}
                           whileTap={{ scale: 0.88 }}>
                           Watch

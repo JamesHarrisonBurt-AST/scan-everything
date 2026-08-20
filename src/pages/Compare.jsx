@@ -80,24 +80,24 @@ function CompareColumn({ item, summary, assessment, onRemove, accentColor, index
         <div className="p-3 space-y-3" style={{ transform: 'translateZ(12px)' }}>
           <div>
             <p className="text-xs font-bold text-foreground leading-tight line-clamp-2">{item.title}</p>
-            {item.brand && <p className="text-[10px] mt-0.5" style={{ color: accentColor + 'bb' }}>{item.brand}</p>}
+            {item.brand && <p className="text-[11px] mt-0.5" style={{ color: accentColor + 'bb' }}>{item.brand}</p>}
           </div>
 
           {/* Price */}
           <div className="rounded-xl p-2.5 text-center"
             style={{ background: `${accentColor}12`, border: `1px solid ${accentColor}20` }}>
-            <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-0.5">Best Price</p>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-0.5">Best Price</p>
             <p className="text-base font-extrabold font-heading" style={{ color: accentColor }}>
               {summary?.lowest_price ? `$${summary.lowest_price.toFixed(2)}` : '—'}
             </p>
             {summary?.high_price && summary.high_price > (summary.lowest_price || 0) && (
-              <p className="text-[9px] text-muted-foreground line-through">${summary.high_price.toFixed(2)}</p>
+              <p className="text-[11px] text-muted-foreground line-through">${summary.high_price.toFixed(2)}</p>
             )}
           </div>
 
           {/* Deal Score */}
           <div>
-            <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Deal Score</p>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Deal Score</p>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                 <motion.div
@@ -108,13 +108,13 @@ function CompareColumn({ item, summary, assessment, onRemove, accentColor, index
                   transition={{ duration: 1, delay: 0.4 + index * 0.1, ease: 'easeOut' }}
                 />
               </div>
-              <span className="text-[10px] font-bold" style={{ color: scoreColor }}>{score}</span>
+              <span className="text-[11px] font-bold" style={{ color: scoreColor }}>{score}</span>
             </div>
           </div>
 
           {/* Condition */}
           <div>
-            <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Condition</p>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Condition</p>
             <p className="text-xs text-foreground/80">{item.condition_guess || '—'}</p>
           </div>
 
@@ -122,14 +122,14 @@ function CompareColumn({ item, summary, assessment, onRemove, accentColor, index
           {assessment?.value_verdict && (
             <div className="rounded-lg px-2 py-1.5 text-center"
               style={{ background: 'hsl(263 70% 58% / 0.1)', border: '1px solid hsl(263 70% 58% / 0.2)' }}>
-              <p className="text-[10px] font-semibold" style={{ color: '#a78bfa' }}>{assessment.value_verdict}</p>
+              <p className="text-[11px] font-semibold" style={{ color: '#a78bfa' }}>{assessment.value_verdict}</p>
             </div>
           )}
 
           {/* Resale Score */}
           {assessment?.resale_potential_score != null && (
             <div>
-              <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Resale Potential</p>
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Resale Potential</p>
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                   <motion.div
@@ -140,7 +140,7 @@ function CompareColumn({ item, summary, assessment, onRemove, accentColor, index
                     transition={{ duration: 1, delay: 0.6 + index * 0.1, ease: 'easeOut' }}
                   />
                 </div>
-                <span className="text-[10px] font-bold text-violet-400">{assessment.resale_potential_score}</span>
+                <span className="text-[11px] font-bold text-violet-400">{assessment.resale_potential_score}</span>
               </div>
             </div>
           )}
@@ -254,7 +254,7 @@ function SummaryTable({ cols }) {
         <div className="p-3" />
         {cols.map((col, ci) => (
           <div key={col.item.id} className="p-3 text-center border-l border-border/20">
-            <p className="text-[10px] font-bold truncate" style={{ color: accentColors[ci % accentColors.length] }}>
+            <p className="text-[11px] font-bold truncate" style={{ color: accentColors[ci % accentColors.length] }}>
               {col.item.brand || col.item.title.split(' ')[0]}
             </p>
           </div>
@@ -267,7 +267,7 @@ function SummaryTable({ cols }) {
           style={{ gridTemplateColumns: `120px repeat(${cols.length}, 1fr)`, background: ri % 2 === 0 ? 'transparent' : 'hsl(240 12% 8% / 0.4)' }}
         >
           <div className="p-3 flex items-center">
-            <p className="text-[10px] text-muted-foreground font-medium">{row.label}</p>
+            <p className="text-[11px] text-muted-foreground font-medium">{row.label}</p>
           </div>
           {cols.map((col, ci) => {
             const val = row.fn(col);
@@ -362,7 +362,7 @@ export default function Compare() {
             style={{ background: 'linear-gradient(135deg, hsl(190 100% 75%), #fff, hsl(263 70% 78%))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             Compare
           </h1>
-          <p className="text-[10px] tracking-widest uppercase text-muted-foreground">Side-by-side analysis</p>
+          <p className="text-[11px] tracking-widest uppercase text-muted-foreground">Side-by-side analysis</p>
         </div>
         {selectedIds.length < 4 && (
           <motion.button

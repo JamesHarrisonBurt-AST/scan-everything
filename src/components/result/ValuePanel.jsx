@@ -16,8 +16,8 @@ function ScoreBar({ label, score, color }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] text-muted-foreground">{label}</span>
-        <span className="text-[10px] text-foreground">{score}/100</span>
+        <span className="text-[11px] text-muted-foreground">{label}</span>
+        <span className="text-[11px] text-foreground">{score}/100</span>
       </div>
       <div className="h-1 bg-muted rounded-full overflow-hidden">
         <motion.div
