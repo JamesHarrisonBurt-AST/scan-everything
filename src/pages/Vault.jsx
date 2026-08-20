@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Heart, Bell, Layers3, X, FileText, DollarSign, Clock, Tag, Box, Zap } from 'lucide-react';
+import { Archive, Heart, Bell, BellOff, Layers3, X, FileText, Box, Zap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '../components/GlassCard';
@@ -10,13 +10,8 @@ import CompareSummaryTable from '../components/vault/CompareSummaryTable';
 import QuickActionsSheet from '../components/vault/QuickActionsSheet';
 import VaultExportButton from '../components/vault/VaultExportButton';
 import PullToRefresh from '../components/PullToRefresh';
+import VaultFilterBar from '../components/vault/VaultFilterBar';
 import { cn } from '@/lib/utils';
-
-const sortOptions = [
-  { id: 'recent', label: 'Recent', icon: Clock },
-  { id: 'profit', label: 'Profit', icon: DollarSign },
-  { id: 'category', label: 'Category', icon: Tag },
-];
 
 const filters = [
   { id: 'all', label: 'All' },
@@ -44,11 +39,13 @@ export default function Vault() {
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState([]);
   const [sortBy, setSortBy] = useState('recent');
+  const [activeCategory, setActiveCategory] = useState('all');
   const [quickActionItems, setQuickActionItems] = useState(null);
   const pressTimerRef = useRef(null);
   const longPressFiredRef = useRef(false);
 
   const existingFolders = [...new Set(vaultItems.map(v => v.folder).filter(Boolean))];
+  const vaultCategories = [...new Set(vaultItems.map(v => v.category).filter(Boolean))].sort();
 
   const handlePressStart = (item) => {
     longPressFiredRef.current = false;
@@ -68,31 +65,102 @@ export default function Vault() {
   const load = async () => {
     const [vault, watchlist] = await Promise.all([
       base44.entities.VaultItem.list('-created_date', 50),
-      base44.entities.WatchlistItem.filter({ active: true }, '-created_date', 20),
+      base44.entities.WatchlistItem.list('-created_date', 50),
     ]);
     setVaultItems(vault);
     setWatchlistItems(watchlist);
     setLoading(false);
+
+    // Watchlist alert notifications
+    if ('Notification' in window && watchlist.length > 0) {
+      if (Notification.permission === 'default') await Notification.requestPermission();
+      if (Notification.permission === 'granted') {
+        const activeAlerts = watchlist.filter(w => w.active);
+
+        // Price drop 10%+ below target
+        activeAlerts.forEach(w => {
+          if (w.current_best_price && w.target_price && w.current_best_price <= w.target_price * 0.9) {
+            const dropPct = Math.round((1 - w.current_best_price / w.target_price) * 100);
+            new Notification('📉 10%+ Price Drop!', {
+              body: `${w.item_title} dropped ${dropPct}% to $${w.current_best_price.toFixed(2)}`,
+              icon: w.item_image_url || undefined,
+            });
+          }
+        });
+
+        // Sentiment shift check (throttled — once per 24h per item)
+        const sentimentKey = 'vault_sentiment_cache';
+        const cache = JSON.parse(localStorage.getItem(sentimentKey) || '{}');
+        const now = Date.now();
+        const itemsToCheck = activeAlerts.filter(w =>
+          w.item_title && (!cache[w.id] || now - cache[w.id].checkedAt > 24 * 60 * 60 * 1000)
+        );
+
+        if (itemsToCheck.length > 0 && itemsToCheck.length <= 10) {
+          try {
+            const res = await base44.integrations.Core.InvokeLLM({
+              prompt: `Assess the current resale market sentiment for these items. For each, classify as "bullish" (prices rising, demand growing), "bearish" (prices falling, demand shrinking), or "neutral" (stable):\n${itemsToCheck.map(w => `- ${w.item_title}`).join('\n')}`,
+              add_context_from_internet: true,
+              model: 'gemini_3_flash',
+              response_json_schema: {
+                type: 'object',
+                properties: {
+                  items: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        title: { type: 'string' },
+                        sentiment: { type: 'string', enum: ['bullish', 'bearish', 'neutral'] },
+                      },
+                    },
+                  },
+                },
+              },
+            });
+
+            (res.items || []).forEach(s => {
+              const w = itemsToCheck.find(x => x.item_title === s.title);
+              if (!w) return;
+              const prev = cache[w.id]?.sentiment;
+              if (prev && prev !== s.sentiment) {
+                new Notification('📊 Market Sentiment Shift!', {
+                  body: `${w.item_title} shifted from ${prev} to ${s.sentiment}`,
+                  icon: w.item_image_url || undefined,
+                });
+              }
+              cache[w.id] = { sentiment: s.sentiment, checkedAt: now };
+            });
+            localStorage.setItem(sentimentKey, JSON.stringify(cache));
+          } catch {}
+        }
+      }
+    }
   };
 
   useEffect(() => { load(); }, []);
 
   const filteredItems = (() => {
-    if (activeFilter === 'all') return vaultItems;
-    if (activeFilter === 'favorited') return vaultItems.filter(v => v.favorited);
-    if (activeFilter === 'watching') return watchlistItems.map(w => ({
+    let items;
+    if (activeFilter === 'all') items = vaultItems;
+    else if (activeFilter === 'favorited') items = vaultItems.filter(v => v.favorited);
+    else if (activeFilter === 'watching') items = watchlistItems.map(w => ({
       ...w,
       item_title: w.item_title,
       item_image_url: w.item_image_url,
       status: 'watching',
       best_price_found: w.current_best_price,
     }));
-    return vaultItems.filter(v => v.status === activeFilter);
+    else items = vaultItems.filter(v => v.status === activeFilter);
+
+    if (activeCategory !== 'all' && activeFilter !== 'watching') {
+      items = items.filter(v => v.category === activeCategory);
+    }
+    return items;
   })();
 
   const sortedItems = [...filteredItems].sort((a, b) => {
     if (sortBy === 'profit') return (b.best_price_found || 0) - (a.best_price_found || 0);
-    if (sortBy === 'category') return (a.category || '').localeCompare(b.category || '');
     return new Date(b.created_date) - new Date(a.created_date);
   });
 
@@ -110,6 +178,18 @@ export default function Vault() {
     setSelectedForCompare(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : prev.length < 4 ? [...prev, id] : prev
     );
+  };
+
+  const toggleWatchlistAlert = async (item) => {
+    const w = watchlistItems.find(x => x.id === item.id);
+    if (!w) return;
+    const newActive = !w.active;
+    setWatchlistItems(prev => prev.map(x => x.id === w.id ? { ...x, active: newActive } : x));
+    try {
+      await base44.entities.WatchlistItem.update(w.id, { active: newActive });
+    } catch {
+      setWatchlistItems(prev => prev.map(x => x.id === w.id ? { ...x, active: !newActive } : x));
+    }
   };
 
   return (
@@ -193,34 +273,22 @@ export default function Vault() {
         </AnimatePresence>
       </div>
 
+      {!loading && (
+        <VaultFilterBar
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+          categories={vaultCategories}
+        />
+      )}
+
       {!loading && <VaultDashboard vaultItems={vaultItems} />}
       {!loading && <SellPriorityCard vaultItems={vaultItems} />}
 
       {compareMode && selectedForCompare.length >= 2 && (
         <CompareSummaryTable selectedIds={selectedForCompare} vaultItems={vaultItems} />
       )}
-
-      {/* Sort buttons */}
-      <div className="flex gap-2 px-4 mt-4 mb-1">
-        {sortOptions.map((s) => {
-          const Icon = s.icon;
-          const isActive = sortBy === s.id;
-          return (
-            <motion.button
-              key={s.id}
-              onClick={() => setSortBy(s.id)}
-              className="flex items-center gap-1.5 px-3 h-8 rounded-xl text-xs font-semibold"
-              style={{
-                background: isActive ? 'hsl(190 100% 50% / 0.12)' : 'hsl(240 12% 10%)',
-                border: isActive ? '1px solid hsl(190 100% 50% / 0.3)' : '1px solid hsl(240 10% 18%)',
-                color: isActive ? '#00d4ff' : 'hsl(220 10% 55%)',
-              }}
-              whileTap={{ scale: 0.94 }}>
-              <Icon className="w-3 h-3" /> {s.label}
-            </motion.button>
-          );
-        })}
-      </div>
 
       {/* Filters */}
       <div className="flex gap-2 px-4 overflow-x-auto pb-2 scrollbar-none">
@@ -310,6 +378,16 @@ export default function Vault() {
                         )}
                         {!compareMode && (
                           <div className="absolute top-2 right-2 flex flex-col gap-1.5">
+                            {item.target_price !== undefined && (
+                              <button
+                                onClick={(e) => { e.preventDefault(); toggleWatchlistAlert(item); }}
+                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center"
+                              >
+                                {item.active
+                                  ? <Bell className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400/20" />
+                                  : <BellOff className="w-3.5 h-3.5 text-muted-foreground" />}
+                              </button>
+                            )}
                             {item.favorited !== undefined && (
                               <button
                                 onClick={(e) => { e.preventDefault(); toggleFavorite(item); }}
