@@ -59,22 +59,22 @@ function AnimatedRoutes() {
           <Route path="scan" element={<></>} />
           <Route path="sell-hub" element={<></>} />
           <Route path="profile" element={<></>} />
-          {/* Non-tab pages */}
+          {/* Non-tab pages — kept inside Layout so it stays mounted across transitions */}
           <Route path="deals" element={<LazyRoute><Deals /></LazyRoute>} />
           <Route path="vault" element={<LazyRoute><Vault /></LazyRoute>} />
+          <Route path="scan-result/:id" element={<LazyRoute><ScanResult /></LazyRoute>} />
+          <Route path="search" element={<LazyRoute><Search /></LazyRoute>} />
+          <Route path="compare" element={<LazyRoute><Compare /></LazyRoute>} />
+          <Route path="price-tracker" element={<LazyRoute><PriceTracker /></LazyRoute>} />
+          <Route path="analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
+          <Route path="vault-report" element={<LazyRoute><VaultReport /></LazyRoute>} />
+          <Route path="market-trends" element={<LazyRoute><MarketTrends /></LazyRoute>} />
+          <Route path="bulk-scan" element={<LazyRoute><BulkScan /></LazyRoute>} />
+          <Route path="ar-view" element={<LazyRoute><ARView /></LazyRoute>} />
+          <Route path="privacy-policy" element={<LazyRoute><PrivacyPolicy /></LazyRoute>} />
+          <Route path="terms-of-use" element={<LazyRoute><TermsOfUse /></LazyRoute>} />
+          <Route path="*" element={<LazyRoute><PageNotFound /></LazyRoute>} />
         </Route>
-        <Route path="/scan-result/:id" element={<LazyRoute><ScanResult /></LazyRoute>} />
-        <Route path="/search" element={<LazyRoute><Search /></LazyRoute>} />
-        <Route path="/compare" element={<LazyRoute><Compare /></LazyRoute>} />
-        <Route path="/price-tracker" element={<LazyRoute><PriceTracker /></LazyRoute>} />
-        <Route path="/analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
-        <Route path="/vault-report" element={<LazyRoute><VaultReport /></LazyRoute>} />
-        <Route path="/market-trends" element={<LazyRoute><MarketTrends /></LazyRoute>} />
-        <Route path="/bulk-scan" element={<LazyRoute><BulkScan /></LazyRoute>} />
-        <Route path="/ar-view" element={<LazyRoute><ARView /></LazyRoute>} />
-        <Route path="/privacy-policy" element={<LazyRoute><PrivacyPolicy /></LazyRoute>} />
-        <Route path="/terms-of-use" element={<LazyRoute><TermsOfUse /></LazyRoute>} />
-        <Route path="*" element={<LazyRoute><PageNotFound /></LazyRoute>} />
       </Routes>
     </AnimatePresence>
   );

@@ -10,11 +10,13 @@ const tabs = [
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
+const tabPaths = ['/', '/community', '/scan', '/sell-hub', '/profile'];
+
 export default function BottomTabBar() {
   const location = useLocation();
 
-  // Hide tab bar on certain pages
-  if (location.pathname.startsWith('/scan-result') || location.pathname.startsWith('/bulk-scan')) return null;
+  // Hide tab bar on non-tab pages
+  if (!tabPaths.includes(location.pathname)) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40">
