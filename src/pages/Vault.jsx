@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Archive, Heart, Bell, BellOff, Layers3, X, FileText, Box, Zap } from 'lucide-react';
+import { Archive, Heart, Bell, BellOff, Layers3, X, FileText, Box, Zap, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '../components/GlassCard';
@@ -199,12 +199,17 @@ export default function Vault() {
       {/* Header */}
       <div className="px-4 pb-3 pt-safe-12">
         <div className="flex items-start justify-between">
-          <div>
-            <h1 className="font-heading text-2xl font-bold text-foreground flex items-center gap-2">
-              <Archive className="w-6 h-6 text-violet-400" />
-              Vault
-            </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Your scanned finds and watchlist</p>
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate(-1)} className="touch-target">
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </button>
+            <div>
+              <h1 className="font-heading text-2xl font-bold text-foreground flex items-center gap-2">
+                <Archive className="w-6 h-6 text-violet-400" />
+                Vault
+              </h1>
+              <p className="text-xs text-muted-foreground mt-0.5">Your scanned finds and watchlist</p>
+            </div>
           </div>
           <div className="flex gap-2 mt-1">
             {!loading && vaultItems.length > 0 && <VaultExportButton vaultItems={vaultItems} />}

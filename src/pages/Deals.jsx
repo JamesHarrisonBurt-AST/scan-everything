@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Zap, TrendingDown, Filter } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Zap, TrendingDown, Filter, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import GlassCard from '../components/GlassCard';
 import DealScoreBadge from '../components/DealScoreBadge';
 import CountUpNumber from '../components/CountUpNumber';
 
 export default function Deals() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [summaries, setSummaries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +41,10 @@ export default function Deals() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="px-4 pb-4 pt-safe-12">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="touch-target">
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
           <div>
             <h1 className="font-heading text-2xl font-bold text-foreground flex items-center gap-2">
               <Zap className="w-6 h-6 text-cyan-400" />
