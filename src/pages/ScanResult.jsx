@@ -10,6 +10,7 @@ import ValuePanel from '../components/result/ValuePanel';
 import ResultActions from '../components/result/ResultActions';
 import ListingDraftPanel from '../components/result/ListingDraftPanel';
 import ProfitCalculator from '../components/result/ProfitCalculator';
+import PriceHistoryChart from '../components/result/PriceHistoryChart';
 import ShimmerLoader from '../components/ShimmerLoader';
 import DepthReveal from '../components/result/DepthReveal';
 
@@ -102,6 +103,9 @@ export default function ScanResult() {
 
       <DepthReveal delay={0.4}>
         <PricePanel priceSummary={priceSummary} />
+      </DepthReveal>
+      <DepthReveal delay={0.45}>
+        <PriceHistoryChart item={item} />
       </DepthReveal>
       <DepthReveal delay={0.5}>
         <ListingsPanel listings={listings} />
