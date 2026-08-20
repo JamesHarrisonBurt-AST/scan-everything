@@ -197,7 +197,7 @@ function TrackerCard({ watchlistItem, item, summary, onEdit, onToggle, onTrends,
           <div className="flex flex-col gap-2 items-end flex-shrink-0">
             <motion.button
               onClick={() => onToggle(watchlistItem)}
-              className="w-8 h-8 rounded-xl flex items-center justify-center"
+              className="w-8 h-8 rounded-xl flex items-center justify-center touch-target"
               style={{
                 background: watchlistItem.active ? 'hsl(190 100% 50% / 0.12)' : 'hsl(240 12% 13%)',
                 border: `1px solid ${watchlistItem.active ? 'hsl(190 100% 50% / 0.3)' : 'hsl(240 10% 20%)'}`,
@@ -209,14 +209,14 @@ function TrackerCard({ watchlistItem, item, summary, onEdit, onToggle, onTrends,
             </motion.button>
             <motion.button
               onClick={() => onEdit(watchlistItem, item)}
-              className="w-8 h-8 rounded-xl flex items-center justify-center"
+              className="w-8 h-8 rounded-xl flex items-center justify-center touch-target"
               style={{ background: 'hsl(240 12% 13%)', border: '1px solid hsl(240 10% 20%)' }}
               whileTap={{ scale: 0.88 }}>
               <Target className="w-3.5 h-3.5 text-violet-400" />
             </motion.button>
             <motion.button
               onClick={() => onTrends(item)}
-              className="w-8 h-8 rounded-xl flex items-center justify-center"
+              className="w-8 h-8 rounded-xl flex items-center justify-center touch-target"
               style={{ background: 'hsl(190 100% 50% / 0.08)', border: '1px solid hsl(190 100% 50% / 0.2)' }}
               whileTap={{ scale: 0.88 }}>
               <BarChart2 className="w-3.5 h-3.5 text-cyan-400" />
@@ -328,7 +328,7 @@ export default function PriceTracker() {
           <p className="text-[11px] tracking-widest uppercase text-muted-foreground">Follow & alert</p>
         </div>
         <motion.button onClick={() => setShowAddPicker(true)}
-          className="ml-auto flex items-center gap-2 px-4 h-10 rounded-2xl text-sm font-semibold"
+          className="ml-auto flex items-center gap-2 px-4 h-10 rounded-2xl text-sm font-semibold touch-target"
           style={{ background: 'linear-gradient(135deg, hsl(190 100% 50% / 0.15), hsl(263 70% 58% / 0.1))', border: '1px solid hsl(190 100% 50% / 0.25)', color: '#00d4ff' }}
           whileTap={{ scale: 0.95 }}>
           <Bell className="w-4 h-4" /> Track
@@ -416,7 +416,7 @@ export default function PriceTracker() {
               <div className="flex justify-center pt-3 pb-2"><div className="w-10 h-1 rounded-full bg-muted" /></div>
               <div className="px-5 pb-3 flex items-center justify-between">
                 <h3 className="font-heading text-base font-bold text-foreground">Track an Item</h3>
-                <button onClick={() => setShowAddPicker(false)} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'hsl(240 12% 14%)' }}>
+                <button onClick={() => setShowAddPicker(false)} className="w-8 h-8 rounded-full flex items-center justify-center touch-target" style={{ background: 'hsl(240 12% 14%)' }}>
                   <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>

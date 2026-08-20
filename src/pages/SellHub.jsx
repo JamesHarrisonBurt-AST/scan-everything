@@ -113,7 +113,7 @@ function ListingForm({ vaultItems, onClose, onSaved }) {
                 style={{ background: s <= step ? '#00d4ff' : 'hsl(240 10% 20%)' }} />
             ))}
             <motion.button onClick={onClose} whileTap={{ scale: 0.9 }}
-              className="w-8 h-8 rounded-xl flex items-center justify-center ml-2"
+              className="w-8 h-8 rounded-xl flex items-center justify-center ml-2 touch-target"
               style={{ background: 'hsl(240 12% 14%)' }}>
               <X className="w-4 h-4 text-muted-foreground" />
             </motion.button>
@@ -354,7 +354,7 @@ function ListingCard({ listing, onDelete, onStatusChange }) {
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30">
           {listing.status !== 'sold' && (
             <motion.button onClick={() => onStatusChange(listing, 'sold')}
-              className="flex-1 h-8 rounded-lg text-[11px] font-bold"
+              className="flex-1 h-8 rounded-lg text-[11px] font-bold touch-target"
               style={{ background: 'hsl(190 100% 50% / 0.08)', border: '1px solid hsl(190 100% 50% / 0.2)', color: '#00d4ff' }}
               whileTap={{ scale: 0.94 }}>
               Mark Sold
@@ -362,14 +362,14 @@ function ListingCard({ listing, onDelete, onStatusChange }) {
           )}
           {listing.status === 'draft' && (
             <motion.button onClick={() => onStatusChange(listing, 'active')}
-              className="flex-1 h-8 rounded-lg text-[11px] font-bold"
+              className="flex-1 h-8 rounded-lg text-[11px] font-bold touch-target"
               style={{ background: 'hsl(160 84% 39% / 0.08)', border: '1px solid hsl(160 84% 39% / 0.2)', color: '#10b981' }}
               whileTap={{ scale: 0.94 }}>
               Activate
             </motion.button>
           )}
           <motion.button onClick={() => onDelete(listing)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 touch-target"
             style={{ background: 'hsl(0 84% 60% / 0.08)', border: '1px solid hsl(0 84% 60% / 0.2)' }}
             whileTap={{ scale: 0.92 }}>
             <Trash2 className="w-3.5 h-3.5 text-red-400" />
@@ -444,7 +444,7 @@ export default function SellHub() {
             <p className="text-[11px] text-muted-foreground uppercase tracking-widest mt-0.5">Manage your selling channels</p>
           </div>
           <motion.button onClick={() => setShowForm(true)}
-            className="flex items-center gap-1.5 px-3 h-9 rounded-xl text-xs font-bold"
+            className="flex items-center gap-1.5 px-3 h-9 rounded-xl text-xs font-bold touch-target"
             style={{ background: 'linear-gradient(135deg, hsl(160 84% 39% / 0.15), hsl(190 100% 50% / 0.08))', border: '1px solid hsl(160 84% 39% / 0.3)', color: '#10b981' }}
             whileTap={{ scale: 0.95 }}>
             <Plus className="w-3.5 h-3.5" /> New Listing
@@ -490,7 +490,7 @@ export default function SellHub() {
       <div className="px-4 flex gap-2 mb-4">
         {TABS.map(tab => (
           <motion.button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className="flex items-center gap-1.5 px-3 h-9 rounded-xl text-xs font-semibold"
+            className="flex items-center gap-1.5 px-3 h-9 rounded-xl text-xs font-semibold touch-target"
             style={{
               background: activeTab === tab.key ? 'linear-gradient(135deg, hsl(190 100% 50% / 0.15), hsl(263 70% 58% / 0.08))' : 'hsl(240 12% 10%)',
               border: activeTab === tab.key ? '1px solid hsl(190 100% 50% / 0.3)' : '1px solid hsl(240 10% 18%)',
@@ -525,7 +525,7 @@ export default function SellHub() {
             </p>
             {activeTab !== 'sold' && (
               <motion.button onClick={() => setShowForm(true)}
-                className="mt-4 px-5 h-10 rounded-xl text-sm font-bold flex items-center gap-2"
+                className="mt-4 px-5 h-10 rounded-xl text-sm font-bold flex items-center gap-2 touch-target"
                 style={{ background: 'linear-gradient(135deg, #10b981, #00d4ff)', color: 'white' }}
                 whileTap={{ scale: 0.96 }}>
                 <Plus className="w-4 h-4" /> New Listing

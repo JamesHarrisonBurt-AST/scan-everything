@@ -215,7 +215,7 @@ export default function Vault() {
             {!loading && vaultItems.length > 0 && <VaultExportButton vaultItems={vaultItems} />}
             <Link to="/price-tracker">
               <motion.div
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
+                className="w-9 h-9 rounded-xl flex items-center justify-center touch-target"
                 style={{ background: 'hsl(190 100% 50% / 0.1)', border: '1px solid hsl(190 100% 50% / 0.25)' }}
                 whileTap={{ scale: 0.9 }}>
                 <Bell className="w-4 h-4 text-cyan-400" />
@@ -223,7 +223,7 @@ export default function Vault() {
             </Link>
             <motion.button
               onClick={() => { setCompareMode(!compareMode); setSelectedForCompare([]); }}
-              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              className="w-9 h-9 rounded-xl flex items-center justify-center touch-target"
               style={{
                 background: compareMode ? 'hsl(263 70% 58% / 0.2)' : 'hsl(263 70% 58% / 0.08)',
                 border: `1px solid ${compareMode ? 'hsl(263 70% 58% / 0.5)' : 'hsl(263 70% 58% / 0.2)'}`,
@@ -246,7 +246,7 @@ export default function Vault() {
                 <div className="ml-auto flex gap-2">
                   <motion.button
                     onClick={handleBulkActions}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold touch-target"
                     style={{ background: 'hsl(38 92% 50% / 0.15)', color: '#fbbf24', border: '1px solid hsl(38 92% 50% / 0.3)' }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -255,7 +255,7 @@ export default function Vault() {
                   </motion.button>
                   <motion.button
                     onClick={() => navigate(`/vault-report?ids=${selectedForCompare.join(',')}`)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold touch-target"
                     style={{ background: 'hsl(190 100% 50% / 0.15)', color: '#00d4ff', border: '1px solid hsl(190 100% 50% / 0.3)' }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -264,7 +264,7 @@ export default function Vault() {
                   </motion.button>
                   <motion.button
                     onClick={() => navigate(`/compare?ids=${selectedForCompare.join(',')}`)}
-                    className="px-3 py-1.5 rounded-xl text-xs font-bold"
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold touch-target"
                     style={{ background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff' }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -346,7 +346,7 @@ export default function Vault() {
                 {compareMode && (
                   <motion.button
                     onClick={() => toggleCompareSelect(compareId)}
-                    className="absolute top-2 left-2 z-20 w-6 h-6 rounded-lg flex items-center justify-center"
+                    className="absolute top-2 left-2 z-20 w-6 h-6 rounded-lg flex items-center justify-center touch-target"
                     style={{
                       background: isSelected ? 'hsl(263 70% 58%)' : 'hsl(240 12% 12% / 0.9)',
                       border: `1px solid ${isSelected ? 'hsl(263 70% 58%)' : 'hsl(240 10% 28%)'}`,
@@ -386,7 +386,7 @@ export default function Vault() {
                             {item.target_price !== undefined && (
                               <button
                                 onClick={(e) => { e.preventDefault(); toggleWatchlistAlert(item); }}
-                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center"
+                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center touch-target"
                               >
                                 {item.active
                                   ? <Bell className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400/20" />
@@ -396,7 +396,7 @@ export default function Vault() {
                             {item.favorited !== undefined && (
                               <button
                                 onClick={(e) => { e.preventDefault(); toggleFavorite(item); }}
-                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center"
+                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center touch-target"
                               >
                                 <Heart className={cn('w-3.5 h-3.5', item.favorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground')} />
                               </button>
@@ -404,7 +404,7 @@ export default function Vault() {
                             {item.item_image_url && (
                               <button
                                 onClick={(e) => { e.preventDefault(); navigate(`/ar-view?image=${encodeURIComponent(item.item_image_url)}&title=${encodeURIComponent(item.item_title || 'Item')}`); }}
-                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center"
+                                className="w-7 h-7 rounded-full glass-card flex items-center justify-center touch-target"
                               >
                                 <Box className="w-3.5 h-3.5 text-muted-foreground" />
                               </button>
