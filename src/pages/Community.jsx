@@ -223,33 +223,40 @@ export default function Community() {
   const [showFollowedOnly, setShowFollowedOnly] = useState(false);
 
   const load = async () => {
-    const [me, allDeals, follows] = await Promise.all([
-      base44.auth.me(),
-      base44.entities.CommunityDeal.list('-upvotes', 50),
-      base44.entities.CategoryFollow.list(),
-    ]);
+    let me = null;
+    try { me = await base44.auth.me(); } catch { me = null; }
     setUser(me);
-    setDeals(allDeals);
-    const cats = follows.map(f => f.category);
-    setFollowedCategories(cats);
-    setLoading(false);
+    try {
+      const [allDeals, follows] = await Promise.all([
+        base44.entities.CommunityDeal.list('-upvotes', 50),
+        base44.entities.CategoryFollow.list(),
+      ]);
+      setDeals(allDeals);
+      const cats = follows.map(f => f.category);
+      setFollowedCategories(cats);
 
-    // Notify about new deals in followed categories
-    if ('Notification' in window && cats.length > 0) {
-      if (Notification.permission === 'default') await Notification.requestPermission();
-      if (Notification.permission === 'granted') {
-        const seenKey = 'community_seen_deal_ids';
-        const seen = JSON.parse(localStorage.getItem(seenKey) || '[]');
-        const newMatches = allDeals.filter(d => !seen.includes(d.id) && cats.includes(d.category));
-        newMatches.forEach(d => {
-          const n = new Notification(`🔥 New ${d.category} Deal!`, {
-            body: `${d.title} — $${d.price_found?.toFixed(2)}`,
-            icon: d.image_url || undefined,
+      // Notify about new deals in followed categories
+      if ('Notification' in window && cats.length > 0) {
+        if (Notification.permission === 'default') await Notification.requestPermission();
+        if (Notification.permission === 'granted') {
+          const seenKey = 'community_seen_deal_ids';
+          const seen = JSON.parse(localStorage.getItem(seenKey) || '[]');
+          const newMatches = allDeals.filter(d => !seen.includes(d.id) && cats.includes(d.category));
+          newMatches.forEach(d => {
+            const n = new Notification(`🔥 New ${d.category} Deal!`, {
+              body: `${d.title} — $${d.price_found?.toFixed(2)}`,
+              icon: d.image_url || undefined,
+            });
+            n.onclick = () => window.focus();
           });
-          n.onclick = () => window.focus();
-        });
-        localStorage.setItem(seenKey, JSON.stringify(allDeals.map(d => d.id)));
+          localStorage.setItem(seenKey, JSON.stringify(allDeals.map(d => d.id)));
+        }
       }
+    } catch {
+      setDeals([]);
+      setFollowedCategories([]);
+    } finally {
+      setLoading(false);
     }
   };
 
