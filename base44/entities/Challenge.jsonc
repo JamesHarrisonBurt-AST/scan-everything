@@ -1,0 +1,67 @@
+{
+  "name": "Challenge",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "match_type": {
+      "type": "string",
+      "description": "category_match, attribute_match, count_categories, era_old"
+    },
+    "match_value": {
+      "type": "string",
+      "description": "Value to match (category name, attribute, etc.)"
+    },
+    "target_count": {
+      "type": "number",
+      "default": 1
+    },
+    "xp_reward": {
+      "type": "number",
+      "default": 100
+    },
+    "challenge_type": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "weekly"
+      ],
+      "default": "daily"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "challenge_type"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

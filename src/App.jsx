@@ -10,23 +10,14 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from './components/Layout';
 
 // Lazy load all pages for code splitting
-const ScanResult = lazy(() => import('./pages/ScanResult'));
-const Deals = lazy(() => import('./pages/Deals'));
-const Vault = lazy(() => import('./pages/Vault'));
-const Search = lazy(() => import('./pages/Search'));
-const Compare = lazy(() => import('./pages/Compare'));
-const PriceTracker = lazy(() => import('./pages/PriceTracker'));
-const Analytics = lazy(() => import('./pages/Analytics'));
-const VaultReport = lazy(() => import('./pages/VaultReport'));
-const MarketTrends = lazy(() => import('./pages/MarketTrends'));
-const BulkScan = lazy(() => import('./pages/BulkScan'));
-const ARView = lazy(() => import('./pages/ARView'));
+const ARCamera = lazy(() => import('./pages/ARCamera'));
+const DiscoveryDetail = lazy(() => import('./pages/DiscoveryDetail'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
 
 const PageLoader = () => (
-  <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'hsl(240 15% 4%)' }}>
-    <div className="w-8 h-8 border-4 border-cyan-500/20 border-t-cyan-400 rounded-full animate-spin"></div>
+  <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'hsl(220 18% 5%)' }}>
+    <div className="w-8 h-8 border-4 border-amber-500/20 border-t-amber-400 rounded-full animate-spin"></div>
   </div>
 );
 
@@ -55,22 +46,12 @@ function AnimatedRoutes() {
         <Route element={<Layout />}>
           {/* Tab paths render empty — TabKeepAlive in Layout handles them */}
           <Route index element={<></>} />
-          <Route path="community" element={<></>} />
-          <Route path="scan" element={<></>} />
-          <Route path="sell-hub" element={<></>} />
+          <Route path="discoveries" element={<></>} />
+          <Route path="challenges" element={<></>} />
           <Route path="profile" element={<></>} />
-          {/* Non-tab pages — kept inside Layout so it stays mounted across transitions */}
-          <Route path="deals" element={<LazyRoute><Deals /></LazyRoute>} />
-          <Route path="vault" element={<LazyRoute><Vault /></LazyRoute>} />
-          <Route path="scan-result/:id" element={<LazyRoute><ScanResult /></LazyRoute>} />
-          <Route path="search" element={<LazyRoute><Search /></LazyRoute>} />
-          <Route path="compare" element={<LazyRoute><Compare /></LazyRoute>} />
-          <Route path="price-tracker" element={<LazyRoute><PriceTracker /></LazyRoute>} />
-          <Route path="analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
-          <Route path="vault-report" element={<LazyRoute><VaultReport /></LazyRoute>} />
-          <Route path="market-trends" element={<LazyRoute><MarketTrends /></LazyRoute>} />
-          <Route path="bulk-scan" element={<LazyRoute><BulkScan /></LazyRoute>} />
-          <Route path="ar-view" element={<LazyRoute><ARView /></LazyRoute>} />
+          {/* Non-tab pages */}
+          <Route path="discovery/:id" element={<LazyRoute><DiscoveryDetail /></LazyRoute>} />
+          <Route path="ar-camera" element={<LazyRoute><ARCamera /></LazyRoute>} />
           <Route path="privacy-policy" element={<LazyRoute><PrivacyPolicy /></LazyRoute>} />
           <Route path="terms-of-use" element={<LazyRoute><TermsOfUse /></LazyRoute>} />
           <Route path="*" element={<LazyRoute><PageNotFound /></LazyRoute>} />

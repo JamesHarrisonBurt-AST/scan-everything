@@ -4,12 +4,13 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   safelist: [
     'pt-safe', 'pb-safe', 'pl-safe', 'pr-safe', 'pt-safe-12', 'mb-safe-24', 'touch-target',
-    'bg-cyan-500/10', 'bg-violet-500/10', 'bg-emerald-500/10', 'bg-amber-500/10',
-    'text-cyan-400', 'text-violet-400', 'text-emerald-400', 'text-amber-400',
-    'border-cyan-500/20', 'border-violet-500/20', 'border-emerald-500/20', 'border-amber-500/20',
+    'bg-cyan-500/10', 'bg-violet-500/10', 'bg-emerald-500/10', 'bg-amber-500/10', 'bg-teal-500/10', 'bg-rose-500/10',
+    'text-cyan-400', 'text-violet-400', 'text-emerald-400', 'text-amber-400', 'text-teal-400', 'text-rose-400', 'text-rose-500',
+    'border-cyan-500/20', 'border-violet-500/20', 'border-emerald-500/20', 'border-amber-500/20', 'border-teal-500/20', 'border-rose-500/20',
     'from-cyan-500', 'from-violet-500', 'from-emerald-500', 'from-amber-500',
     'to-cyan-600', 'to-violet-600', 'to-emerald-600', 'to-amber-600',
     'via-cyan-400', 'via-violet-400', 'via-emerald-400',
+    'fill-rose-500', 'bg-amber-400',
   ],
   theme: {
     extend: {

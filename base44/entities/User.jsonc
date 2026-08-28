@@ -7,6 +7,34 @@
         "admin",
         "user"
       ]
+    },
+    "xp": {
+      "type": "number",
+      "default": 0,
+      "description": "Total experience points"
+    },
+    "level": {
+      "type": "number",
+      "default": 1,
+      "description": "Current explorer level"
+    },
+    "streak_days": {
+      "type": "number",
+      "default": 0,
+      "description": "Current discovery streak in days"
+    },
+    "last_scan_date": {
+      "type": "string",
+      "description": "Date of last discovery (ISO date string)"
+    },
+    "total_discoveries": {
+      "type": "number",
+      "default": 0,
+      "description": "Total discoveries captured"
+    },
+    "unique_categories": {
+      "type": "string",
+      "description": "JSON array of unique categories discovered"
     }
   },
   "required": [

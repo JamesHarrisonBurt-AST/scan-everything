@@ -1,17 +1,15 @@
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const Home = lazy(() => import('@/pages/Home'));
-const Community = lazy(() => import('@/pages/Community'));
-const Scan = lazy(() => import('@/pages/Scan'));
-const SellHub = lazy(() => import('@/pages/SellHub'));
+const Explore = lazy(() => import('@/pages/Explore'));
+const Discoveries = lazy(() => import('@/pages/Discoveries'));
+const Challenges = lazy(() => import('@/pages/Challenges'));
 const Profile = lazy(() => import('@/pages/Profile'));
 
 const TABS = {
-  '/': Home,
-  '/community': Community,
-  '/scan': Scan,
-  '/sell-hub': SellHub,
+  '/': Explore,
+  '/discoveries': Discoveries,
+  '/challenges': Challenges,
   '/profile': Profile,
 };
 
@@ -20,7 +18,7 @@ const ACTIVE_TAB_KEY = 'tab_active_section';
 
 const PageLoader = () => (
   <div className="flex items-center justify-center py-20">
-    <div className="w-8 h-8 border-4 border-cyan-500/20 border-t-cyan-400 rounded-full animate-spin"></div>
+    <div className="w-8 h-8 border-4 border-amber-500/20 border-t-amber-400 rounded-full animate-spin"></div>
   </div>
 );
 
@@ -34,7 +32,6 @@ export default function TabKeepAlive() {
   useEffect(() => {
     if (isTabPath) {
       setVisited(prev => (prev.has(currentPath) ? prev : new Set(prev).add(currentPath)));
-      // Update active tab and save sub-path as the tab root
       sessionStorage.setItem(ACTIVE_TAB_KEY, currentPath);
       try {
         const paths = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
@@ -42,7 +39,6 @@ export default function TabKeepAlive() {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(paths));
       } catch {}
     } else {
-      // Non-tab path: save as the last sub-path of the current active tab
       const activeTab = sessionStorage.getItem(ACTIVE_TAB_KEY) || '/';
       try {
         const paths = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');

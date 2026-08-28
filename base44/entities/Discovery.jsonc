@@ -1,0 +1,127 @@
+{
+  "name": "Discovery",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Identified object name"
+    },
+    "category": {
+      "type": "string",
+      "description": "Primary category"
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "Subcategory"
+    },
+    "summary": {
+      "type": "string",
+      "description": "One-line summary"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full AI description"
+    },
+    "possible_brand": {
+      "type": "string"
+    },
+    "possible_model": {
+      "type": "string"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "0-100"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Captured image URL"
+    },
+    "materials": {
+      "type": "string",
+      "description": "JSON array of materials"
+    },
+    "characteristics": {
+      "type": "string",
+      "description": "JSON array of characteristics"
+    },
+    "estimated_era": {
+      "type": "string"
+    },
+    "interesting_facts": {
+      "type": "string",
+      "description": "JSON array of facts"
+    },
+    "safety_notes": {
+      "type": "string",
+      "description": "JSON array of safety notes"
+    },
+    "maintenance_tips": {
+      "type": "string",
+      "description": "JSON array of tips"
+    },
+    "search_terms": {
+      "type": "string",
+      "description": "JSON array of search terms"
+    },
+    "follow_up_suggestions": {
+      "type": "string",
+      "description": "JSON array of suggested questions"
+    },
+    "rarity": {
+      "type": "string",
+      "enum": [
+        "common",
+        "interesting",
+        "unusual",
+        "exceptional"
+      ],
+      "default": "common"
+    },
+    "xp_earned": {
+      "type": "number",
+      "default": 0
+    },
+    "favorited": {
+      "type": "boolean",
+      "default": false
+    },
+    "tags": {
+      "type": "string",
+      "description": "JSON array of user tags"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "location_lat": {
+      "type": "number"
+    },
+    "location_lng": {
+      "type": "number"
+    },
+    "location_label": {
+      "type": "string"
+    },
+    "ai_thread_id": {
+      "type": "string",
+      "description": "Reference to AIThread for follow-up questions"
+    }
+  },
+  "required": [
+    "title",
+    "category"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

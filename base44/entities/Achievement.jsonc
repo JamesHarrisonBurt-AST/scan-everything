@@ -1,0 +1,55 @@
+{
+  "name": "Achievement",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Unique identifier e.g. first_sight"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Lucide icon name"
+    },
+    "category": {
+      "type": "string",
+      "description": "Grouping: discovery, category, streak, special"
+    },
+    "threshold": {
+      "type": "number",
+      "default": 1
+    },
+    "xp_reward": {
+      "type": "number",
+      "default": 50
+    }
+  },
+  "required": [
+    "code",
+    "title",
+    "description"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

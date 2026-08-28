@@ -1,0 +1,30 @@
+{
+  "name": "CollectionItem",
+  "type": "object",
+  "properties": {
+    "collection_id": {
+      "type": "string"
+    },
+    "discovery_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "collection_id",
+    "discovery_id"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
