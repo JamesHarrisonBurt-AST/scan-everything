@@ -7,10 +7,14 @@ import RecentScansCarousel from '../components/home/RecentScansCarousel';
 import InsightCards from '../components/home/InsightCards';
 import ScanCategories from '../components/home/ScanCategories';
 import SplashScreen from '../components/SplashScreen';
+import Onboarding from '../components/Onboarding';
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(() => {
     return !sessionStorage.getItem('splash_shown');
+  });
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('onboarding_completed');
   });
   const [recentItems, setRecentItems] = useState([]);
 
@@ -28,9 +32,14 @@ export default function Home() {
     setShowSplash(false);
   };
 
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+  };
+
   return (
     <>
       {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+      {showOnboarding && !showSplash && <Onboarding onComplete={handleOnboardingComplete} />}
 
       <PullToRefresh onRefresh={loadRecent}>
       <motion.div

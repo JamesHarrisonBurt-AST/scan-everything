@@ -10,7 +10,8 @@
         "text_label",
         "receipt",
         "gallery_upload",
-        "manual_search"
+        "manual_search",
+        "ocr"
       ],
       "description": "How the scan was initiated"
     },
@@ -23,6 +24,10 @@
         "barcode_reader"
       ],
       "description": "Source of the scan input"
+    },
+    "scan_category": {
+      "type": "string",
+      "description": "Selected scan category (product, vehicle, plant, electronics, clothing, collectible, document)"
     },
     "image_url": {
       "type": "string",
@@ -43,6 +48,18 @@
     "current_observed_price": {
       "type": "number",
       "description": "Price the user sees in store"
+    },
+    "location_lat": {
+      "type": "number",
+      "description": "Latitude where scan occurred"
+    },
+    "location_lng": {
+      "type": "number",
+      "description": "Longitude where scan occurred"
+    },
+    "location_label": {
+      "type": "string",
+      "description": "Human-readable location label"
     },
     "status": {
       "type": "string",

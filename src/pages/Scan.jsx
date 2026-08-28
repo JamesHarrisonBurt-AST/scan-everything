@@ -1,23 +1,38 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Image, FlashlightOff, Camera } from 'lucide-react';
+import { Zap, Image, Camera, MapPin, ScanBarcode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { base44 } from '@/api/base44Client';
 import ScanModeSelector from '../components/scan/ScanModeSelector';
+import ScanCategorySelector, { getCategoryPromptInstruction } from '../components/scan/ScanCategorySelector';
 import ScannerViewfinder from '../components/scan/ScannerViewfinder';
 import CameraCapture from '../components/scan/CameraCapture';
+import BarcodeScanner from '../components/scan/BarcodeScanner';
 
 export default function Scan() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [mode, setMode] = useState('camera');
+  const [scanCategory, setScanCategory] = useState('product');
   const [isScanning, setIsScanning] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [barcodeOpen, setBarcodeOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [manualQuery, setManualQuery] = useState('');
   const [observedPrice, setObservedPrice] = useState('');
+  const [location, setLocation] = useState(null);
+
+  // Capture location on mount
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { timeout: 5000, maximumAge: 60000 }
+    );
+  }, []);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -25,8 +40,9 @@ export default function Scan() {
     await processScan({ file });
   };
 
-  const processScan = async ({ file, query }) => {
+  const processScan = async ({ file, query, barcode, category }) => {
     setIsProcessing(true);
+    const cat = category || scanCategory;
 
     let imageUrl = '';
     if (file) {
@@ -34,26 +50,33 @@ export default function Scan() {
       imageUrl = file_url;
     }
 
-    // Create scan session
+    // Create scan session with category and location
     const session = await base44.entities.ScanSession.create({
-      scan_mode: file ? 'gallery_upload' : 'manual_search',
-      input_source_type: file ? 'photo_library' : 'typed_query',
+      scan_mode: barcode ? 'barcode' : (file ? 'gallery_upload' : 'manual_search'),
+      input_source_type: barcode ? 'barcode_reader' : (file ? 'photo_library' : 'typed_query'),
+      scan_category: cat,
       image_url: imageUrl,
-      raw_user_query: query || '',
+      barcode_value: barcode || '',
+      raw_user_query: query || barcode || '',
       current_observed_price: observedPrice ? parseFloat(observedPrice) : undefined,
+      location_lat: location?.lat,
+      location_lng: location?.lng,
       status: 'identifying',
     });
 
+    const categoryInstruction = getCategoryPromptInstruction(cat);
+
     // Call AI directly — vision + web search for real prices
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are an expert product identification and pricing AI.
-${file ? 'Analyze the attached photo of a product.' : `Analyze this product description/query: "${query}"`}
+      prompt: `You are an expert identification and valuation AI.
+${file ? 'Analyze the attached photo.' : `Analyze this query: "${query || barcode || ''}"`}
+${barcode ? `A barcode/QR code was scanned with value: ${barcode}. Look up the product associated with this code.` : ''}
 ${observedPrice ? `The user saw this item priced at $${observedPrice}.` : ''}
 
-Identify the specific product, then search the web for its current real market prices across major retailers and marketplaces (eBay, Amazon, StockX, Mercari, etc.).
+${categoryInstruction}
 
 Return a JSON object with:
-- identified: { title, brand, model, category, subcategory, description, confidence_score (0-100), condition_guess, attributes_json (JSON string) }
+- identified: { title, brand, model, category, subcategory, description, confidence_score (0-100), condition_guess, attributes_json (JSON string with category-specific fields) }
 - search_query_used: string (the optimized search query you used)
 - listings: array of up to 8 objects, each { source_name, source_type ("online_retailer"|"marketplace"|"auction"|"resale"|"local"), listing_title, price_amount, condition_label, product_url, availability_label, notes }
 - price_summary: { lowest_price, median_price, high_price, average_price, deal_score (0-100), recommendation_label, difference_from_observed }
@@ -188,12 +211,21 @@ Return a JSON object with:
   };
 
   const handleSimulateScan = () => {
-    setCameraOpen(true);
+    if (mode === 'barcode') {
+      setBarcodeOpen(true);
+    } else {
+      setCameraOpen(true);
+    }
   };
 
   const handleCameraCapture = async (file) => {
     setCameraOpen(false);
     await processScan({ file });
+  };
+
+  const handleBarcodeDetect = async (value) => {
+    setBarcodeOpen(false);
+    await processScan({ barcode: value });
   };
 
   return (
@@ -210,7 +242,23 @@ Return a JSON object with:
         />
       )}
 
+      {barcodeOpen && (
+        <BarcodeScanner
+          onDetect={handleBarcodeDetect}
+          onClose={() => setBarcodeOpen(false)}
+        />
+      )}
+
       <ScanModeSelector activeMode={mode} onModeChange={setMode} />
+      <ScanCategorySelector activeCategory={scanCategory} onCategoryChange={setScanCategory} />
+
+      {/* Location indicator */}
+      {location && (
+        <div className="flex items-center gap-1.5 px-4 mt-2">
+          <MapPin className="w-3 h-3 text-emerald-400" />
+          <span className="text-[11px] text-muted-foreground">Location captured for this scan</span>
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {isProcessing ? (
@@ -319,7 +367,7 @@ Return a JSON object with:
                     onClick={handleSimulateScan}
                     className="w-full h-12 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-heading font-semibold"
                   >
-                    <Camera className="w-5 h-5 mr-2" />
+                    {mode === 'barcode' ? <ScanBarcode className="w-5 h-5 mr-2" /> : <Camera className="w-5 h-5 mr-2" />}
                     {mode === 'barcode' ? 'Scan Barcode' : 'Take Photo'}
                   </Button>
 
@@ -334,7 +382,7 @@ Return a JSON object with:
                   </div>
 
                   <p className="text-[11px] text-muted-foreground text-center">
-                    Take a photo or upload an image to identify and price any product
+                    {mode === 'barcode' ? 'Point at any barcode or QR code to look up the product' : `Point at any ${scanCategory} to identify and price it`}
                   </p>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MapPin } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ResultHeader from '../components/result/ResultHeader';
 import PricePanel from '../components/result/PricePanel';
@@ -11,6 +11,8 @@ import ResultActions from '../components/result/ResultActions';
 import ListingDraftPanel from '../components/result/ListingDraftPanel';
 import ProfitCalculator from '../components/result/ProfitCalculator';
 import PriceHistoryChart from '../components/result/PriceHistoryChart';
+import FollowUpQuestions from '../components/result/FollowUpQuestions';
+import CategoryInsights from '../components/result/CategoryInsights';
 import ShimmerLoader from '../components/ShimmerLoader';
 import DepthReveal from '../components/result/DepthReveal';
 
@@ -22,21 +24,32 @@ export default function ScanResult() {
   const [priceSummary, setPriceSummary] = useState(null);
   const [listings, setListings] = useState([]);
   const [valueAssessment, setValueAssessment] = useState(null);
+  const [scanSession, setScanSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
-      const [items, summaries, priceResults, assessments] = await Promise.all([
-        base44.entities.IdentifiedItem.filter({ id: itemId }),
-        base44.entities.PriceSummary.filter({ identified_item_id: itemId }),
-        base44.entities.PriceResult.filter({ identified_item_id: itemId }),
-        base44.entities.ValueAssessment.filter({ identified_item_id: itemId }),
-      ]);
+      try {
+        const [items, summaries, priceResults, assessments] = await Promise.all([
+          base44.entities.IdentifiedItem.filter({ id: itemId }),
+          base44.entities.PriceSummary.filter({ identified_item_id: itemId }),
+          base44.entities.PriceResult.filter({ identified_item_id: itemId }),
+          base44.entities.ValueAssessment.filter({ identified_item_id: itemId }),
+        ]);
 
-      setItem(items[0] || null);
-      setPriceSummary(summaries[0] || null);
-      setListings(priceResults || []);
-      setValueAssessment(assessments[0] || null);
+        setItem(items[0] || null);
+        setPriceSummary(summaries[0] || null);
+        setListings(priceResults || []);
+        setValueAssessment(assessments[0] || null);
+
+        // Load scan session for location metadata
+        if (items[0]?.scan_session_id) {
+          try {
+            const sessions = await base44.entities.ScanSession.filter({ id: items[0].scan_session_id });
+            setScanSession(sessions[0] || null);
+          } catch {}
+        }
+      } catch {}
       setLoading(false);
     }
     loadData();
@@ -81,6 +94,36 @@ export default function ScanResult() {
 
       <ResultHeader item={item} priceSummary={priceSummary} />
 
+      {/* Scan metadata bar */}
+      {(scanSession?.location_lat || scanSession?.barcode_value || scanSession?.scan_category) && (
+        <motion.div
+          className="px-4 mt-3 flex items-center gap-3 flex-wrap"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 }}
+        >
+          {scanSession.scan_category && (
+            <span className="text-[11px] px-2 py-0.5 rounded-full capitalize" style={{ background: 'hsl(263 70% 58% / 0.1)', border: '1px solid hsl(263 70% 58% / 0.2)', color: '#a78bfa' }}>
+              {scanSession.scan_category} scan
+            </span>
+          )}
+          {scanSession.barcode_value && (
+            <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ background: 'hsl(190 100% 50% / 0.1)', border: '1px solid hsl(190 100% 50% / 0.2)', color: '#00d4ff' }}>
+              Barcode: {scanSession.barcode_value}
+            </span>
+          )}
+          {scanSession.location_lat && (
+            <span className="text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1" style={{ background: 'hsl(160 84% 39% / 0.1)', border: '1px solid hsl(160 84% 39% / 0.2)', color: '#10b981' }}>
+              <MapPin className="w-2.5 h-2.5" />
+              {scanSession.location_lat.toFixed(2)}, {scanSession.location_lng?.toFixed(2)}
+            </span>
+          )}
+          <span className="text-[11px] text-muted-foreground">
+            {new Date(item.created_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </span>
+        </motion.div>
+      )}
+
       {/* Description */}
       {item.description && (
         <motion.div
@@ -100,6 +143,9 @@ export default function ScanResult() {
           </div>
         </motion.div>
       )}
+
+      {/* Category-specific insights */}
+      <CategoryInsights item={item} />
 
       <DepthReveal delay={0.4}>
         <PricePanel priceSummary={priceSummary} />
@@ -122,6 +168,7 @@ export default function ScanResult() {
       <DepthReveal delay={0.9}>
         <ResultActions item={item} priceSummary={priceSummary} />
       </DepthReveal>
+      <FollowUpQuestions item={item} priceSummary={priceSummary} assessment={valueAssessment} />
     </div>
   );
 }
