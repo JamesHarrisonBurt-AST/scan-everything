@@ -24,12 +24,12 @@ export default function TermsOfUse() {
         <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
           <section>
             <h2 className="text-base font-heading font-bold text-foreground mb-2">1. Acceptance of Terms</h2>
-            <p>By using Curio, you agree to these Terms of Use. If you do not agree, please do not use the app.</p>
+            <p>By using Scan Anything AI, you agree to these Terms of Use. If you do not agree, please do not use the app.</p>
           </section>
 
           <section>
             <h2 className="text-base font-heading font-bold text-foreground mb-2">2. Free Service</h2>
-            <p>Curio is provided free of charge. There are no subscriptions, in-app purchases, or fees. All features are available to all users at no cost. The service is provided "as is" without warranties of any kind.</p>
+            <p>Scan Anything AI is provided free of charge. There are no subscriptions, in-app purchases, or fees. All features are available to all users at no cost. The service is provided "as is" without warranties of any kind.</p>
           </section>
 
           <section>
@@ -54,7 +54,7 @@ export default function TermsOfUse() {
 
           <section>
             <h2 className="text-base font-heading font-bold text-foreground mb-2">6. Gamification</h2>
-            <p>Curio includes gamification features such as XP, levels, achievements, streaks, and challenges. These are designed to encourage exploration and learning. Progress is tied to your account and can be reset by deleting your discoveries.</p>
+            <p>Scan Anything AI includes gamification features such as XP, levels, achievements, streaks, and challenges. These are designed to encourage exploration and learning. Progress is tied to your account and can be reset by deleting your discoveries.</p>
           </section>
 
           <section>

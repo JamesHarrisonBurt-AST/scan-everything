@@ -1,6 +1,6 @@
-# Curio — AR Visual Discovery
+# Scan Anything AI — AR Visual Discovery
 
-Curio is an AR + AI-powered visual discovery app that encourages physical world exploration. Point your camera at any object — a plant, a rock, a gadget, a landmark — and Curio identifies it, explains what it is, and helps you build a collection of your discoveries.
+Scan Anything AI is an AR + AI-powered visual discovery app that encourages physical world exploration. Point your camera at any object — a plant, a rock, a gadget, a landmark — and Curio identifies it, explains what it is, and helps you build a collection of your discoveries.
 
 ## Features
 

@@ -1,6 +1,6 @@
 {
-  "name": "Curio — AR Visual Discovery",
-  "short_name": "Curio",
+  "name": "Scan Anything AI — AR Visual Discovery",
+  "short_name": "Scan Anything AI",
   "description": "Point your camera at any object. AI identifies it, explains what it is, and helps you build a collection of discoveries from the world around you.",
   "start_url": "/",
   "display": "standalone",

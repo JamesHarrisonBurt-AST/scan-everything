@@ -24,7 +24,7 @@ export default function PrivacyPolicy() {
         <div className="space-y-6 text-sm text-muted-foreground leading-relaxed">
           <section>
             <h2 className="text-base font-heading font-bold text-foreground mb-2">1. Overview</h2>
-            <p>Curio is a free AR visual discovery app that helps you identify and learn about objects in the physical world around you. Point your camera at anything — a plant, a rock, a gadget, a landmark — and Curio uses AI vision to tell you what it is, share interesting facts, and help you build a personal collection of discoveries. We are committed to protecting your privacy and being transparent about how your data is used.</p>
+            <p>Scan Anything AI is a free AR visual discovery app that helps you identify and learn about objects in the physical world around you. Point your camera at anything — a plant, a rock, a gadget, a landmark — and Scan Anything AI uses AI vision to tell you what it is, share interesting facts, and help you build a personal collection of discoveries. We are committed to protecting your privacy and being transparent about how your data is used.</p>
           </section>
 
           <section>
@@ -76,7 +76,7 @@ export default function PrivacyPolicy() {
 
           <section>
             <h2 className="text-base font-heading font-bold text-foreground mb-2">9. No Fees or Subscriptions</h2>
-            <p>Curio is completely free. There are no in-app purchases, subscriptions, or hidden fees. All features are available to all users at no cost.</p>
+            <p>Scan Anything AI is completely free. There are no in-app purchases, subscriptions, or hidden fees. All features are available to all users at no cost.</p>
           </section>
 
           <section>
