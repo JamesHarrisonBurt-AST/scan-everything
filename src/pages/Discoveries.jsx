@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Plus, Folder, Heart, Clock, LayoutGrid, X, Package } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import DiscoveryCard from '@/components/discovery/DiscoveryCard';
 import EmptyState from '@/components/common/EmptyState';
 import PullToRefresh from '@/components/PullToRefresh';
+import CollectionSheet from '@/components/collections/CollectionSheet';
 
 const FILTERS = [
   { id: 'all', label: 'All', icon: LayoutGrid },
@@ -13,6 +15,7 @@ const FILTERS = [
 ];
 
 export default function Discoveries() {
+  const navigate = useNavigate();
   const [discoveries, setDiscoveries] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,6 +23,7 @@ export default function Discoveries() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [showNewCollection, setShowNewCollection] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
+  const [selectedCollection, setSelectedCollection] = useState(null);
 
   const load = async () => {
     try {
@@ -93,10 +97,10 @@ export default function Discoveries() {
                 <p className="text-[11px] text-muted-foreground/50 px-1">No collections yet</p>
               ) : (
                 collections.map(c => (
-                  <div key={c.id} className="flex-shrink-0 px-3 py-2 rounded-xl flex items-center gap-2" style={{ background: 'hsl(220 12% 10%)', border: '1px solid hsl(220 12% 18%)' }}>
+                  <button key={c.id} onClick={() => setSelectedCollection(c)} className="flex-shrink-0 px-3 py-2 rounded-xl flex items-center gap-2 touch-target" style={{ background: 'hsl(220 12% 10%)', border: '1px solid hsl(220 12% 18%)' }}>
                     <Folder className="w-3.5 h-3.5 text-amber-400" />
                     <span className="text-xs font-medium text-foreground">{c.name}</span>
-                  </div>
+                  </button>
                 ))
               )}
             </div>
@@ -133,6 +137,15 @@ export default function Discoveries() {
           )}
         </div>
       </PullToRefresh>
+
+      {/* Collection Sheet */}
+      {selectedCollection && (
+        <CollectionSheet
+          collection={selectedCollection}
+          onClose={() => setSelectedCollection(null)}
+          onViewAR={() => { navigate(`/ar-camera?collection=${selectedCollection.id}`); setSelectedCollection(null); }}
+        />
+      )}
 
       {/* New Collection Modal */}
       {showNewCollection && (

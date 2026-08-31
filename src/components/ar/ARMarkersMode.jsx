@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { X, Camera, MapPin, Boxes, Compass } from 'lucide-react';
+import { X, Camera, MapPin, Boxes, Compass, Save } from 'lucide-react';
 import * as THREE from 'three';
 import { base44 } from '@/api/base44Client';
 import MarkerTray from './MarkerTray';
 import MarkerInfoPanel from './MarkerInfoPanel';
+import SaveToCollectionSheet from './SaveToCollectionSheet';
 import { loadSavedMarkers, saveMarkersToStorage, createMarkerMesh, disposeMarkerMesh, PLACE_DISTANCE } from './markerUtils';
 
-export default function ARMarkersMode({ onSwitchMode, onClose }) {
+export default function ARMarkersMode({ onSwitchMode, onClose, collectionId }) {
   const navigate = useNavigate();
   const canvasRef = useRef(null);
   const camera3DRef = useRef(null);
@@ -26,6 +27,10 @@ export default function ARMarkersMode({ onSwitchMode, onClose }) {
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const [placedMarkers, setPlacedMarkers] = useState([]);
   const [motionEnabled, setMotionEnabled] = useState(false);
+  const [showSaveSheet, setShowSaveSheet] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [collections, setCollections] = useState([]);
 
   // Load discoveries
   useEffect(() => {
@@ -33,6 +38,8 @@ export default function ARMarkersMode({ onSwitchMode, onClose }) {
       try {
         const list = await base44.entities.Discovery.list('-created_date', 50);
         setDiscoveries(list);
+        const cols = await base44.entities.Collection.list('-created_date', 50);
+        setCollections(cols);
       } catch { /* ignore */ }
       setLoading(false);
     })();
@@ -101,11 +108,25 @@ export default function ARMarkersMode({ onSwitchMode, onClose }) {
   // Load saved markers after discoveries load
   useEffect(() => {
     if (loading || !discoveries.length) return;
-    const saved = loadSavedMarkers();
-    const valid = saved.filter(m => discoveries.find(d => d.id === m.discoveryId));
-    setPlacedMarkers(valid);
-    if (valid.length !== saved.length) saveMarkersToStorage(valid);
-  }, [loading, discoveries]);
+    if (collectionId) {
+      (async () => {
+        try {
+          const items = await base44.entities.CollectionItem.filter({ collection_id: collectionId });
+          const positioned = items.filter(i => i.ar_position_x != null);
+          setPlacedMarkers(positioned.map(i => ({
+            id: `col_${i.id}`,
+            discoveryId: i.discovery_id,
+            position: { x: i.ar_position_x, y: i.ar_position_y, z: i.ar_position_z },
+          })));
+        } catch { /* ignore */ }
+      })();
+    } else {
+      const saved = loadSavedMarkers();
+      const valid = saved.filter(m => discoveries.find(d => d.id === m.discoveryId));
+      setPlacedMarkers(valid);
+      if (valid.length !== saved.length) saveMarkersToStorage(valid);
+    }
+  }, [loading, discoveries, collectionId]);
 
   // Sync three.js meshes with placedMarkers state
   useEffect(() => {
@@ -163,7 +184,7 @@ export default function ARMarkersMode({ onSwitchMode, onClose }) {
     };
     setPlacedMarkers(prev => {
       const next = [...prev, newMarker];
-      saveMarkersToStorage(next);
+      if (!collectionId) saveMarkersToStorage(next);
       return next;
     });
     setSelectedDiscoveryId(null);
@@ -172,10 +193,52 @@ export default function ARMarkersMode({ onSwitchMode, onClose }) {
   const removeMarker = (markerId) => {
     setPlacedMarkers(prev => {
       const next = prev.filter(m => m.id !== markerId);
-      saveMarkersToStorage(next);
+      if (!collectionId) saveMarkersToStorage(next);
       return next;
     });
     setSelectedMarkerId(null);
+  };
+
+  const doSave = async (colId) => {
+    const existingItems = await base44.entities.CollectionItem.filter({ collection_id: colId });
+    const toUpdate = [];
+    const toCreate = [];
+    for (const marker of placedMarkers) {
+      const existing = existingItems.find(i => i.discovery_id === marker.discoveryId);
+      if (existing) {
+        toUpdate.push({ id: existing.id, ar_position_x: marker.position.x, ar_position_y: marker.position.y, ar_position_z: marker.position.z });
+      } else {
+        toCreate.push({ collection_id: colId, discovery_id: marker.discoveryId, ar_position_x: marker.position.x, ar_position_y: marker.position.y, ar_position_z: marker.position.z });
+      }
+    }
+    if (toUpdate.length) await base44.entities.CollectionItem.bulkUpdate(toUpdate);
+    if (toCreate.length) await base44.entities.CollectionItem.bulkCreate(toCreate);
+  };
+
+  const saveToCollection = async (colId) => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await doSave(colId);
+      setShowSaveSheet(false);
+    } catch {
+      setSaveError('Failed to save. Try again.');
+    }
+    setSaving(false);
+  };
+
+  const createAndSave = async (name) => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const col = await base44.entities.Collection.create({ name });
+      setCollections(prev => [col, ...prev]);
+      await doSave(col.id);
+      setShowSaveSheet(false);
+    } catch {
+      setSaveError('Failed to create collection.');
+    }
+    setSaving(false);
   };
 
   const handlePointerDown = (e) => {
@@ -232,6 +295,7 @@ export default function ARMarkersMode({ onSwitchMode, onClose }) {
     }
   };
 
+  const activeCollection = collections.find(c => c.id === collectionId);
   const selectedDiscovery = discoveries.find(d => d.id === selectedDiscoveryId);
   const selectedMarker = placedMarkers.find(m => m.id === selectedMarkerId);
   const selectedMarkerData = selectedMarker ? discoveries.find(d => d.id === selectedMarker.discoveryId) : null;
@@ -255,7 +319,7 @@ export default function ARMarkersMode({ onSwitchMode, onClose }) {
         </button>
         <div className="px-4 py-1.5 rounded-full ar-glass flex items-center gap-1.5">
           <MapPin className="w-3.5 h-3.5 text-teal-400" />
-          <span className="text-xs font-semibold text-white">AR MARKERS</span>
+          <span className="text-xs font-semibold text-white truncate max-w-[100px]">{activeCollection ? activeCollection.name : 'AR MARKERS'}</span>
           {placedMarkers.length > 0 && <span className="text-xs text-white/50">· {placedMarkers.length}</span>}
         </div>
         <div className="flex items-center gap-2">
@@ -301,6 +365,47 @@ export default function ARMarkersMode({ onSwitchMode, onClose }) {
             onView={() => navigate(`/discovery/${selectedMarkerData.id}`)}
             onRemove={() => removeMarker(selectedMarkerId)}
             onClose={() => setSelectedMarkerId(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Save button */}
+      {placedMarkers.length > 0 && !selectedMarkerData && (
+        <motion.button
+          onClick={() => setShowSaveSheet(true)}
+          className="absolute right-4 z-40 rounded-full px-4 h-10 flex items-center gap-1.5 touch-target"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 11rem)', background: 'linear-gradient(135deg, hsl(35 95% 55%), hsl(25 90% 45%))', color: 'white' }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Save className="w-4 h-4" /> Save Layout
+        </motion.button>
+      )}
+
+      {/* Error toast */}
+      <AnimatePresence>
+        {saveError && (
+          <motion.div
+            className="absolute top-20 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full z-50"
+            style={{ background: 'hsl(340 70% 25% / 0.4)', border: '1px solid hsl(340 70% 50% / 0.4)' }}
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+          >
+            <span className="text-xs text-rose-300">{saveError}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Save sheet */}
+      <AnimatePresence>
+        {showSaveSheet && (
+          <SaveToCollectionSheet
+            collections={collections}
+            markerCount={placedMarkers.length}
+            saving={saving}
+            onSave={saveToCollection}
+            onSaveNew={createAndSave}
+            onClose={() => { setShowSaveSheet(false); setSaveError(null); }}
           />
         )}
       </AnimatePresence>

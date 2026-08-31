@@ -7,6 +7,18 @@
     },
     "discovery_id": {
       "type": "string"
+    },
+    "ar_position_x": {
+      "type": "number",
+      "description": "AR marker X position"
+    },
+    "ar_position_y": {
+      "type": "number",
+      "description": "AR marker Y position"
+    },
+    "ar_position_z": {
+      "type": "number",
+      "description": "AR marker Z position"
     }
   },
   "required": [

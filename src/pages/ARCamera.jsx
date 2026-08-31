@@ -18,7 +18,8 @@ export default function ARCamera() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [flash, setFlash] = useState(false);
-  const [mode, setMode] = useState('discover');
+  const urlParams = new URLSearchParams(window.location.search);
+  const [mode, setMode] = useState(urlParams.get('collection') ? 'markers' : 'discover');
 
   useEffect(() => {
     startCamera();
@@ -162,7 +163,7 @@ export default function ARCamera() {
 
       {/* Markers Mode */}
       {cameraReady && mode === 'markers' && (
-        <ARMarkersMode onSwitchMode={() => setMode('discover')} onClose={() => navigate(-1)} />
+        <ARMarkersMode collectionId={urlParams.get('collection')} onSwitchMode={() => setMode('discover')} onClose={() => navigate(-1)} />
       )}
 
       {/* Analyzing */}
