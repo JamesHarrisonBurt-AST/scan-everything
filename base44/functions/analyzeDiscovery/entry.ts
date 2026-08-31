@@ -2,6 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import OpenAI from 'npm:openai@4.77.0';
 import { secrets } from 'base44:runtime';
 import { calculateXp, calculateLevel, updateStreak, checkAchievements, matchChallenges } from '../../shared/gamification.ts';
+import { DISCOVERY_PROMPT } from '../../shared/discoveryPrompt.ts';
 
 export default async function(req) {
   try {
@@ -10,53 +11,31 @@ export default async function(req) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { image_url, location_lat, location_lng } = body;
+    const { image_url, location_lat, location_lng, analysis: preComputed } = body;
     if (!image_url) return Response.json({ error: 'Image URL required' }, { status: 400 });
 
-    // 1. AI Vision Analysis
-    const openai = new OpenAI({ apiKey: secrets.get("OPENAI_API_KEY") });
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `You are an expert object identification AI for a discovery app. Analyze the image and identify the object.
-
-Return ONLY a JSON object with these exact fields:
-{
-  "name": "object name (use confidence-aware language like 'Likely Fender-style guitar' if unsure)",
-  "category": "one of: electronics, vehicle, plant, clothing, shoes, musical instrument, collectible, toy, furniture, tool, household, book, artwork, appliance, food, landmark, outdoor, other",
-  "subcategory": "more specific type",
-  "summary": "one sentence summary",
-  "description": "2-3 sentence description of what it is",
-  "possibleBrand": "likely brand or empty string",
-  "possibleModel": "likely model or empty string",
-  "confidence": 0-100,
-  "materials": ["list of materials"],
-  "characteristics": ["list of notable characteristics"],
-  "estimatedEra": "estimated decade/period or 'modern'",
-  "interestingFacts": ["2-3 interesting facts"],
-  "safetyNotes": ["any safety notes or empty array"],
-  "maintenanceTips": ["care/maintenance tips or empty array"],
-  "searchTerms": ["search terms"],
-  "followUpSuggestions": ["3-4 suggested follow-up questions"],
-  "rarity": "one of: common, interesting, unusual, exceptional"
-}
-
-Set rarity based on how unusual the find is. Return only valid JSON.`
-            },
-            { type: "image_url", image_url: { url: image_url } }
-          ]
-        }
-      ],
-      response_format: { type: "json_object" },
-      max_tokens: 1500
-    });
-
-    const analysis = JSON.parse(response.choices[0].message.content);
+    // 1. AI Vision Analysis (or use pre-computed analysis from HUD mode)
+    let analysis;
+    if (preComputed) {
+      analysis = preComputed;
+    } else {
+      const openai = new OpenAI({ apiKey: secrets.get("OPENAI_API_KEY") });
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: DISCOVERY_PROMPT },
+              { type: "image_url", image_url: { url: image_url } }
+            ]
+          }
+        ],
+        response_format: { type: "json_object" },
+        max_tokens: 1500
+      });
+      analysis = JSON.parse(response.choices[0].message.content);
+    }
 
     // 2. Calculate gamification
     const totalDiscoveries = (user.data?.total_discoveries || 0) + 1;
@@ -80,6 +59,7 @@ Set rarity based on how unusual the find is. Return only valid JSON.`
       materials: JSON.stringify(analysis.materials || []),
       characteristics: JSON.stringify(analysis.characteristics || []),
       estimated_era: analysis.estimatedEra || 'modern',
+      estimated_value: analysis.estimatedValue || 'Everyday Item',
       interesting_facts: JSON.stringify(analysis.interestingFacts || []),
       safety_notes: JSON.stringify(analysis.safetyNotes || []),
       maintenance_tips: JSON.stringify(analysis.maintenanceTips || []),

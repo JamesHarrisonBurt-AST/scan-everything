@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { X, Images, AlertCircle, Sparkles, ChevronRight, CameraOff } from 'lucide-react';
+import { X, Images, AlertCircle, Sparkles, ChevronRight, CameraOff, Crosshair } from 'lucide-react';
+import ARHudMode from '@/components/ar/ARHudMode';
 import { base44 } from '@/api/base44Client';
 import { RARITY_STYLES } from '@/lib/gamification';
 
@@ -16,6 +17,7 @@ export default function ARCamera() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [flash, setFlash] = useState(false);
+  const [mode, setMode] = useState('discover');
 
   useEffect(() => {
     startCamera();
@@ -97,7 +99,7 @@ export default function ARCamera() {
       </AnimatePresence>
 
       {/* AR HUD */}
-      {cameraReady && !analyzing && !result && (
+      {cameraReady && !analyzing && !result && mode === 'discover' && (
         <motion.div className="absolute inset-0 z-30" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {/* Top bar */}
           <div className="absolute top-0 left-0 right-0 pt-safe px-4 py-3 flex items-center justify-between">
@@ -109,7 +111,9 @@ export default function ARCamera() {
                 <Sparkles className="w-3 h-3 text-amber-400" /> DISCOVER MODE
               </span>
             </div>
-            <div className="w-10 h-10" />
+            <button onClick={() => setMode('hud')} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
+              <Crosshair className="w-5 h-5 text-amber-400" />
+            </button>
           </div>
 
           {/* Targeting reticle */}
@@ -143,6 +147,11 @@ export default function ARCamera() {
             <div className="w-12 h-12" />
           </div>
         </motion.div>
+      )}
+
+      {/* HUD Mode */}
+      {cameraReady && mode === 'hud' && (
+        <ARHudMode videoRef={videoRef} cameraReady={cameraReady} onSwitchMode={() => setMode('discover')} onClose={() => navigate(-1)} />
       )}
 
       {/* Analyzing */}

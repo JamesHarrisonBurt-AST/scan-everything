@@ -47,6 +47,10 @@
     "estimated_era": {
       "type": "string"
     },
+    "estimated_value": {
+      "type": "string",
+      "description": "Qualitative value assessment (Everyday Item, Notable Find, Collector's Piece, Rare Discovery)"
+    },
     "interesting_facts": {
       "type": "string",
       "description": "JSON array of facts"
