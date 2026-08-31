@@ -1,0 +1,21 @@
+{
+  "name": "Curio — AR Visual Discovery",
+  "short_name": "Curio",
+  "description": "Point your camera at any object. AI identifies it, explains what it is, and helps you build a collection of discoveries from the world around you.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e14",
+  "theme_color": "#0a0e14",
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/69c42db9cc8f9251ee56219b/b4cc77079_generated_image.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://media.base44.com/images/public/69c42db9cc8f9251ee56219b/b4cc77079_generated_image.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

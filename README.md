@@ -1,39 +1,36 @@
-**Welcome to your Base44 project** 
+# Curio — AR Visual Discovery
 
-**About**
+Curio is an AR + AI-powered visual discovery app that encourages physical world exploration. Point your camera at any object — a plant, a rock, a gadget, a landmark — and Curio identifies it, explains what it is, and helps you build a collection of your discoveries.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+## Features
 
-This project contains everything you need to run your app locally.
+- **AR Camera Discovery** — Full-screen live camera with targeting reticle and AI vision analysis
+- **AI Identification** — Structured results with name, category, confidence score, description, materials, interesting facts, and maintenance tips
+- **Ask AI** — Follow-up conversations about any discovery with full context retention
+- **Collections** — Organize discoveries into custom collections
+- **Gamification** — XP, 7 levels, achievements, daily challenges, and exploration streaks
+- **Rarity System** — Discoveries classified as common, interesting, unusual, or exceptional
+- **Search** — Find discoveries by title, category, brand, or tags
 
-**Edit the code in your local development environment**
+## Tech Stack
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+- React + Vite + Tailwind CSS
+- Base44 BaaS (auth, database, hosting)
+- OpenAI Vision API (server-side, via backend functions)
+- Framer Motion (animations)
+- Row-Level Security on all user data
 
-**Prerequisites:** 
+## Development
 
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Create a `.env.local` file with your Base44 credentials:
+   ```
+   VITE_BASE44_APP_ID=your_app_id
+   VITE_BASE44_APP_BASE_URL=your_backend_url
+   ```
+4. Run the app: `npm run dev`
 
-```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
+## Publish
 
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
-```
-
-Run the app: `npm run dev`
-
-**Publish your changes**
-
-Open [Base44.com](http://Base44.com) and click on Publish.
-
-**Docs & Support**
-
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
-
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+Open [Base44.com](https://base44.com) and click Publish.

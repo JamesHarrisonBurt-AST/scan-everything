@@ -1,5 +1,5 @@
 {
-  "name": "Scan Everything",
+  "name": "Curio",
   "site": {
     "installCommand": "npm install",
     "buildCommand": "npm run build",

@@ -60,7 +60,7 @@ export default function PullToRefresh({ children, onRefresh }) {
     <div ref={containerRef} className="relative">
       <motion.div style={{ opacity, y: pull }} className="absolute left-1/2 -translate-x-1/2 top-2 z-50 pointer-events-none">
         <motion.div style={{ scale }} animate={{ rotate: refreshing ? 360 : 0 }} transition={{ duration: 0.8, repeat: refreshing ? Infinity : 0, ease: 'linear' }}>
-          <RefreshCw className="w-5 h-5 text-cyan-400" />
+          <RefreshCw className="w-5 h-5 text-amber-400" />
         </motion.div>
       </motion.div>
       <motion.div style={{ y: pull }}>
