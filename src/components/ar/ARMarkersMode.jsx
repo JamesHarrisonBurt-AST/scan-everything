@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { X, Camera, MapPin, Boxes, Compass, Save } from 'lucide-react';
+import { X, Camera, MapPin, Map, Boxes, Compass, Save } from 'lucide-react';
 import * as THREE from 'three';
 import { base44 } from '@/api/base44Client';
 import MarkerTray from './MarkerTray';
 import MarkerInfoPanel from './MarkerInfoPanel';
 import SaveToCollectionSheet from './SaveToCollectionSheet';
-import { loadSavedMarkers, saveMarkersToStorage, createMarkerMesh, disposeMarkerMesh, PLACE_DISTANCE } from './markerUtils';
+import BirdsEyeView from './BirdsEyeView';
+import MarkerTutorial from './MarkerTutorial';
+import { loadSavedMarkers, saveMarkersToStorage, createMarkerMesh, disposeMarkerMesh, clusterMarkers, PLACE_DISTANCE } from './markerUtils';
 
 export default function ARMarkersMode({ onSwitchMode, onClose, collectionId }) {
   const navigate = useNavigate();
@@ -31,6 +33,8 @@ export default function ARMarkersMode({ onSwitchMode, onClose, collectionId }) {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [collections, setCollections] = useState([]);
+  const [showBirdsEye, setShowBirdsEye] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(() => !localStorage.getItem('ar_markers_tutorial_seen'));
 
   // Load discoveries
   useEffect(() => {
@@ -241,6 +245,11 @@ export default function ARMarkersMode({ onSwitchMode, onClose, collectionId }) {
     setSaving(false);
   };
 
+  const dismissTutorial = () => {
+    localStorage.setItem('ar_markers_tutorial_seen', '1');
+    setShowTutorial(false);
+  };
+
   const handlePointerDown = (e) => {
     pointerRef.current = { down: true, x: e.clientX, y: e.clientY, moved: false };
   };
@@ -295,6 +304,7 @@ export default function ARMarkersMode({ onSwitchMode, onClose, collectionId }) {
     }
   };
 
+  const clusters = useMemo(() => clusterMarkers(placedMarkers), [placedMarkers]);
   const activeCollection = collections.find(c => c.id === collectionId);
   const selectedDiscovery = discoveries.find(d => d.id === selectedDiscoveryId);
   const selectedMarker = placedMarkers.find(m => m.id === selectedMarkerId);
@@ -328,6 +338,9 @@ export default function ARMarkersMode({ onSwitchMode, onClose, collectionId }) {
               ? { background: 'hsl(175 65% 42% / 0.2)', border: '1px solid hsl(175 65% 42% / 0.5)' }
               : { background: 'hsl(220 14% 8% / 0.72)', border: '1px solid hsl(220 12% 18% / 0.5)' }}>
             <Compass className={`w-5 h-5 ${motionEnabled ? 'text-teal-400' : 'text-white/60'}`} />
+          </button>
+          <button onClick={() => setShowBirdsEye(true)} disabled={placedMarkers.length === 0} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target" style={placedMarkers.length === 0 ? { opacity: 0.4 } : {}}>
+            <Map className="w-5 h-5 text-teal-400" />
           </button>
           <button onClick={onSwitchMode} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
             <Camera className="w-5 h-5 text-white" />
@@ -407,6 +420,25 @@ export default function ARMarkersMode({ onSwitchMode, onClose, collectionId }) {
             onSaveNew={createAndSave}
             onClose={() => { setShowSaveSheet(false); setSaveError(null); }}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Bird's-eye view */}
+      <AnimatePresence>
+        {showBirdsEye && (
+          <BirdsEyeView
+            markers={placedMarkers}
+            discoveries={discoveries}
+            clusters={clusters}
+            onClose={() => setShowBirdsEye(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Tutorial overlay */}
+      <AnimatePresence>
+        {showTutorial && (
+          <MarkerTutorial onDismiss={dismissTutorial} />
         )}
       </AnimatePresence>
 

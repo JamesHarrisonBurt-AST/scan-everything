@@ -29,17 +29,28 @@ export default function ARCamera() {
   const startCamera = async () => {
     try {
       setCameraError(null);
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError('unavailable');
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play().catch(() => {});
+      const video = videoRef.current;
+      if (video) {
+        video.srcObject = stream;
+        const onReady = () => {
+          video.play().catch(() => {});
           setCameraReady(true);
         };
+        if (video.readyState >= 2) {
+          onReady();
+        } else {
+          video.onloadedmetadata = onReady;
+          setTimeout(() => { if (streamRef.current) setCameraReady(true); }, 1500);
+        }
       }
     } catch (err) {
       setCameraError(err.name === 'NotAllowedError' ? 'permission' : 'unavailable');

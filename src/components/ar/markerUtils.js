@@ -59,6 +59,13 @@ export function createMarkerMesh(marker, discovery) {
   pin.position.y = -0.15;
   group.add(pin);
 
+  // Invisible hitbox for easier selection (larger than the gem)
+  const hitboxGeo = new THREE.SphereGeometry(0.35, 8, 8);
+  const hitboxMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+  const hitbox = new THREE.Mesh(hitboxGeo, hitboxMat);
+  hitbox.userData.markerId = marker.id;
+  group.add(hitbox);
+
   return group;
 }
 
@@ -67,4 +74,51 @@ export function disposeMarkerMesh(group) {
     if (obj.geometry) obj.geometry.dispose();
     if (obj.material) obj.material.dispose();
   });
+}
+
+export function clusterMarkers(markers, threshold = 2.5) {
+  if (markers.length === 0) return [];
+  const clusters = [];
+  const assigned = new Set();
+  for (const marker of markers) {
+    if (assigned.has(marker.id)) continue;
+    const cluster = [marker];
+    assigned.add(marker.id);
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const other of markers) {
+        if (assigned.has(other.id)) continue;
+        for (const cm of cluster) {
+          const dx = cm.position.x - other.position.x;
+          const dz = cm.position.z - other.position.z;
+          if (Math.sqrt(dx * dx + dz * dz) < threshold) {
+            cluster.push(other);
+            assigned.add(other.id);
+            changed = true;
+            break;
+          }
+        }
+      }
+    }
+    clusters.push(cluster);
+  }
+  return clusters;
+}
+
+export function getZoneLabel(centroid) {
+  const x = centroid.x;
+  const z = centroid.z;
+  const dist = Math.sqrt(x * x + z * z);
+  if (dist < 1.5) return 'Center';
+  const isFront = z < -0.5;
+  const isBack = z > 0.5;
+  const isLeft = x < -0.5;
+  const isRight = x > 0.5;
+  const parts = [];
+  if (isFront) parts.push('Front');
+  else if (isBack) parts.push('Back');
+  if (isLeft) parts.push('Left');
+  else if (isRight) parts.push('Right');
+  return parts.length > 0 ? parts.join('-') + ' Zone' : 'Side Zone';
 }
