@@ -14,6 +14,7 @@ const ARCamera = lazy(() => import('./pages/ARCamera'));
 const DiscoveryDetail = lazy(() => import('./pages/DiscoveryDetail'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
+const OAuthConsent = lazy(() => import('./pages/OAuthConsent'));
 
 const PageLoader = () => (
   <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'hsl(220 18% 5%)' }}>
@@ -54,6 +55,7 @@ function AnimatedRoutes() {
           <Route path="ar-camera" element={<LazyRoute><ARCamera /></LazyRoute>} />
           <Route path="privacy-policy" element={<LazyRoute><PrivacyPolicy /></LazyRoute>} />
           <Route path="terms-of-use" element={<LazyRoute><TermsOfUse /></LazyRoute>} />
+          <Route path="oauth-consent" element={<LazyRoute><OAuthConsent /></LazyRoute>} />
           <Route path="*" element={<LazyRoute><PageNotFound /></LazyRoute>} />
         </Route>
       </Routes>

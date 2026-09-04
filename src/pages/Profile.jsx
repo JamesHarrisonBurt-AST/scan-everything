@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Compass, Trophy, LogOut, ChevronRight, Bell, MapPin, Shield, FileText } from 'lucide-react';
+import { Flame, Compass, Trophy, LogOut, ChevronRight, Bell, MapPin, Shield, FileText, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 import { base44 } from '@/api/base44Client';
 import XPBar from '@/components/gamification/XPBar';
 import EmptyState from '@/components/common/EmptyState';
@@ -38,6 +48,26 @@ export default function Profile() {
   const earnedCodes = earned.map(e => e.achievement_code);
 
   const handleLogout = () => base44.auth.logout();
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      await base44.auth.updateMe({
+        xp: 0,
+        streak_days: 0,
+        total_discoveries: 0,
+        unique_categories: '[]',
+        level: 1,
+        last_scan_date: null,
+      });
+      await base44.auth.logout();
+    } catch {
+      setDeleting(false);
+    }
+  };
 
   return (
     <PullToRefresh onRefresh={load}>
@@ -121,13 +151,38 @@ export default function Profile() {
               <span className="text-sm text-foreground flex-1 text-left">Terms of Use</span>
               <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
             </button>
-            <button onClick={handleLogout} className="w-full flex items-center gap-3 p-4">
+            <button onClick={handleLogout} className="w-full flex items-center gap-3 p-4 border-b border-border/30">
               <LogOut className="w-4 h-4 text-rose-400" />
               <span className="text-sm text-rose-400 flex-1 text-left">Sign Out</span>
+            </button>
+            <button onClick={() => setShowDeleteDialog(true)} className="w-full flex items-center gap-3 p-4">
+              <Trash2 className="w-4 h-4 text-rose-400" />
+              <span className="text-sm text-rose-400 flex-1 text-left">Delete Account</span>
             </button>
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently erase your profile data, including XP, streaks, achievements, and discovery stats. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDeleteAccount(); }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? 'Deleting...' : 'Delete Permanently'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PullToRefresh>
   );
 }
