@@ -111,6 +111,17 @@ export default function ARCamera() {
         {flash && <motion.div className="absolute inset-0 bg-white z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} />}
       </AnimatePresence>
 
+      {/* Camera starting viewer */}
+      {!cameraReady && !cameraError && !analyzing && !result && (
+        <motion.div className="absolute inset-0 z-30 flex flex-col items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <motion.div className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ background: 'hsl(35 95% 55% / 0.1)', border: '2px solid hsl(35 95% 55% / 0.2)' }} animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>
+            <Camera className="w-8 h-8 text-amber-400" />
+          </motion.div>
+          <p className="text-sm font-heading font-semibold text-foreground mb-1">Starting Camera...</p>
+          <p className="text-xs text-muted-foreground">Getting your camera ready</p>
+        </motion.div>
+      )}
+
       {/* AR HUD */}
       {cameraReady && !analyzing && !result && mode === 'discover' && (
         <motion.div className="absolute inset-0 z-30" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
