@@ -122,6 +122,21 @@ export default function ARCamera() {
         </motion.div>
       )}
 
+      {/* Camera error */}
+      {cameraError && !analyzing && !result && (
+        <motion.div className="absolute inset-0 z-30 flex flex-col items-center justify-center px-8 text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'hsl(340 70% 50% / 0.1)', border: '1px solid hsl(340 70% 50% / 0.25)' }}>
+            <CameraOff className="w-8 h-8 text-rose-400" />
+          </div>
+          <p className="text-sm font-heading font-semibold text-foreground mb-1">{cameraError === 'permission' ? 'Camera Access Needed' : 'Camera Unavailable'}</p>
+          <p className="text-xs text-muted-foreground mb-6 max-w-[260px]">{cameraError === 'permission' ? 'Please allow camera access in your browser to scan objects.' : 'Your camera is not available right now. Try again or upload a photo.'}</p>
+          <div className="flex gap-3">
+            <button onClick={startCamera} className="px-5 h-10 rounded-xl text-sm font-bold touch-target" style={{ background: 'linear-gradient(135deg, hsl(35 95% 55%), hsl(25 90% 45%))', color: 'white' }}>Open Camera</button>
+            <button onClick={() => fileInputRef.current?.click()} className="px-5 h-10 rounded-xl text-sm font-bold touch-target" style={{ background: 'hsl(220 12% 14%)', border: '1px solid hsl(220 12% 20%)', color: 'white' }}>Choose Photo</button>
+          </div>
+        </motion.div>
+      )}
+
       {/* Mode screens — each mode is a separate animated screen */}
       <AnimatePresence>
       {cameraReady && !analyzing && !result && mode === 'discover' && (
