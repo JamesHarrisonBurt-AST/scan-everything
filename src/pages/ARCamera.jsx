@@ -252,7 +252,7 @@ export default function ARCamera() {
               <CameraOff className="w-12 h-12 text-muted-foreground/40 mb-4" />
               <p className="text-sm font-heading font-semibold text-foreground mb-1">Camera Access Needed</p>
               <p className="text-xs text-muted-foreground mb-6 max-w-[260px]">Camera access lets you visually discover and identify objects around you. Enable it in your browser settings.</p>
-              <button onClick={startCamera} className="px-6 h-11 rounded-xl text-sm font-bold touch-target" style={{ background: 'linear-gradient(135deg, hsl(35 95% 55%), hsl(25 90% 45%))', color: 'white' }}>Open Scanner</button>
+              <button onClick={startCamera} className="px-6 h-11 rounded-xl text-sm font-bold touch-target" style={{ background: 'linear-gradient(135deg, hsl(35 95% 55%), hsl(25 90% 45%))', color: 'white' }}>Open Camera</button>
               <button onClick={() => fileInputRef.current?.click()} className="mt-3 text-xs text-amber-400">Or upload a photo instead</button>
             </>
           ) : (
