@@ -255,28 +255,6 @@ export default function ARCamera() {
         </motion.div>
       )}
 
-      {/* Camera error */}
-      {cameraError && !analyzing && !result && (
-        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center px-8 text-center">
-          {cameraError === 'permission' ? (
-            <>
-              <CameraOff className="w-12 h-12 text-muted-foreground/40 mb-4" />
-              <p className="text-sm font-heading font-semibold text-foreground mb-1">Camera Access Needed</p>
-              <p className="text-xs text-muted-foreground mb-6 max-w-[260px]">Camera access lets you visually discover and identify objects around you. Enable it in your browser settings.</p>
-              <button onClick={startCamera} className="px-6 h-11 rounded-xl text-sm font-bold touch-target" style={{ background: 'linear-gradient(135deg, hsl(35 95% 55%), hsl(25 90% 45%))', color: 'white' }}>Open Camera</button>
-              <button onClick={() => fileInputRef.current?.click()} className="mt-3 text-xs text-amber-400">Or upload a photo instead</button>
-            </>
-          ) : (
-            <>
-              <AlertCircle className="w-12 h-12 text-muted-foreground/40 mb-4" />
-              <p className="text-sm font-heading font-semibold text-foreground mb-1">Camera Unavailable</p>
-              <p className="text-xs text-muted-foreground mb-6">Your device camera could not be accessed.</p>
-              <button onClick={() => fileInputRef.current?.click()} className="px-5 h-10 rounded-xl text-sm font-bold" style={{ background: 'hsl(220 12% 14%)', border: '1px solid hsl(220 12% 20%)', color: 'white' }}>Upload Photo</button>
-            </>
-          )}
-        </div>
-      )}
-
       {/* Analysis error */}
       {error && !analyzing && (
         <div className="absolute inset-0 z-40 flex flex-col items-center justify-center px-8 text-center" style={{ background: 'hsl(220 18% 5% / 0.9)' }}>
@@ -290,8 +268,8 @@ export default function ARCamera() {
         </div>
       )}
 
-      {/* Close button when analyzing or result */}
-      {(analyzing || result) && !cameraError && (
+      {/* Close button */}
+      {(!cameraReady || analyzing || result) && (
         <button onClick={() => navigate(-1)} className="absolute top-0 left-0 z-50 pt-safe px-4 py-3">
           <div className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
             <X className="w-5 h-5 text-white" />
