@@ -122,9 +122,10 @@ export default function ARCamera() {
         </motion.div>
       )}
 
-      {/* AR HUD */}
+      {/* Mode screens — each mode is a separate animated screen */}
+      <AnimatePresence>
       {cameraReady && !analyzing && !result && mode === 'discover' && (
-        <motion.div className="absolute inset-0 z-30" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div key="scanner" className="absolute inset-0 z-30" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
           {/* Top bar */}
           <div className="absolute top-0 left-0 right-0 pt-safe px-4 py-3 flex items-center justify-between">
             <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
@@ -176,15 +177,18 @@ export default function ARCamera() {
         </motion.div>
       )}
 
-      {/* HUD Mode */}
       {cameraReady && mode === 'hud' && (
-        <ARHudMode videoRef={videoRef} cameraReady={cameraReady} mode={mode} onSetMode={setMode} onClose={() => navigate(-1)} />
+        <motion.div key="hud" className="absolute inset-0 z-30" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
+          <ARHudMode videoRef={videoRef} cameraReady={cameraReady} mode={mode} onSetMode={setMode} onClose={() => navigate(-1)} />
+        </motion.div>
       )}
 
-      {/* Markers Mode */}
       {cameraReady && mode === 'markers' && (
-        <ARMarkersMode collectionId={urlParams.get('collection')} onSwitchMode={() => setMode('discover')} onClose={() => navigate(-1)} />
+        <motion.div key="markers" className="absolute inset-0 z-30" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
+          <ARMarkersMode collectionId={urlParams.get('collection')} onSwitchMode={() => setMode('discover')} onClose={() => navigate(-1)} />
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* Analyzing */}
       {analyzing && (
