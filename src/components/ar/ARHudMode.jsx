@@ -8,7 +8,7 @@ import ARHudLabel, { VALUE_STYLES } from './ARHudLabel';
 const SCAN_INTERVAL = 5000;
 const LOW_CONF_THRESHOLD = 40;
 
-export default function ARHudMode({ videoRef, cameraReady, onSwitchMode, onClose }) {
+export default function ARHudMode({ videoRef, cameraReady, mode, onSetMode, onClose }) {
   const navigate = useNavigate();
   const [hudAnalyzing, setHudAnalyzing] = useState(false);
   const [hudResult, setHudResult] = useState(null);
@@ -118,15 +118,15 @@ export default function ARHudMode({ videoRef, cameraReady, onSwitchMode, onClose
         <button onClick={onClose} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
           <X className="w-5 h-5 text-white" />
         </button>
-        <div className="px-4 py-1.5 rounded-full ar-glass flex items-center gap-1.5">
-          <motion.div animate={{ rotate: hudAnalyzing ? 360 : 0 }} transition={{ duration: 1.2, repeat: hudAnalyzing ? Infinity : 0, ease: 'linear' }}>
-            <ScanLine className="w-3.5 h-3.5 text-amber-400" />
-          </motion.div>
-          <span className="text-xs font-semibold text-white">HUD MODE</span>
+        <div className="flex rounded-full p-1 ar-glass">
+          <button onClick={() => onSetMode('discover')} className="px-3 h-8 rounded-full text-xs font-bold touch-target transition-all flex items-center gap-1.5" style={mode === 'discover' ? { background: 'hsl(35 95% 55%)', color: 'hsl(220 18% 5%)' } : { color: 'rgba(255,255,255,0.6)' }}>
+            <Camera className="w-3.5 h-3.5" /> Scanner
+          </button>
+          <button onClick={() => onSetMode('hud')} className="px-3 h-8 rounded-full text-xs font-bold touch-target transition-all flex items-center gap-1.5" style={mode === 'hud' ? { background: 'hsl(35 95% 55%)', color: 'hsl(220 18% 5%)' } : { color: 'rgba(255,255,255,0.6)' }}>
+            <Crosshair className="w-3.5 h-3.5" /> AR
+          </button>
         </div>
-        <button onClick={onSwitchMode} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
-          <Camera className="w-5 h-5 text-white" />
-        </button>
+        <div className="w-10 h-10" />
       </div>
 
       {/* Scanning reticle */}

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { X, Images, AlertCircle, Sparkles, ChevronRight, CameraOff, Crosshair, MapPin } from 'lucide-react';
+import { X, Images, AlertCircle, Sparkles, ChevronRight, Camera, CameraOff, Crosshair, MapPin } from 'lucide-react';
 import ARHudMode from '@/components/ar/ARHudMode';
 import ARMarkersMode from '@/components/ar/ARMarkersMode';
 import { base44 } from '@/api/base44Client';
@@ -119,19 +119,17 @@ export default function ARCamera() {
             <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
               <X className="w-5 h-5 text-white" />
             </button>
-            <div className="px-4 py-1.5 rounded-full ar-glass">
-              <span className="text-xs font-semibold text-white flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-amber-400" /> DISCOVER MODE
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setMode('hud')} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
-                <Crosshair className="w-5 h-5 text-amber-400" />
+            <div className="flex rounded-full p-1 ar-glass">
+              <button onClick={() => setMode('discover')} className="px-3 h-8 rounded-full text-xs font-bold touch-target transition-all flex items-center gap-1.5" style={mode === 'discover' ? { background: 'hsl(35 95% 55%)', color: 'hsl(220 18% 5%)' } : { color: 'rgba(255,255,255,0.6)' }}>
+                <Camera className="w-3.5 h-3.5" /> Scanner
               </button>
-              <button onClick={() => setMode('markers')} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
-                <MapPin className="w-5 h-5 text-teal-400" />
+              <button onClick={() => setMode('hud')} className="px-3 h-8 rounded-full text-xs font-bold touch-target transition-all flex items-center gap-1.5" style={mode === 'hud' ? { background: 'hsl(35 95% 55%)', color: 'hsl(220 18% 5%)' } : { color: 'rgba(255,255,255,0.6)' }}>
+                <Crosshair className="w-3.5 h-3.5" /> AR
               </button>
             </div>
+            <button onClick={() => setMode('markers')} className="w-10 h-10 rounded-full ar-glass flex items-center justify-center touch-target">
+              <MapPin className="w-5 h-5 text-teal-400" />
+            </button>
           </div>
 
           {/* Targeting reticle */}
@@ -169,7 +167,7 @@ export default function ARCamera() {
 
       {/* HUD Mode */}
       {cameraReady && mode === 'hud' && (
-        <ARHudMode videoRef={videoRef} cameraReady={cameraReady} onSwitchMode={() => setMode('discover')} onClose={() => navigate(-1)} />
+        <ARHudMode videoRef={videoRef} cameraReady={cameraReady} mode={mode} onSetMode={setMode} onClose={() => navigate(-1)} />
       )}
 
       {/* Markers Mode */}
