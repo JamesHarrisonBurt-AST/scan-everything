@@ -16,6 +16,7 @@
 		3EB782B041E1C4E88EFF3FC4 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3C28336619B360AE7E8E43C /* ProfileView.swift */; };
 		193E9761A4376F2B31B3D1A8 /* QuestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8BAB11275B4443DCD850F6B /* QuestsView.swift */; };
 		FC2C28B60F9405A12AFC6AF1 /* ScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8DE203B91C45011CC72E9F6 /* ScannerView.swift */; };
+		4BF17BA6A687C65A44A89768 /* ShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB84C9BA8BD8A6F6E7C12AD2 /* ShareCardView.swift */; };
 		ACEBB44903B98D364D736478 /* SystemScanners.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9B33308D5395EBD697B975 /* SystemScanners.swift */; };
 		2A93485D51C93AE1EDC7B9F1 /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2DCF91F904FA8D258C70395 /* Records.swift */; };
 		BD6400481398238B32E78E9A /* ScanAnythingAIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44888E5158A5480499CD7EC4 /* ScanAnythingAIApp.swift */; };
@@ -46,6 +47,7 @@
 		F3C28336619B360AE7E8E43C /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileView.swift"; sourceTree = "<group>"; };
 		B8BAB11275B4443DCD850F6B /* QuestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestsView.swift"; sourceTree = "<group>"; };
 		A8DE203B91C45011CC72E9F6 /* ScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScannerView.swift"; sourceTree = "<group>"; };
+		EB84C9BA8BD8A6F6E7C12AD2 /* ShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShareCardView.swift"; sourceTree = "<group>"; };
 		AD9B33308D5395EBD697B975 /* SystemScanners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SystemScanners.swift"; sourceTree = "<group>"; };
 		0EF6DC74DAB19D2F309ACA97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
 		D2DCF91F904FA8D258C70395 /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Records.swift"; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				F3C28336619B360AE7E8E43C /* ProfileView.swift */,
 				B8BAB11275B4443DCD850F6B /* QuestsView.swift */,
 				A8DE203B91C45011CC72E9F6 /* ScannerView.swift */,
+				EB84C9BA8BD8A6F6E7C12AD2 /* ShareCardView.swift */,
 				AD9B33308D5395EBD697B975 /* SystemScanners.swift */,
 			);
 			path = Features;
@@ -243,6 +246,7 @@
 				3EB782B041E1C4E88EFF3FC4 /* ProfileView.swift in Sources */,
 				193E9761A4376F2B31B3D1A8 /* QuestsView.swift in Sources */,
 				FC2C28B60F9405A12AFC6AF1 /* ScannerView.swift in Sources */,
+				4BF17BA6A687C65A44A89768 /* ShareCardView.swift in Sources */,
 				ACEBB44903B98D364D736478 /* SystemScanners.swift in Sources */,
 				2A93485D51C93AE1EDC7B9F1 /* Records.swift in Sources */,
 				BD6400481398238B32E78E9A /* ScanAnythingAIApp.swift in Sources */,

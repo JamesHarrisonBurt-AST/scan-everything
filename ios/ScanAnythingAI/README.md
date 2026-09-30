@@ -55,6 +55,7 @@ The analyzer is `OpenAICompatibleAnalyzer` in `ScanAnythingAI/Services`, behind 
 - Barcode lookup is on by default and can be turned off in Profile. A GTIN is sent to Open Food Facts, then Open Beauty Facts, then Open Products Facts. The photo is not sent with that request. QR codes and other non-product symbols are not looked up.
 - Low-confidence and offline scans still save, with a note that the read was on-device.
 - Finds can be searched, favorited, tagged, noted, collected, shared, and shown on a map when location tags are on.
+- Share builds a card (photo, name, rarity, confidence, and a short line) and sends that image with the written find. The card is what Save Image stores. The plain photo is used on the card, not as a second attachment.
 - XP, seven levels, streaks, achievements, and a rotating set of daily and weekly quests follow the web app's rules, with a few extra badges for text and barcodes.
 - Ask-about-this-object chat is stored on the discovery.
 - Export writes a JSON journal. Erase deletes local photos and records.
@@ -63,6 +64,6 @@ Location tags are off until you turn them on in Profile.
 
 ## Checks that ran here
 
-`ScanAnythingCore` builds and its tests pass with Swift 6.0.3 (`swift test`). That covers XP, levels, streaks, achievements, quest rotation, JSON decoding, on-device fallback text, share copy, GTIN normalization, and Open Food Facts response mapping.
+`ScanAnythingCore` builds and its tests pass with Swift 6.0.3 (`swift test`). That covers XP, levels, streaks, achievements, quest rotation, JSON decoding, on-device fallback text, share copy, share-card wording, GTIN normalization, and Open Food Facts response mapping.
 
 This machine has no Xcode and no iOS SDK, so the app target was not compiled or launched. Every app Swift file was parse-checked only. Build it on a Mac before treating the project as signed off.

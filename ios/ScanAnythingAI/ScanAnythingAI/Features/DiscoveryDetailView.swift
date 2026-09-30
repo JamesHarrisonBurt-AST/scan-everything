@@ -49,7 +49,7 @@ struct DiscoveryDetailView: View {
                     Button { showShare = true } label: {
                         Image(systemName: "square.and.arrow.up")
                     }
-                    .accessibilityLabel("Share")
+                    .accessibilityLabel("Share card")
 
                     Button { showCollections = true } label: {
                         Image(systemName: "folder.badge.plus")
@@ -65,8 +65,7 @@ struct DiscoveryDetailView: View {
         }
         .sheet(isPresented: $showShare) {
             if let discovery {
-                ActivityView(items: shareItems(discovery))
-                    .presentationDetents([.medium])
+                ShareCardSheet(discovery: discovery)
             }
         }
         .confirmationDialog("Delete this discovery?", isPresented: $confirmDelete, titleVisibility: .visible) {
@@ -425,25 +424,6 @@ struct DiscoveryDetailView: View {
         discovery.favorited.toggle()
         try? context.save()
         Haptics.impact(.light)
-    }
-
-    private func shareItems(_ discovery: DiscoveryRecord) -> [Any] {
-        var items: [Any] = [DiscoveryShareText.plain(ShareDraft(
-            title: discovery.title,
-            category: discovery.category,
-            summary: discovery.summary,
-            details: discovery.narrative,
-            confidence: discovery.confidence,
-            rarity: discovery.rarity.title,
-            facts: discovery.interestingFacts,
-            barcode: discovery.barcodePayload,
-            recognizedText: discovery.recognizedText,
-            location: discovery.locationLabel
-        ))]
-        if let image = ImageStore.load(discovery.imageFilename) {
-            items.insert(image, at: 0)
-        }
-        return items
     }
 
     private func confidenceColor(_ score: Int) -> Color {

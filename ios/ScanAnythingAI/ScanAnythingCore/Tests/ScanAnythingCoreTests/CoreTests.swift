@@ -138,6 +138,135 @@ final class CoreTests: XCTestCase {
         XCTAssertLessThan(empty.confidence, 40)
     }
 
+    func testShareCardKeepsTheFindShort() {
+        let draft = ShareDraft(
+            title: "Brass compass",
+            category: "tool",
+            summary: "A pocket compass.",
+            details: "Likely a hiking compass.",
+            confidence: 84,
+            rarity: "Interesting",
+            facts: ["The needle aligns to magnetic north."],
+            barcode: "012345678905",
+            recognizedText: "MADE IN ENGLAND",
+            location: "Golden Gate Park"
+        )
+        let copy = ShareCardComposer.compose(draft)
+        XCTAssertEqual(copy.category, "Tool")
+        XCTAssertEqual(copy.title, "Brass compass")
+        XCTAssertEqual(copy.rarity, "Interesting")
+        XCTAssertEqual(copy.confidence, "84%")
+        XCTAssertEqual(copy.blurb, "A pocket compass.")
+        XCTAssertEqual(copy.fact, "The needle aligns to magnetic north.")
+        XCTAssertEqual(copy.place, "Golden Gate Park")
+        XCTAssertEqual(copy.footer, "Scan Anything AI")
+        XCTAssertFalse(copy.blurb.contains("012345678905"))
+        let spoken = ShareCardComposer.accessibilityLabel(copy)
+        XCTAssertTrue(spoken.contains("Brass compass"))
+        XCTAssertTrue(spoken.contains("Found near Golden Gate Park"))
+        XCTAssertTrue(DiscoveryShareText.plain(draft).contains("012345678905"))
+    }
+
+    func testShareCardFallsBackAndTruncates() {
+        let emptyTitle = ShareCardComposer.compose(ShareDraft(
+            title: "   ",
+            category: "musical instrument",
+            summary: "",
+            details: "",
+            confidence: 140,
+            rarity: "exceptional",
+            facts: ["  ", "A real fact that should show."],
+            barcode: "3017620422003",
+            recognizedText: "",
+            location: ""
+        ))
+        XCTAssertEqual(emptyTitle.title, "Untitled find")
+        XCTAssertEqual(emptyTitle.category, "Musical Instrument")
+        XCTAssertEqual(emptyTitle.rarity, "Exceptional")
+        XCTAssertEqual(emptyTitle.confidence, "100%")
+        XCTAssertEqual(emptyTitle.blurb, "Barcode 3017620422003")
+        XCTAssertEqual(emptyTitle.fact, "A real fact that should show.")
+        XCTAssertEqual(emptyTitle.place, "")
+
+        let fromDetails = ShareCardComposer.compose(ShareDraft(
+            title: "Fern",
+            category: "plant",
+            summary: "  ",
+            details: "A  common   indoor   fern.",
+            confidence: -4,
+            rarity: "",
+            facts: ["A common indoor fern."],
+            barcode: "",
+            recognizedText: "CARE",
+            location: "Kitchen window"
+        ))
+        XCTAssertEqual(fromDetails.confidence, "0%")
+        XCTAssertEqual(fromDetails.rarity, "Common")
+        XCTAssertEqual(fromDetails.blurb, "A common indoor fern.")
+        XCTAssertEqual(fromDetails.fact, "")
+        XCTAssertEqual(fromDetails.place, "Kitchen window")
+
+        let fromPlace = ShareCardComposer.compose(ShareDraft(
+            title: "Stone",
+            category: "outdoor",
+            summary: "",
+            details: "",
+            confidence: 40,
+            rarity: "unusual",
+            facts: [],
+            barcode: "",
+            recognizedText: "",
+            location: "  Baker \n Beach "
+        ))
+        XCTAssertEqual(fromPlace.blurb, "Found near Baker Beach")
+        XCTAssertEqual(fromPlace.place, "")
+        XCTAssertEqual(fromPlace.rarity, "Unusual")
+
+        let fromText = ShareCardComposer.compose(ShareDraft(
+            title: "Label",
+            category: "document",
+            summary: "",
+            details: "",
+            confidence: 60,
+            rarity: "common",
+            facts: [],
+            barcode: "3017620422003",
+            recognizedText: "  Field   Guide ",
+            location: ""
+        ))
+        XCTAssertEqual(fromText.blurb, "Field Guide")
+        XCTAssertFalse(fromText.blurb.contains("3017620422003"))
+
+        let longTitle = String(repeating: "Ancient ", count: 12).trimmingCharacters(in: .whitespaces)
+        let long = ShareCardComposer.compose(ShareDraft(
+            title: longTitle,
+            category: "collectible",
+            summary: String(repeating: "word ", count: 40),
+            details: "",
+            confidence: 50,
+            rarity: "Rare find",
+            facts: [String(repeating: "fact ", count: 40)],
+            barcode: "",
+            recognizedText: "",
+            location: ""
+        ))
+        XCTAssertTrue(long.title.hasSuffix("…"))
+        XCTAssertLessThanOrEqual(long.title.count, ShareCardComposer.titleLimit)
+        XCTAssertTrue(long.blurb.hasSuffix("…"))
+        XCTAssertLessThanOrEqual(long.blurb.count, ShareCardComposer.blurbLimit)
+        XCTAssertTrue(long.fact.hasSuffix("…"))
+        XCTAssertLessThanOrEqual(long.fact.count, ShareCardComposer.factLimit)
+        XCTAssertEqual(long.rarity, "Rare find")
+        XCTAssertFalse(long.title.contains("  "))
+    }
+
+    func testShareCardClippingBreaksOnWords() {
+        XCTAssertEqual(ShareCardComposer.clipped("Brass pocket compass from the trail", limit: 20), "Brass pocket…")
+        XCTAssertEqual(ShareCardComposer.clipped("Supercalifragilistic", limit: 10), "Supercali…")
+        XCTAssertEqual(ShareCardComposer.clipped("  Nutella\n spread  ", limit: 40), "Nutella spread")
+        XCTAssertEqual(ShareCardComposer.clipped("", limit: 10), "")
+    }
+
     func testShareTextIncludesTheFind() {
         let text = DiscoveryShareText.plain(ShareDraft(
             title: "Brass compass",

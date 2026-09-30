@@ -27,6 +27,8 @@ struct ScannerView: View {
     @State private var flash = false
     @State private var zoomBaseline: CGFloat = 1
     @State private var status = "Point at any object"
+    @State private var shareRoute: DiscoveryRoute?
+    @Query private var discoveries: [DiscoveryRecord]
 
     var body: some View {
         ZStack {
@@ -56,6 +58,34 @@ struct ScannerView: View {
         .onChange(of: photoItem) { _, item in
             guard let item else { return }
             Task { await loadPhoto(item) }
+        }
+        .sheet(item: $shareRoute) { route in
+            if let discovery = discoveries.first(where: { $0.id == route.id }) {
+                ShareCardSheet(discovery: discovery)
+            } else {
+                NavigationStack {
+                    VStack(spacing: 12) {
+                        Text("This find is not in the journal yet.")
+                            .font(.system(.headline, design: .serif))
+                            .foregroundStyle(Theme.ink)
+                        Text("Open it from Finds once it has finished saving.")
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.muted)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(24)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Theme.canvas)
+                    .navigationTitle("Share card")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { shareRoute = nil }
+                        }
+                    }
+                }
+                .presentationDetents([.medium])
+            }
         }
         .fullScreenCover(isPresented: $showDocuments) {
             DocumentScanner { images in
@@ -347,6 +377,14 @@ struct ScannerView: View {
                     Button("Open find") { onOpen(outcome.discoveryID) }
                         .buttonStyle(PrimaryButtonStyle())
                 }
+                Button {
+                    shareRoute = DiscoveryRoute(id: outcome.discoveryID)
+                } label: {
+                    Label("Share card", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(QuietButtonStyle())
+                .accessibilityHint("Shows a card you can send or save")
             }
             .padding(20)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
