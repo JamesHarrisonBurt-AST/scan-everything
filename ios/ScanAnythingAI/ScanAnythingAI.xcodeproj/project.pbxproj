@@ -1,0 +1,406 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C8B3B294D80840BA8CFF2EC2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3354A3059326710EC80F0E44 /* Theme.swift */; };
+		6FF5E44125F7D72A6276B371 /* DiscoveriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905629C02BCDF2160B7D55E /* DiscoveriesView.swift */; };
+		AA9DF3DE01DE78D8E763A51B /* DiscoveryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97B8916B67D75992E679C98 /* DiscoveryDetailView.swift */; };
+		C4E7302239AB8ADD77647634 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609EDB05FB43F1F90256869B /* ExploreView.swift */; };
+		0F3768E1900D249102F4E737 /* LegalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A320A51E0ECAFDEA8BFFC0 /* LegalView.swift */; };
+		42BF81C9F4841C4031DA7813 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60983062129DF1BA3CB59ACB /* OnboardingView.swift */; };
+		3EB782B041E1C4E88EFF3FC4 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3C28336619B360AE7E8E43C /* ProfileView.swift */; };
+		193E9761A4376F2B31B3D1A8 /* QuestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8BAB11275B4443DCD850F6B /* QuestsView.swift */; };
+		FC2C28B60F9405A12AFC6AF1 /* ScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8DE203B91C45011CC72E9F6 /* ScannerView.swift */; };
+		ACEBB44903B98D364D736478 /* SystemScanners.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9B33308D5395EBD697B975 /* SystemScanners.swift */; };
+		2A93485D51C93AE1EDC7B9F1 /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2DCF91F904FA8D258C70395 /* Records.swift */; };
+		BD6400481398238B32E78E9A /* ScanAnythingAIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44888E5158A5480499CD7EC4 /* ScanAnythingAIApp.swift */; };
+		A13ED9F74DDE3C3543134957 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31291313AF93F9BC19870DF6 /* AppSettings.swift */; };
+		8AA34F50A0CE726C12EC879F /* CameraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA67F4E88BDE11914B524081 /* CameraModel.swift */; };
+		B23144B386CD8C0AF6224FA9 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3B822995E5735E1D2FFBBA /* Haptics.swift */; };
+		42FB5E71842C656F75B116FB /* Identification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAD420C406E81846C4DAA9F /* Identification.swift */; };
+		180F560DBBA366203DDF26A8 /* ImageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EEDFCB515CD8EDB72E0DF15 /* ImageStore.swift */; };
+		C14A877071143F39D4BB794A /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D264D3EBDF68D68FB0B39134 /* KeychainStore.swift */; };
+		50131C5B11A999359A4F2ED2 /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD2E4BB4490ACCBA8812833 /* LocationProvider.swift */; };
+		81AF70C2FB5A6D8ABD0F1433 /* OpenAICompatibleAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B3F778964D2B42D37D4126 /* OpenAICompatibleAnalyzer.swift */; };
+		3A95CFEFDCC693415EF7BC0A /* ScanLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386D32A9ED6E133B4FFBE41B /* ScanLibrary.swift */; };
+		76646BA9E5F8E572D1F6DA63 /* VisionInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213E7498451F9B043ED91B5A /* VisionInspector.swift */; };
+		CF101D72675EB81B7906A59C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3336771037E89A52C8032826 /* Assets.xcassets */; };
+		D878E4D4F332A677C9BABC41 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D72A725B3A16126D64A1B /* PrivacyInfo.xcprivacy */; };
+		460B965AC505A0CD3E98819D /* ScanAnythingCore in Frameworks */ = {isa = PBXBuildFile; productRef = 2D4E4BE47F04568CDDEECA64 /* ScanAnythingCore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3336771037E89A52C8032826 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets.xcassets"; sourceTree = "<group>"; };
+		3354A3059326710EC80F0E44 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme.swift"; sourceTree = "<group>"; };
+		F905629C02BCDF2160B7D55E /* DiscoveriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DiscoveriesView.swift"; sourceTree = "<group>"; };
+		B97B8916B67D75992E679C98 /* DiscoveryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DiscoveryDetailView.swift"; sourceTree = "<group>"; };
+		609EDB05FB43F1F90256869B /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExploreView.swift"; sourceTree = "<group>"; };
+		D1A320A51E0ECAFDEA8BFFC0 /* LegalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LegalView.swift"; sourceTree = "<group>"; };
+		60983062129DF1BA3CB59ACB /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnboardingView.swift"; sourceTree = "<group>"; };
+		F3C28336619B360AE7E8E43C /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileView.swift"; sourceTree = "<group>"; };
+		B8BAB11275B4443DCD850F6B /* QuestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestsView.swift"; sourceTree = "<group>"; };
+		A8DE203B91C45011CC72E9F6 /* ScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScannerView.swift"; sourceTree = "<group>"; };
+		AD9B33308D5395EBD697B975 /* SystemScanners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SystemScanners.swift"; sourceTree = "<group>"; };
+		0EF6DC74DAB19D2F309ACA97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
+		D2DCF91F904FA8D258C70395 /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Records.swift"; sourceTree = "<group>"; };
+		4A5D72A725B3A16126D64A1B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PrivacyInfo.xcprivacy"; sourceTree = "<group>"; };
+		44888E5158A5480499CD7EC4 /* ScanAnythingAIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScanAnythingAIApp.swift"; sourceTree = "<group>"; };
+		31291313AF93F9BC19870DF6 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSettings.swift"; sourceTree = "<group>"; };
+		AA67F4E88BDE11914B524081 /* CameraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CameraModel.swift"; sourceTree = "<group>"; };
+		4B3B822995E5735E1D2FFBBA /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Haptics.swift"; sourceTree = "<group>"; };
+		DFAD420C406E81846C4DAA9F /* Identification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Identification.swift"; sourceTree = "<group>"; };
+		3EEDFCB515CD8EDB72E0DF15 /* ImageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageStore.swift"; sourceTree = "<group>"; };
+		D264D3EBDF68D68FB0B39134 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainStore.swift"; sourceTree = "<group>"; };
+		9BD2E4BB4490ACCBA8812833 /* LocationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocationProvider.swift"; sourceTree = "<group>"; };
+		92B3F778964D2B42D37D4126 /* OpenAICompatibleAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OpenAICompatibleAnalyzer.swift"; sourceTree = "<group>"; };
+		386D32A9ED6E133B4FFBE41B /* ScanLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScanLibrary.swift"; sourceTree = "<group>"; };
+		213E7498451F9B043ED91B5A /* VisionInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VisionInspector.swift"; sourceTree = "<group>"; };
+		B6CDB6E5D160E013280D3C68 /* ScanAnythingAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScanAnythingAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CF5BDB0BEAFE176F9629192A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				460B965AC505A0CD3E98819D /* ScanAnythingCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CF8D0BD4B75E8C2C174692A5 /* ScanAnythingAI */ = {
+			isa = PBXGroup;
+			children = (
+				9B5AE5E0B9094422CB46A7B3 /* Design */,
+				E677B1122DC37C3A693D0884 /* Features */,
+				073F63FFA7D060856AF3581C /* Models */,
+				721C66961AEE6733F97E1B85 /* Services */,
+				3336771037E89A52C8032826 /* Assets.xcassets */,
+				0EF6DC74DAB19D2F309ACA97 /* Info.plist */,
+				4A5D72A725B3A16126D64A1B /* PrivacyInfo.xcprivacy */,
+				44888E5158A5480499CD7EC4 /* ScanAnythingAIApp.swift */,
+			);
+			path = ScanAnythingAI;
+			sourceTree = "<group>";
+		};
+		9B5AE5E0B9094422CB46A7B3 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				3354A3059326710EC80F0E44 /* Theme.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		E677B1122DC37C3A693D0884 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				F905629C02BCDF2160B7D55E /* DiscoveriesView.swift */,
+				B97B8916B67D75992E679C98 /* DiscoveryDetailView.swift */,
+				609EDB05FB43F1F90256869B /* ExploreView.swift */,
+				D1A320A51E0ECAFDEA8BFFC0 /* LegalView.swift */,
+				60983062129DF1BA3CB59ACB /* OnboardingView.swift */,
+				F3C28336619B360AE7E8E43C /* ProfileView.swift */,
+				B8BAB11275B4443DCD850F6B /* QuestsView.swift */,
+				A8DE203B91C45011CC72E9F6 /* ScannerView.swift */,
+				AD9B33308D5395EBD697B975 /* SystemScanners.swift */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		073F63FFA7D060856AF3581C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D2DCF91F904FA8D258C70395 /* Records.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		721C66961AEE6733F97E1B85 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				31291313AF93F9BC19870DF6 /* AppSettings.swift */,
+				AA67F4E88BDE11914B524081 /* CameraModel.swift */,
+				4B3B822995E5735E1D2FFBBA /* Haptics.swift */,
+				DFAD420C406E81846C4DAA9F /* Identification.swift */,
+				3EEDFCB515CD8EDB72E0DF15 /* ImageStore.swift */,
+				D264D3EBDF68D68FB0B39134 /* KeychainStore.swift */,
+				9BD2E4BB4490ACCBA8812833 /* LocationProvider.swift */,
+				92B3F778964D2B42D37D4126 /* OpenAICompatibleAnalyzer.swift */,
+				386D32A9ED6E133B4FFBE41B /* ScanLibrary.swift */,
+				213E7498451F9B043ED91B5A /* VisionInspector.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		00C45FD35CB0F9C5F764F070 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B6CDB6E5D160E013280D3C68 /* ScanAnythingAI.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		ADCF10F76EBF2A74473E9DC4 = {
+			isa = PBXGroup;
+			children = (
+				CF8D0BD4B75E8C2C174692A5 /* ScanAnythingAI */,
+				00C45FD35CB0F9C5F764F070 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		29C7B681C8D62CBAC94D51C0 /* ScanAnythingAI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7ADE71700E9404B10E13B577 /* Build configuration list for PBXNativeTarget "ScanAnythingAI" */;
+			buildPhases = (
+				1CDF2F71A52B082132B04DFF /* Sources */,
+				CF5BDB0BEAFE176F9629192A /* Frameworks */,
+				C02F1309AF4906C92F1EAD44 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScanAnythingAI;
+			packageProductDependencies = (
+				2D4E4BE47F04568CDDEECA64 /* ScanAnythingCore */,
+			);
+			productName = ScanAnythingAI;
+			productReference = B6CDB6E5D160E013280D3C68 /* ScanAnythingAI.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		98F54143AB4E86B28C3AFEE0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					29C7B681C8D62CBAC94D51C0 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 12D04D787E90C9B967248BFD /* Build configuration list for PBXProject "ScanAnythingAI" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = ADCF10F76EBF2A74473E9DC4;
+			packageReferences = (
+				F4DE02C0234D00B78CEAC666 /* XCLocalSwiftPackageReference "ScanAnythingCore" */,
+			);
+			productRefGroup = 00C45FD35CB0F9C5F764F070 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				29C7B681C8D62CBAC94D51C0 /* ScanAnythingAI */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C02F1309AF4906C92F1EAD44 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CF101D72675EB81B7906A59C /* Assets.xcassets in Resources */,
+				D878E4D4F332A677C9BABC41 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1CDF2F71A52B082132B04DFF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8B3B294D80840BA8CFF2EC2 /* Theme.swift in Sources */,
+				6FF5E44125F7D72A6276B371 /* DiscoveriesView.swift in Sources */,
+				AA9DF3DE01DE78D8E763A51B /* DiscoveryDetailView.swift in Sources */,
+				C4E7302239AB8ADD77647634 /* ExploreView.swift in Sources */,
+				0F3768E1900D249102F4E737 /* LegalView.swift in Sources */,
+				42BF81C9F4841C4031DA7813 /* OnboardingView.swift in Sources */,
+				3EB782B041E1C4E88EFF3FC4 /* ProfileView.swift in Sources */,
+				193E9761A4376F2B31B3D1A8 /* QuestsView.swift in Sources */,
+				FC2C28B60F9405A12AFC6AF1 /* ScannerView.swift in Sources */,
+				ACEBB44903B98D364D736478 /* SystemScanners.swift in Sources */,
+				2A93485D51C93AE1EDC7B9F1 /* Records.swift in Sources */,
+				BD6400481398238B32E78E9A /* ScanAnythingAIApp.swift in Sources */,
+				A13ED9F74DDE3C3543134957 /* AppSettings.swift in Sources */,
+				8AA34F50A0CE726C12EC879F /* CameraModel.swift in Sources */,
+				B23144B386CD8C0AF6224FA9 /* Haptics.swift in Sources */,
+				42FB5E71842C656F75B116FB /* Identification.swift in Sources */,
+				180F560DBBA366203DDF26A8 /* ImageStore.swift in Sources */,
+				C14A877071143F39D4BB794A /* KeychainStore.swift in Sources */,
+				50131C5B11A999359A4F2ED2 /* LocationProvider.swift in Sources */,
+				81AF70C2FB5A6D8ABD0F1433 /* OpenAICompatibleAnalyzer.swift in Sources */,
+				3A95CFEFDCC693415EF7BC0A /* ScanLibrary.swift in Sources */,
+				76646BA9E5F8E572D1F6DA63 /* VisionInspector.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		73BFC4993D558C2844970A56 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		3C5BC6FE1E438E679FB7F74F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A45358D7F57D12409C956205 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScanAnythingAI/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Scan Anything AI";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.scananything.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		7A3CC3E65B4BE81911CE6871 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScanAnythingAI/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Scan Anything AI";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.scananything.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		12D04D787E90C9B967248BFD /* Build configuration list for PBXProject "ScanAnythingAI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				73BFC4993D558C2844970A56 /* Debug */,
+				3C5BC6FE1E438E679FB7F74F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7ADE71700E9404B10E13B577 /* Build configuration list for PBXNativeTarget "ScanAnythingAI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A45358D7F57D12409C956205 /* Debug */,
+				7A3CC3E65B4BE81911CE6871 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		F4DE02C0234D00B78CEAC666 /* XCLocalSwiftPackageReference "ScanAnythingCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ScanAnythingCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2D4E4BE47F04568CDDEECA64 /* ScanAnythingCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4DE02C0234D00B78CEAC666 /* XCLocalSwiftPackageReference "ScanAnythingCore" */;
+			productName = ScanAnythingCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 98F54143AB4E86B28C3AFEE0 /* Project object */;
+}
