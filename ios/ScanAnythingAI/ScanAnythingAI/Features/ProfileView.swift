@@ -189,6 +189,11 @@ struct ProfileView: View {
             Text("Location is used only when you save a scan, and only if this is on.")
                 .font(.caption)
                 .foregroundStyle(Theme.muted)
+            Toggle("Look up barcodes", isOn: $form.lookupBarcodes)
+                .onChange(of: form.lookupBarcodes) { _, _ in form.savePreferences() }
+            Text("A product barcode is sent to Open Food Facts, Open Beauty Facts, and Open Products Facts before any AI call. The photo stays on this iPhone. Turn this off to keep codes on device.")
+                .font(.caption)
+                .foregroundStyle(Theme.muted)
         }
         .padding(16)
         .glassPanel()

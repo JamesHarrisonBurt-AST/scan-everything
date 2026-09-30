@@ -41,7 +41,7 @@ enum ScanLibrary {
         hints: VisionHints,
         location: CLLocation?,
         locationLabel: String,
-        usedOnDeviceOnly: Bool,
+        source: String,
         notice: String?,
         context: ModelContext
     ) throws -> SaveOutcome {
@@ -88,7 +88,7 @@ enum ScanLibrary {
             recognizedText: hints.recognizedText,
             barcodePayload: hints.barcodePayload ?? "",
             barcodeSymbology: hints.barcodeSymbology ?? "",
-            sourceRaw: usedOnDeviceOnly ? "onDevice" : "ai",
+            sourceRaw: source,
             createdAt: now
         )
         context.insert(record)
@@ -154,7 +154,7 @@ enum ScanLibrary {
             streak: profile.streakDays,
             newAchievements: freshAchievements,
             completedQuests: completedQuests,
-            usedOnDeviceOnly: usedOnDeviceOnly,
+            usedOnDeviceOnly: source == "onDevice",
             notice: notice
         )
     }

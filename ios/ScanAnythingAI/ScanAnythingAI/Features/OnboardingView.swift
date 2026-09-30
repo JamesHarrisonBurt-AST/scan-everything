@@ -7,7 +7,7 @@ struct OnboardingView: View {
 
     private let pages: [(String, String, String, Color)] = [
         ("viewfinder", "Discover what's around you", "Point your camera at a plant, a tool, a label, a landmark. Scan Anything reads it.", Theme.amber),
-        ("text.viewfinder", "Text and codes, on device", "Barcodes and printed words are recognized on your iPhone before anything is sent away.", Theme.teal),
+        ("text.viewfinder", "Text on device, products by code", "Printed words stay on your iPhone. A product barcode can be matched to a public catalog before any AI call. Turn that off in Profile.", Theme.teal),
         ("books.vertical", "Keep a private journal", "Finds, collections, notes, and follow-up questions stay on this phone.", Theme.violet),
         ("flame", "Make a streak of it", "Earn XP, keep a daily streak, and finish quests as you look closer at the world.", Theme.rose)
     ]

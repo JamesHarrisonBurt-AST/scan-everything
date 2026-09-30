@@ -12,6 +12,7 @@ final class AppSettings {
         static let model = "ai.model"
         static let haptics = "ai.haptics"
         static let location = "ai.tagLocation"
+        static let lookup = "ai.lookupBarcodes"
     }
 
     var apiKey: String
@@ -19,6 +20,7 @@ final class AppSettings {
     var modelName: String
     var hapticsEnabled: Bool
     var tagLocation: Bool
+    var lookupBarcodes: Bool
 
     var hasAPIKey: Bool {
         !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -35,6 +37,11 @@ final class AppSettings {
             hapticsEnabled = defaults.bool(forKey: Key.haptics)
         }
         tagLocation = defaults.bool(forKey: Key.location)
+        if defaults.object(forKey: Key.lookup) == nil {
+            lookupBarcodes = true
+        } else {
+            lookupBarcodes = defaults.bool(forKey: Key.lookup)
+        }
     }
 
     func saveAI() {
@@ -57,6 +64,7 @@ final class AppSettings {
         let defaults = UserDefaults.standard
         defaults.set(hapticsEnabled, forKey: Key.haptics)
         defaults.set(tagLocation, forKey: Key.location)
+        defaults.set(lookupBarcodes, forKey: Key.lookup)
     }
 
     func makeAnalyzer() -> OpenAICompatibleAnalyzer {

@@ -27,6 +27,7 @@
 		C14A877071143F39D4BB794A /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D264D3EBDF68D68FB0B39134 /* KeychainStore.swift */; };
 		50131C5B11A999359A4F2ED2 /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD2E4BB4490ACCBA8812833 /* LocationProvider.swift */; };
 		81AF70C2FB5A6D8ABD0F1433 /* OpenAICompatibleAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B3F778964D2B42D37D4126 /* OpenAICompatibleAnalyzer.swift */; };
+		D8FF8D09BD596D172695B7BD /* ProductLookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7976063D56D22BF755D746 /* ProductLookup.swift */; };
 		3A95CFEFDCC693415EF7BC0A /* ScanLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386D32A9ED6E133B4FFBE41B /* ScanLibrary.swift */; };
 		76646BA9E5F8E572D1F6DA63 /* VisionInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213E7498451F9B043ED91B5A /* VisionInspector.swift */; };
 		CF101D72675EB81B7906A59C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3336771037E89A52C8032826 /* Assets.xcassets */; };
@@ -58,6 +59,7 @@
 		D264D3EBDF68D68FB0B39134 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainStore.swift"; sourceTree = "<group>"; };
 		9BD2E4BB4490ACCBA8812833 /* LocationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocationProvider.swift"; sourceTree = "<group>"; };
 		92B3F778964D2B42D37D4126 /* OpenAICompatibleAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OpenAICompatibleAnalyzer.swift"; sourceTree = "<group>"; };
+		6B7976063D56D22BF755D746 /* ProductLookup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductLookup.swift"; sourceTree = "<group>"; };
 		386D32A9ED6E133B4FFBE41B /* ScanLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScanLibrary.swift"; sourceTree = "<group>"; };
 		213E7498451F9B043ED91B5A /* VisionInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VisionInspector.swift"; sourceTree = "<group>"; };
 		B6CDB6E5D160E013280D3C68 /* ScanAnythingAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScanAnythingAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,6 +135,7 @@
 				D264D3EBDF68D68FB0B39134 /* KeychainStore.swift */,
 				9BD2E4BB4490ACCBA8812833 /* LocationProvider.swift */,
 				92B3F778964D2B42D37D4126 /* OpenAICompatibleAnalyzer.swift */,
+				6B7976063D56D22BF755D746 /* ProductLookup.swift */,
 				386D32A9ED6E133B4FFBE41B /* ScanLibrary.swift */,
 				213E7498451F9B043ED91B5A /* VisionInspector.swift */,
 			);
@@ -251,6 +254,7 @@
 				C14A877071143F39D4BB794A /* KeychainStore.swift in Sources */,
 				50131C5B11A999359A4F2ED2 /* LocationProvider.swift in Sources */,
 				81AF70C2FB5A6D8ABD0F1433 /* OpenAICompatibleAnalyzer.swift in Sources */,
+				D8FF8D09BD596D172695B7BD /* ProductLookup.swift in Sources */,
 				3A95CFEFDCC693415EF7BC0A /* ScanLibrary.swift in Sources */,
 				76646BA9E5F8E572D1F6DA63 /* VisionInspector.swift in Sources */,
 			);

@@ -35,20 +35,22 @@ enum Identification {
         location: LocationProvider,
         context: ModelContext
     ) async throws -> SaveOutcome {
-        let analysis = OnDeviceSynthesis.analysis(from: hints)
-        let image = labelCard(title: analysis.name, subtitle: analysis.summary)
-        guard let jpeg = ImageEncoding.jpeg(image, maxEdge: 1200, quality: 0.86) else {
-            throw CameraError.noImage
+        let prepared = try await prepare(jpegForAI: nil, hints: hints, preferAI: false, settings: settings)
+        let rendered = await journalImage(for: prepared)
+        guard !rendered.data.isEmpty else { throw CameraError.noImage }
+        var notice = prepared.notice
+        if let facts = prepared.facts {
+            notice = ProductAnalysis.notice(for: facts, picture: rendered.picture)
         }
         if settings.tagLocation { location.requestIfNeeded() }
         return try ScanLibrary.save(
-            analysis: analysis,
-            imageJPEG: jpeg,
+            analysis: prepared.analysis,
+            imageJPEG: rendered.data,
             hints: hints,
             location: settings.tagLocation ? location.location : nil,
             locationLabel: settings.tagLocation ? location.label : "",
-            usedOnDeviceOnly: true,
-            notice: "Saved from on-device text or a barcode. Use Identify for a full AI read of the object.",
+            source: prepared.source,
+            notice: notice,
             context: context
         )
     }
@@ -62,39 +64,115 @@ enum Identification {
         context: ModelContext
     ) async throws -> SaveOutcome {
         if settings.tagLocation { location.requestIfNeeded() }
-        let prepared = ImageEncoding.jpeg(jpeg, maxEdge: 1280, quality: 0.72)
-        var analysis: DiscoveryAnalysis
-        var onDevice = false
-        var notice: String?
-
-        if preferAI && settings.hasAPIKey {
-            do {
-                analysis = try await settings.makeAnalyzer().analyze(jpeg: prepared, hints: hints)
-            } catch {
-                if hints.hasSignal {
-                    analysis = OnDeviceSynthesis.analysis(from: hints)
-                    onDevice = true
-                    notice = "AI could not finish, so this find was read on device. \(error.localizedDescription)"
-                } else {
-                    throw error
-                }
-            }
-        } else {
-            analysis = OnDeviceSynthesis.analysis(from: hints)
-            onDevice = true
-            notice = "Saved with on-device Vision. Add an API key in Profile for a full identification."
-        }
-
+        let prepared = try await prepare(jpegForAI: jpeg, hints: hints, preferAI: preferAI, settings: settings)
         return try ScanLibrary.save(
-            analysis: analysis,
+            analysis: prepared.analysis,
             imageJPEG: jpeg,
             hints: hints,
             location: settings.tagLocation ? location.location : nil,
             locationLabel: settings.tagLocation ? location.label : "",
-            usedOnDeviceOnly: onDevice,
-            notice: notice,
+            source: prepared.source,
+            notice: prepared.notice,
             context: context
         )
+    }
+
+    private struct Prepared {
+        var analysis: DiscoveryAnalysis
+        var source: String
+        var notice: String?
+        var facts: ProductFacts?
+    }
+
+    /// Product catalogs run before the vision model. A hit names the packaged
+    /// item and skips the AI call. A miss or an unreachable catalog falls
+    /// through to the configured model, then to on-device text.
+    private static func prepare(
+        jpegForAI: Data?,
+        hints: VisionHints,
+        preferAI: Bool,
+        settings: AppSettings
+    ) async throws -> Prepared {
+        let catalog = await ProductLookup.resolve(hints: hints, enabled: settings.lookupBarcodes)
+        if case .hit(let facts) = catalog {
+            let picture: ProductAnalysis.Picture = jpegForAI == nil ? .codeOnly : .userPhoto
+            return Prepared(
+                analysis: ProductAnalysis.analysis(from: facts),
+                source: "catalog",
+                notice: ProductAnalysis.notice(for: facts, picture: picture),
+                facts: facts
+            )
+        }
+
+        let preparedJPEG = jpegForAI.map { ImageEncoding.jpeg($0, maxEdge: 1280, quality: 0.72) }
+        if preferAI, let preparedJPEG, settings.hasAPIKey {
+            do {
+                let analysis = try await settings.makeAnalyzer().analyze(jpeg: preparedJPEG, hints: hints)
+                return Prepared(
+                    analysis: analysis,
+                    source: "ai",
+                    notice: catalogNotice(catalog, usedAI: true),
+                    facts: nil
+                )
+            } catch {
+                if hints.hasSignal {
+                    return onDevice(hints: hints, catalog: catalog, aiFailure: error.localizedDescription)
+                }
+                throw error
+            }
+        }
+        return onDevice(hints: hints, catalog: catalog, aiFailure: nil)
+    }
+
+    private static func onDevice(hints: VisionHints, catalog: CatalogOutcome, aiFailure: String?) -> Prepared {
+        let lead: String
+        switch catalog {
+        case .notListed:
+            lead = "No public product listing for this barcode."
+        case .unreachable:
+            lead = "Product catalogs could not be reached."
+        case .skipped, .hit:
+            lead = ""
+        }
+        let notice: String
+        if let aiFailure {
+            let prefix = lead.isEmpty ? "" : lead + " "
+            notice = prefix + "AI could not finish, so this find was read on device. \(aiFailure)"
+        } else if !lead.isEmpty {
+            notice = lead + " Saved from what the camera read on this iPhone. Add an API key in Profile for a fuller read."
+        } else {
+            notice = "Saved with on-device Vision. Add an API key in Profile for a full identification."
+        }
+        return Prepared(
+            analysis: OnDeviceSynthesis.analysis(from: hints),
+            source: "onDevice",
+            notice: notice,
+            facts: nil
+        )
+    }
+
+    private static func catalogNotice(_ catalog: CatalogOutcome, usedAI: Bool) -> String? {
+        switch catalog {
+        case .skipped, .hit:
+            return nil
+        case .notListed:
+            return ProductAnalysis.notListedNotice(usedAI: usedAI)
+        case .unreachable:
+            return ProductAnalysis.unreachableNotice(usedAI: usedAI)
+        }
+    }
+
+    private static func journalImage(for prepared: Prepared) async -> (data: Data, picture: ProductAnalysis.Picture) {
+        if let facts = prepared.facts,
+           let downloaded = await ProductLookup.journalImage(from: facts.imageURL),
+           let image = UIImage(data: downloaded),
+           let jpeg = ImageEncoding.jpeg(image, maxEdge: 1200, quality: 0.86),
+           !jpeg.isEmpty {
+            return (jpeg, .catalogPhoto)
+        }
+        let card = labelCard(title: prepared.analysis.name, subtitle: prepared.analysis.summary)
+        let jpeg = ImageEncoding.jpeg(card, maxEdge: 1200, quality: 0.86) ?? Data()
+        return (jpeg, .codeOnly)
     }
 
     private static func labelCard(title: String, subtitle: String) -> UIImage {

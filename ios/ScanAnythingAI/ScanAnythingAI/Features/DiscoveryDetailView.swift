@@ -167,6 +167,10 @@ struct DiscoveryDetailView: View {
                 Text("On device")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(Theme.teal)
+            } else if discovery.sourceRaw == "catalog" {
+                Text("Catalog")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(Theme.amberText)
             }
         }
     }

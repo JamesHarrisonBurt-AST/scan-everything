@@ -232,6 +232,9 @@ struct ScannerView: View {
             return "Live text and barcodes update as you move. Tap a code to save it."
         }
         if !settings.hasAPIKey {
+            if settings.lookupBarcodes {
+                return "Product barcodes are checked in public catalogs. Add an AI key in Profile for other objects."
+            }
             return "On-device reading is ready. Add an AI key in Profile for names, facts, and care tips."
         }
         return status
@@ -265,6 +268,19 @@ struct ScannerView: View {
         .padding(28)
     }
 
+    private var analyzingDetail: String {
+        if settings.lookupBarcodes && settings.hasAPIKey {
+            return "Checking public product catalogs, then your AI if the barcode is unknown."
+        }
+        if settings.lookupBarcodes {
+            return "Checking public product catalogs, and reading what stays on device."
+        }
+        if settings.hasAPIKey {
+            return "Reading the frame, then asking your AI."
+        }
+        return "Reading text and barcodes on device."
+    }
+
     private var analyzingOverlay: some View {
         VStack(spacing: 14) {
             ProgressView()
@@ -273,7 +289,7 @@ struct ScannerView: View {
             Text("Looking closely")
                 .font(.system(.title3, design: .serif, weight: .bold))
                 .foregroundStyle(.white)
-            Text(settings.hasAPIKey ? "Reading the frame, then asking your AI." : "Reading text and barcodes on device.")
+            Text(analyzingDetail)
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.7))
         }

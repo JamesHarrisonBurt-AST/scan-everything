@@ -50,8 +50,9 @@ The analyzer is `OpenAICompatibleAnalyzer` in `ScanAnythingAI/Services`, behind 
 ## What the app does
 
 - Onboarding, then Explore, Finds, Quests, and Profile, with the camera on the center button.
-- Identify mode captures a still, runs Vision, then the configured model. Pinch to zoom, tap to focus, torch, photo library, and the document camera are included.
-- Live mode uses VisionKit's data scanner when the device supports it, and falls back to the AVFoundation preview with live text and barcode chips.
+- Identify mode captures a still, runs Vision, looks up a product barcode, then the configured model only if the catalog has no listing. Pinch to zoom, tap to focus, torch, photo library, and the document camera are included.
+- Live mode uses VisionKit's data scanner when the device supports it, and falls back to the AVFoundation preview with live text and barcode chips. Saving a product barcode names it from the catalog before anything else.
+- Barcode lookup is on by default and can be turned off in Profile. A GTIN is sent to Open Food Facts, then Open Beauty Facts, then Open Products Facts. The photo is not sent with that request. QR codes and other non-product symbols are not looked up.
 - Low-confidence and offline scans still save, with a note that the read was on-device.
 - Finds can be searched, favorited, tagged, noted, collected, shared, and shown on a map when location tags are on.
 - XP, seven levels, streaks, achievements, and a rotating set of daily and weekly quests follow the web app's rules, with a few extra badges for text and barcodes.
@@ -62,6 +63,6 @@ Location tags are off until you turn them on in Profile.
 
 ## Checks that ran here
 
-`ScanAnythingCore` builds and its tests pass with Swift 6.0.3 (`swift test`, 8 tests). That covers XP, levels, streaks, achievements, quest rotation, JSON decoding, on-device fallback text, and share copy.
+`ScanAnythingCore` builds and its tests pass with Swift 6.0.3 (`swift test`). That covers XP, levels, streaks, achievements, quest rotation, JSON decoding, on-device fallback text, share copy, GTIN normalization, and Open Food Facts response mapping.
 
 This machine has no Xcode and no iOS SDK, so the app target was not compiled or launched. Every app Swift file was parse-checked only. Build it on a Mac before treating the project as signed off.

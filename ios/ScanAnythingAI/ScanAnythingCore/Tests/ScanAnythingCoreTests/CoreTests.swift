@@ -156,6 +156,90 @@ final class CoreTests: XCTestCase {
         XCTAssertTrue(text.contains("Scan Anything AI"))
     }
 
+    func testGTINNormalization() {
+        XCTAssertEqual(BarcodeIdentity.gtin(from: "3017620422003", symbology: "VNBarcodeSymbologyEAN13"), "3017620422003")
+        XCTAssertEqual(BarcodeIdentity.gtin(from: "036000291452", symbology: "UPC-A"), "0036000291452")
+        XCTAssertEqual(BarcodeIdentity.gtin(from: "96385074", symbology: "EAN8"), "96385074")
+        XCTAssertEqual(BarcodeIdentity.gtin(from: "03017620422003", symbology: "ITF14"), "03017620422003")
+        XCTAssertEqual(BarcodeIdentity.gtin(from: "04252614", symbology: "VNBarcodeSymbologyUPCE"), "0042100005264")
+        XCTAssertEqual(BarcodeIdentity.gtin(from: "425261", symbology: "org.gs1.UPC-E"), "0042100005264")
+        XCTAssertEqual(BarcodeIdentity.gtin(from: " 3017620422003 "), "3017620422003")
+        XCTAssertNil(BarcodeIdentity.gtin(from: "3017620422004"))
+        XCTAssertNil(BarcodeIdentity.gtin(from: "https://example.com/product/42", symbology: "QR"))
+        XCTAssertNil(BarcodeIdentity.gtin(from: "12345", symbology: "Code128"))
+        XCTAssertEqual(
+            BarcodeIdentity.gtin(from: "https://id.gs1.org/01/03017620422003/10/ABC", symbology: "QR"),
+            "03017620422003"
+        )
+        XCTAssertEqual(BarcodeIdentity.gtin(from: "(01)03017620422003"), "03017620422003")
+    }
+
+    func testProductFactsDecodeAndMapping() throws {
+        let raw = """
+        {
+          "code": "3017620422003",
+          "product": {
+            "product_name": "Nutella",
+            "product_name_en": "Nutella",
+            "generic_name_en": "Hazelnut And Cocoa Spread",
+            "brands": "Nutella, Ferrero",
+            "quantity": "400 g",
+            "categories_tags": ["en:breakfasts", "en:sweet-spreads", "en:Pâtes à tartiner", "fr:nutella"],
+            "ingredients_text_en": "Sugar, palm oil, hazelnuts 13%, skimmed milk powder.",
+            "allergens": "milk, nuts",
+            "labels_tags": ["en:no-gluten"],
+            "nutriscore_grade": "e",
+            "nova_group": 4,
+            "packaging": "Glass, Plastic lid",
+            "origins": "",
+            "conservation_conditions": "Store away from heat.",
+            "image_front_url": "https://images.openfoodfacts.org/images/products/301/front.jpg",
+            "image_front_small_url": "http://insecure.example/front.jpg"
+          },
+          "status": 1
+        }
+        """.data(using: .utf8)!
+        let facts = try XCTUnwrap(ProductFactsJSON.decode(raw, barcode: "3017620422003", source: ProductCatalog.food.rawValue))
+        XCTAssertEqual(facts.name, "Nutella")
+        XCTAssertEqual(facts.brand, "Nutella, Ferrero")
+        XCTAssertEqual(facts.allergens, ["milk", "nuts"])
+        XCTAssertEqual(facts.categories, ["Breakfasts", "Sweet Spreads"])
+        XCTAssertEqual(facts.imageURL, "https://images.openfoodfacts.org/images/products/301/front.jpg")
+        XCTAssertEqual(facts.novaGroup, 4)
+
+        let analysis = ProductAnalysis.analysis(from: facts)
+        XCTAssertEqual(analysis.name, "Nutella")
+        XCTAssertEqual(analysis.category, "food")
+        XCTAssertEqual(analysis.subcategory, "Sweet Spreads")
+        XCTAssertEqual(analysis.possibleBrand, "Nutella, Ferrero")
+        XCTAssertEqual(analysis.confidence, 93)
+        XCTAssertEqual(analysis.rarity, .common)
+        XCTAssertEqual(analysis.materials, ["Glass", "Plastic lid"])
+        XCTAssertTrue(analysis.safetyNotes.contains("Contains milk, nuts."))
+        XCTAssertTrue(analysis.interestingFacts.contains { $0.contains("NOVA 4") })
+        XCTAssertEqual(analysis.maintenanceTips, ["Store away from heat."])
+        XCTAssertTrue(ProductAnalysis.notice(for: facts, picture: .userPhoto).contains("Open Food Facts"))
+        XCTAssertTrue(ProductAnalysis.notice(for: facts, picture: .userPhoto).contains("photo stayed"))
+
+        let miss = #"{"status":0,"status_verbose":"product not found"}"#.data(using: .utf8)!
+        XCTAssertNil(ProductFactsJSON.decode(miss, barcode: "0000000000000", source: ProductCatalog.food.rawValue))
+        let nameless = #"{"status":1,"product":{"brands":"Acme"}}"#.data(using: .utf8)!
+        XCTAssertNil(ProductFactsJSON.decode(nameless, barcode: "3017620422003", source: ProductCatalog.food.rawValue))
+    }
+
+    func testProductCategoryDefaults() {
+        let shampoo = ProductFacts(barcode: "1", source: ProductCatalog.beauty.rawValue, name: "Daily Wash", categories: ["Shampoo"])
+        XCTAssertEqual(ProductAnalysis.analysis(from: shampoo).category, "household")
+        let cable = ProductFacts(barcode: "2", source: ProductCatalog.products.rawValue, name: "USB Cable", categories: ["Phone accessories"])
+        XCTAssertEqual(ProductAnalysis.analysis(from: cable).category, "electronics")
+        let unknown = ProductFacts(barcode: "3", source: ProductCatalog.products.rawValue, name: "Mystery Tin")
+        XCTAssertEqual(ProductAnalysis.analysis(from: unknown).category, "other")
+        let url = ProductCatalog.food.productURL(code: "3017620422003")
+        XCTAssertEqual(url?.host, "world.openfoodfacts.org")
+        XCTAssertTrue(url?.absoluteString.contains("3017620422003") == true)
+        XCTAssertTrue(url?.absoluteString.contains("product_name") == true)
+    }
+
     private func date(_ iso: String, calendar: Calendar) -> Date {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
