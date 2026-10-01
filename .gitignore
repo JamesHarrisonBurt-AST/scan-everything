@@ -30,3 +30,10 @@ dist-ssr
 .env
 .vite
 base44/.app.jsonc
+
+# Xcode
+xcuserdata/
+DerivedData/
+*.xcuserstate
+.build/
+ios/ScanAnythingAI/**/AIConfig.plist

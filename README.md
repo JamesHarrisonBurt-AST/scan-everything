@@ -34,3 +34,7 @@ Scan Anything AI is an AR + AI-powered visual discovery app that encourages phys
 ## Publish
 
 Open [Base44.com](https://base44.com) and click Publish.
+
+## Native iOS app
+
+A SwiftUI version lives in `ios/ScanAnythingAI/`. Open `ScanAnythingAI.xcodeproj`, or unzip `ios/ScanAnythingAI.zip`. Setup, the AI key, the map, the streak widget, and how the on-device scanner fits together are in `ios/ScanAnythingAI/README.md`. The web app in this folder is unchanged.
