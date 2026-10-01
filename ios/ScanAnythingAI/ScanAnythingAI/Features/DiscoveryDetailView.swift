@@ -31,7 +31,7 @@ struct DiscoveryDetailView: View {
                 EmptyJournal(symbol: "questionmark", title: "Find unavailable", message: "It may have been deleted.")
             }
         }
-        .background(Theme.canvas)
+        .journalCanvas()
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: UUID.self) { id in
             DiscoveryDetailView(discoveryID: id)
@@ -124,25 +124,34 @@ struct DiscoveryDetailView: View {
         }
     }
 
+    @Environment(\.heroNamespace) private var heroNamespace
+
     private func hero(_ discovery: DiscoveryRecord) -> some View {
         ZStack(alignment: .bottomLeading) {
             DiscoveryThumbnail(filename: discovery.imageFilename)
-                .frame(height: 280)
+                .frame(height: 320)
                 .frame(maxWidth: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            LinearGradient(colors: [.clear, .black.opacity(0.72)], startPoint: .center, endPoint: .bottom)
-                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            VStack(alignment: .leading, spacing: 4) {
+                .heroMatched(id: discovery.id, namespace: heroNamespace)
+            LinearGradient(colors: [.clear, .black.opacity(0.78)], startPoint: .center, endPoint: .bottom)
+            VStack(alignment: .leading, spacing: 6) {
+                RarityPill(rarity: discovery.rarity)
                 Text(DiscoveryCategory.displayName(for: discovery.category).uppercased())
                     .font(.system(.caption2, design: .rounded, weight: .bold))
-                    .tracking(1.1)
+                    .tracking(1.4)
                     .foregroundStyle(.white.opacity(0.8))
                 Text(discovery.title)
-                    .font(.system(.title, design: .serif, weight: .bold))
+                    .font(.system(.largeTitle, design: .serif, weight: .bold))
                     .foregroundStyle(.white)
+                    .shadow(color: Theme.rarityColor(discovery.rarity).opacity(0.7), radius: 12)
             }
             .padding(18)
         }
+        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
+                .strokeBorder(Theme.rarityColor(discovery.rarity).opacity(discovery.rarity == .common ? 0.25 : 0.85), lineWidth: 1.5)
+        )
+        .shadow(color: Theme.rarityColor(discovery.rarity).opacity(discovery.rarity == .common ? 0.05 : 0.45), radius: 22, y: 10)
         .accessibilityElement(children: .combine)
     }
 

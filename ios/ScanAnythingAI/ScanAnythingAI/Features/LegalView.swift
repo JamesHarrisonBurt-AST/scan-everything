@@ -17,7 +17,7 @@ struct LegalView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(20)
         }
-        .background(Theme.canvas)
+        .journalCanvas()
         .navigationTitle(document == .privacy ? "Privacy" : "Terms")
         .navigationBarTitleDisplayMode(.inline)
     }

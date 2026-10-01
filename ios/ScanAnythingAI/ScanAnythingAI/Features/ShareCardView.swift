@@ -290,7 +290,7 @@ struct ShareCardSheet: View {
             }
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Theme.canvas)
+            .journalCanvas()
             .navigationTitle("Share card")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

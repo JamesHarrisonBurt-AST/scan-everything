@@ -15,7 +15,7 @@ struct QuestsView: View {
                 VStack(alignment: .leading, spacing: 22) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Quests")
-                            .font(.system(size: 32, weight: .bold, design: .serif))
+                            .font(.system(size: 36, weight: .bold, design: .serif))
                             .foregroundStyle(Theme.ink)
                         Text("A fresh set each day, plus one for the week.")
                             .font(.subheadline)
@@ -52,7 +52,7 @@ struct QuestsView: View {
                 }
                 .padding(20)
             }
-            .background(Theme.canvas)
+            .journalCanvas()
         }
     }
 

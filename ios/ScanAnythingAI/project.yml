@@ -21,10 +21,14 @@ targets:
       - path: ScanAnythingAI
         excludes:
           - Info.plist
+          - ScanAnythingAI.entitlements
           - Config/**
+      - path: Shared
     dependencies:
       - package: ScanAnythingCore
         product: ScanAnythingCore
+      - target: ScanAnythingWidget
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: ai.scananything.app
@@ -39,8 +43,34 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: NO
         CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: ScanAnythingAI/ScanAnythingAI.entitlements
         ENABLE_PREVIEWS: YES
         SWIFT_VERSION: "5.0"
         SWIFT_EMIT_LOC_STRINGS: YES
     scheme:
       gatherCoverageData: false
+  ScanAnythingWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ScanAnythingWidget
+        excludes:
+          - Info.plist
+          - ScanAnythingWidget.entitlements
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ai.scananything.app.widget
+        PRODUCT_NAME: ScanAnythingWidget
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: ScanAnythingWidget/Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: Scan Anything
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: ScanAnythingWidget/ScanAnythingWidget.entitlements
+        SKIP_INSTALL: YES
+        SWIFT_VERSION: "5.0"
+        SWIFT_EMIT_LOC_STRINGS: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        IPHONEOS_DEPLOYMENT_TARGET: "17.0"

@@ -118,23 +118,8 @@ struct ScannerView: View {
                 if state == .changed { camera.setZoom(zoomBaseline * scale) }
             })
             .ignoresSafeArea()
-            reticle
+            AnimatedReticle(active: mode == .identify && outcome == nil && failure == nil && !analyzing)
         }
-    }
-
-    private var reticle: some View {
-        ZStack {
-            Reticle()
-                .stroke(Color(red: 0.98, green: 0.75, blue: 0.38).opacity(0.85), style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                .frame(width: 210, height: 210)
-            if !reduceMotion && mode == .identify && outcome == nil && !analyzing {
-                ScanBeam()
-                    .frame(width: 180, height: 180)
-            }
-        }
-        .allowsHitTesting(false)
-        .opacity(mode == .identify && outcome == nil && failure == nil ? 1 : 0.25)
-        .accessibilityHidden(true)
     }
 
     private var chrome: some View {
@@ -229,15 +214,9 @@ struct ScannerView: View {
             }
             .accessibilityLabel("Choose a photo")
             Spacer()
-            Button {
+            ShutterButton(disabled: !camera.isRunning && mode != .live) {
                 Task { await capture() }
-            } label: {
-                ZStack {
-                    Circle().stroke(.white, lineWidth: 4).frame(width: 78, height: 78)
-                    Circle().fill(Color(red: 0.98, green: 0.75, blue: 0.38)).frame(width: 62, height: 62)
-                }
             }
-            .disabled(!camera.isRunning && mode != .live)
             .accessibilityLabel(mode == .live ? "Capture and read" : "Capture and identify")
             Spacer()
             Button { camera.toggleTorch() } label: {
@@ -263,9 +242,9 @@ struct ScannerView: View {
         }
         if !settings.hasAPIKey {
             if settings.lookupBarcodes {
-                return "Product barcodes are checked in public catalogs. Add an AI key in Profile for other objects."
+                return "Product barcodes are checked in public catalogs. Other finds are named on this iPhone."
             }
-            return "On-device reading is ready. Add an AI key in Profile for names, facts, and care tips."
+            return "No API key. Text, barcodes, and Apple Intelligence stay on this iPhone."
         }
         return status
     }
@@ -308,7 +287,7 @@ struct ScannerView: View {
         if settings.hasAPIKey {
             return "Reading the frame, then asking your AI."
         }
-        return "Reading text and barcodes on device."
+        return "Reading on this iPhone. Apple Intelligence names it when the device allows."
     }
 
     private var analyzingOverlay: some View {
@@ -330,69 +309,118 @@ struct ScannerView: View {
     }
 
     private func resultOverlay(_ outcome: SaveOutcome) -> some View {
-        VStack {
-            Spacer()
-            VStack(alignment: .leading, spacing: 12) {
-                if outcome.leveledUp {
-                    Text("Level up · \(outcome.levelName)")
-                        .font(.system(.caption, design: .rounded, weight: .bold))
-                        .foregroundStyle(Color(red: 0.1, green: 0.07, blue: 0.04))
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Theme.amberGradient, in: Capsule())
-                }
-                Text(outcome.category.uppercased())
-                    .font(.system(.caption2, design: .rounded, weight: .bold))
-                    .tracking(1.1)
-                    .foregroundStyle(.white.opacity(0.65))
-                Text(outcome.title)
-                    .font(.system(.title2, design: .serif, weight: .bold))
-                    .foregroundStyle(.white)
-                HStack(spacing: 8) {
-                    Text("\(outcome.confidence)%")
-                    RarityPill(rarity: outcome.rarity)
-                    Text("+\(outcome.xpEarned) XP")
-                        .foregroundStyle(Color(red: 0.98, green: 0.75, blue: 0.38))
-                }
-                .font(.system(.caption, design: .rounded, weight: .bold))
-                .foregroundStyle(.white.opacity(0.85))
-                if !outcome.summary.isEmpty {
-                    Text(outcome.summary)
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.78))
-                }
-                if let notice = outcome.notice {
-                    Text(notice)
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
-                }
-                if !outcome.newAchievements.isEmpty {
-                    Text(outcome.newAchievements.map(\.title).joined(separator: " · "))
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Color(red: 0.98, green: 0.75, blue: 0.38))
-                }
-                HStack(spacing: 10) {
-                    Button("Keep scanning") { self.outcome = nil }
+        ZStack {
+            RarityBurst(rarity: outcome.rarity)
+                .frame(maxHeight: .infinity, alignment: .center)
+            VStack {
+                Spacer()
+                VStack(alignment: .leading, spacing: 12) {
+                    if outcome.leveledUp {
+                        LevelUpBanner(name: outcome.levelName)
+                    }
+                    Text(DiscoveryCategory.displayName(for: outcome.category).uppercased())
+                        .font(.system(.caption2, design: .rounded, weight: .bold))
+                        .tracking(1.1)
+                        .foregroundStyle(.white.opacity(0.65))
+                    Text(outcome.title)
+                        .font(.system(.largeTitle, design: .serif, weight: .bold))
+                        .foregroundStyle(.white)
+                        .shadow(color: Theme.rarityColor(outcome.rarity).opacity(0.8), radius: 16)
+                    HStack(spacing: 8) {
+                        Text("\(outcome.confidence)%")
+                        RarityPill(rarity: outcome.rarity)
+                        Text("+\(outcome.xpEarned) XP")
+                            .foregroundStyle(Theme.amberText)
+                    }
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.85))
+                    if !outcome.summary.isEmpty {
+                        Text(outcome.summary)
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.78))
+                    }
+                    if let notice = outcome.notice {
+                        Text(notice)
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                    if !outcome.priorSightings.isEmpty {
+                        priorSightings(outcome.priorSightings)
+                    }
+                    if !outcome.newAchievements.isEmpty {
+                        Text(outcome.newAchievements.map(\.title).joined(separator: " · "))
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Theme.amberText)
+                    }
+                    HStack(spacing: 10) {
+                        Button("Keep scanning") {
+                            if reduceMotion {
+                                self.outcome = nil
+                            } else {
+                                withAnimation(.spring(duration: 0.35)) { self.outcome = nil }
+                            }
+                        }
                         .buttonStyle(QuietButtonStyle())
-                    Button("Open find") { onOpen(outcome.discoveryID) }
-                        .buttonStyle(PrimaryButtonStyle())
+                        Button("Open find") { onOpen(outcome.discoveryID) }
+                            .buttonStyle(PrimaryButtonStyle())
+                    }
+                    Button {
+                        shareRoute = DiscoveryRoute(id: outcome.discoveryID)
+                    } label: {
+                        Label("Share card", systemImage: "square.and.arrow.up")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(QuietButtonStyle())
+                    .accessibilityHint("Shows a card you can send or save")
                 }
-                Button {
-                    shareRoute = DiscoveryRoute(id: outcome.discoveryID)
-                } label: {
-                    Label("Share card", systemImage: "square.and.arrow.up")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(QuietButtonStyle())
-                .accessibilityHint("Shows a card you can send or save")
+                .padding(20)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 32, style: .continuous)
+                        .strokeBorder(Theme.rarityColor(outcome.rarity).opacity(0.7), lineWidth: 1.5)
+                )
+                .shadow(color: Theme.rarityColor(outcome.rarity).opacity(0.45), radius: 24, y: 8)
+                .padding(16)
             }
-            .padding(20)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .padding(16)
         }
+        .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
         .onAppear {
-            if outcome.confidence < 40 { Haptics.notify(.warning) } else { Haptics.notify(.success) }
-            AccessibilityNotification.Announcement(outcome.title).post()
+            if outcome.rarity == .exceptional || outcome.leveledUp {
+                Haptics.notify(.success)
+            } else if outcome.confidence < 40 {
+                Haptics.notify(.warning)
+            } else {
+                Haptics.notify(.success)
+            }
+            let lead = outcome.priorSightings.first?.kind == .same ? "You've scanned this before. " : ""
+            AccessibilityNotification.Announcement(lead + outcome.title).post()
+        }
+    }
+
+    private func priorSightings(_ sightings: [PriorSighting]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(sightings.contains { $0.kind == .same } ? "You've scanned this before" : "This looks like an earlier find")
+                .font(.system(.caption, design: .rounded, weight: .bold))
+                .foregroundStyle(Theme.amberText)
+            ForEach(sightings) { sighting in
+                Button {
+                    onOpen(sighting.id)
+                } label: {
+                    HStack {
+                        Text(sighting.kind.title)
+                            .font(.caption2.weight(.bold))
+                        Text(sighting.title)
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .frame(minHeight: 36)
+                    .background(Color.white.opacity(0.08), in: Capsule())
+                }
+                .accessibilityHint("Opens the earlier find")
+            }
         }
     }
 
@@ -507,39 +535,3 @@ private struct PickedImage: Transferable {
     }
 }
 
-private struct Reticle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let length = rect.width * 0.18
-        let corners = [
-            (CGPoint(x: rect.minX, y: rect.minY), CGPoint(x: 1, y: 0), CGPoint(x: 0, y: 1)),
-            (CGPoint(x: rect.maxX, y: rect.minY), CGPoint(x: -1, y: 0), CGPoint(x: 0, y: 1)),
-            (CGPoint(x: rect.minX, y: rect.maxY), CGPoint(x: 1, y: 0), CGPoint(x: 0, y: -1)),
-            (CGPoint(x: rect.maxX, y: rect.maxY), CGPoint(x: -1, y: 0), CGPoint(x: 0, y: -1))
-        ]
-        for corner in corners {
-            path.move(to: corner.0)
-            path.addLine(to: CGPoint(x: corner.0.x + corner.1.x * length, y: corner.0.y + corner.1.y * length))
-            path.move(to: corner.0)
-            path.addLine(to: CGPoint(x: corner.0.x + corner.2.x * length, y: corner.0.y + corner.2.y * length))
-        }
-        return path
-    }
-}
-
-private struct ScanBeam: View {
-    @State private var phase: CGFloat = 0
-    var body: some View {
-        GeometryReader { geo in
-            Rectangle()
-                .fill(Color(red: 0.98, green: 0.75, blue: 0.38).opacity(0.55))
-                .frame(height: 2)
-                .offset(y: phase * geo.size.height)
-                .onAppear {
-                    withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
-                        phase = 1
-                    }
-                }
-        }
-    }
-}

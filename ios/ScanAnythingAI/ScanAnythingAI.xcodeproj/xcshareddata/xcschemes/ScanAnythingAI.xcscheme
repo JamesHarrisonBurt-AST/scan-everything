@@ -14,6 +14,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A5A0AA9F4FB5BC8D9254438A"
+               BuildableName = "ScanAnythingWidget.appex"
+               BlueprintName = "ScanAnythingWidget"
+               ReferencedContainer = "container:ScanAnythingAI.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "29C7B681C8D62CBAC94D51C0"
                BuildableName = "ScanAnythingAI.app"
                BlueprintName = "ScanAnythingAI"

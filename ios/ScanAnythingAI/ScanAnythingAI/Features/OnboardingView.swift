@@ -14,7 +14,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Theme.canvas.ignoresSafeArea()
+            AmbientBackground()
             VStack(spacing: 0) {
                 HStack {
                     Spacer()

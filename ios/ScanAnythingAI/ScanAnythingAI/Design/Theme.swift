@@ -39,13 +39,36 @@ enum Theme {
 
 struct GlassPanel: ViewModifier {
     var radius: CGFloat = 22
+    @Environment(\.colorScheme) private var scheme
+
     func body(content: Content) -> some View {
         content
-            .background(Theme.card, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
+            .background {
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .fill(Theme.card.opacity(scheme == .dark ? 0.9 : 0.94))
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.white.opacity(scheme == .dark ? 0.08 : 0.35), Color.clear],
+                            startPoint: .top,
+                            endPoint: .center
+                        )
+                    )
+            }
             .overlay(
                 RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .stroke(Theme.stroke, lineWidth: 1)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [Theme.amber.opacity(0.55), Theme.stroke, Theme.violet.opacity(0.35)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
             )
+            .shadow(color: Color.black.opacity(scheme == .dark ? 0.38 : 0.1), radius: 18, y: 10)
     }
 }
 
@@ -58,6 +81,32 @@ extension View {
         font(.system(.title2, design: .serif, weight: .bold))
             .foregroundStyle(Theme.ink)
     }
+
+    func journalCanvas() -> some View {
+        background {
+            AmbientBackground()
+        }
+    }
+
+    @ViewBuilder
+    func heroMatched(id: UUID, namespace: Namespace.ID?) -> some View {
+        if let namespace {
+            self.matchedGeometryEffect(id: id, in: namespace)
+        } else {
+            self
+        }
+    }
+}
+
+private struct HeroNamespaceKey: EnvironmentKey {
+    static let defaultValue: Namespace.ID? = nil
+}
+
+extension EnvironmentValues {
+    var heroNamespace: Namespace.ID? {
+        get { self[HeroNamespaceKey.self] }
+        set { self[HeroNamespaceKey.self] = newValue }
+    }
 }
 
 struct PrimaryButtonStyle: ButtonStyle {
@@ -68,7 +117,8 @@ struct PrimaryButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity)
             .frame(minHeight: 52)
             .background(Theme.amberGradient, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .opacity(configuration.isPressed ? 0.82 : 1)
+            .shadow(color: Theme.amber.opacity(configuration.isPressed ? 0.15 : 0.45), radius: 16, y: 8)
+            .opacity(configuration.isPressed ? 0.88 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
     }
 }
@@ -131,18 +181,38 @@ struct EmptyJournal: View {
     let message: String
     var actionTitle: String?
     var action: (() -> Void)?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var glow = false
 
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: symbol)
-                .font(.system(size: 28, weight: .light))
-                .foregroundStyle(Theme.amberText)
-                .frame(width: 64, height: 64)
-                .background(Theme.amber.opacity(0.12), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .accessibilityHidden(true)
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Theme.amber.opacity(0.22))
+                    .frame(width: 92, height: 92)
+                    .blur(radius: 8)
+                    .scaleEffect(reduceMotion ? 1 : (glow ? 1.08 : 0.92))
+                Image(systemName: symbol)
+                    .font(.system(size: 32, weight: .light))
+                    .foregroundStyle(Theme.amberText)
+                    .frame(width: 76, height: 76)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .strokeBorder(Theme.amber.opacity(0.45), lineWidth: 1)
+                    )
+            }
+            .accessibilityHidden(true)
+            .onAppear {
+                guard !reduceMotion else { return }
+                withAnimation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true)) {
+                    glow = true
+                }
+            }
             Text(title)
-                .font(.system(.headline, design: .serif))
+                .font(.system(.title3, design: .serif, weight: .bold))
                 .foregroundStyle(Theme.ink)
+                .multilineTextAlignment(.center)
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(Theme.muted)
@@ -166,7 +236,9 @@ struct RarityPill: View {
             .foregroundStyle(Theme.rarityColor(rarity))
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Theme.rarityColor(rarity).opacity(0.14), in: Capsule())
+            .background(Theme.rarityColor(rarity).opacity(0.16), in: Capsule())
+            .overlay(Capsule().strokeBorder(Theme.rarityColor(rarity).opacity(0.45), lineWidth: 1))
+            .shadow(color: Theme.rarityColor(rarity).opacity(rarity == .common ? 0 : 0.45), radius: 8)
             .accessibilityLabel("Rarity \(rarity.title)")
     }
 }

@@ -65,7 +65,10 @@ enum Identification {
     ) async throws -> SaveOutcome {
         if settings.tagLocation { location.requestIfNeeded() }
         let prepared = try await prepare(jpegForAI: jpeg, hints: hints, preferAI: preferAI, settings: settings)
-        return try ScanLibrary.save(
+        let featurePrint = FeaturePrints.archive(from: jpeg)
+        let existing = (try? context.fetch(FetchDescriptor<DiscoveryRecord>())) ?? []
+        let sightings = FeaturePrints.matches(query: featurePrint, records: existing)
+        var outcome = try ScanLibrary.save(
             analysis: prepared.analysis,
             imageJPEG: jpeg,
             hints: hints,
@@ -73,8 +76,11 @@ enum Identification {
             locationLabel: settings.tagLocation ? location.label : "",
             source: prepared.source,
             notice: prepared.notice,
+            featurePrint: featurePrint,
             context: context
         )
+        outcome.priorSightings = sightings
+        return outcome
     }
 
     private struct Prepared {
@@ -120,6 +126,14 @@ enum Identification {
                 }
                 throw error
             }
+        }
+        if !settings.hasAPIKey, let named = await OnDeviceModel.identify(hints: hints) {
+            return Prepared(
+                analysis: named,
+                source: "onDevice",
+                notice: "Named on this iPhone with Apple Intelligence. The photo stayed on device.",
+                facts: nil
+            )
         }
         return onDevice(hints: hints, catalog: catalog, aiFailure: nil)
     }

@@ -20,6 +20,7 @@ struct SaveOutcome: Equatable, Identifiable {
     var completedQuests: [QuestDefinition]
     var usedOnDeviceOnly: Bool
     var notice: String?
+    var priorSightings: [PriorSighting]
 }
 
 @MainActor
@@ -43,6 +44,7 @@ enum ScanLibrary {
         locationLabel: String,
         source: String,
         notice: String?,
+        featurePrint: Data? = nil,
         context: ModelContext
     ) throws -> SaveOutcome {
         let profile = ensureProfile(context)
@@ -89,6 +91,7 @@ enum ScanLibrary {
             barcodePayload: hints.barcodePayload ?? "",
             barcodeSymbology: hints.barcodeSymbology ?? "",
             sourceRaw: source,
+            featurePrint: featurePrint,
             createdAt: now
         )
         context.insert(record)
@@ -138,6 +141,7 @@ enum ScanLibrary {
         profile.xp = xpBefore + scanXP + bonus
         record.xpEarned = scanXP + bonus
         try context.save()
+        publishWidget(profile)
 
         let level = ExplorerLevels.level(for: profile.xp)
         return SaveOutcome(
@@ -155,7 +159,19 @@ enum ScanLibrary {
             newAchievements: freshAchievements,
             completedQuests: completedQuests,
             usedOnDeviceOnly: source == "onDevice",
-            notice: notice
+            notice: notice,
+            priorSightings: []
+        )
+    }
+
+    static func publishWidget(_ profile: ExplorerProfile) {
+        let level = ExplorerLevels.level(for: profile.xp)
+        JournalSnapshotStore.publish(
+            displayName: profile.displayName,
+            xp: profile.xp,
+            streakDays: profile.streakDays,
+            level: level.level,
+            levelName: level.name
         )
     }
 
@@ -189,6 +205,7 @@ enum ScanLibrary {
         let fresh = ExplorerProfile(onboardingCompleted: true)
         context.insert(fresh)
         try context.save()
+        publishWidget(fresh)
     }
 
     static func createCollection(name: String, context: ModelContext) -> ScanCollection {

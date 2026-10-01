@@ -30,14 +30,15 @@ public enum OnDeviceSynthesis {
         let lines = hints.textLines.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
         if let headline = lines.first {
             let body = lines.joined(separator: " ")
+            let guess = OnDeviceGuessing.classify(lines)
             return DiscoveryAnalysis(
                 name: String(headline.prefix(80)),
-                category: "document",
-                subcategory: "printed text",
-                summary: "Text read on device from the camera.",
-                details: "Apple Vision read this without a cloud model: \(body)",
-                confidence: min(70, 40 + lines.count * 8),
-                characteristics: ["printed text"],
+                category: guess?.category ?? "document",
+                subcategory: guess == nil ? "printed text" : "",
+                summary: guess?.summary ?? "Text read on device from the camera.",
+                details: guess?.details ?? "Apple Vision read this without a cloud model: \(body)",
+                confidence: guess?.confidence ?? min(70, 40 + lines.count * 8),
+                characteristics: guess?.characteristics ?? ["printed text"],
                 searchTerms: Array(lines.prefix(5)),
                 followUpSuggestions: [
                     "Summarize this text",

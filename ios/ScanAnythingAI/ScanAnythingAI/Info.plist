@@ -17,7 +17,18 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Scan Anything AI saves a share card to your photo library only when you choose Save Image.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Scan Anything AI can attach your current location to a discovery so you can remember where you found it. Location is only used while the app is open, and only if you turn the option on.</string>
+	<string>Scan Anything AI can attach your current location to a discovery, and can filter the Finds map to places near you. Location is only used while the app is open.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>ai.scananything.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>scananything</string>
+			</array>
+		</dict>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

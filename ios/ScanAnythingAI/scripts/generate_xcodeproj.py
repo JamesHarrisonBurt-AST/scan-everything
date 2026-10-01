@@ -12,8 +12,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "ScanAnythingAI"
+SHARED = ROOT / "Shared"
+WIDGET = ROOT / "ScanAnythingWidget"
 PROJECT = ROOT / "ScanAnythingAI.xcodeproj"
-TARGET_NAME = "ScanAnythingAI"
 
 
 def uid(key: str) -> str:
@@ -27,67 +28,91 @@ def quote(value: str) -> str:
     return f'"{escaped}"'
 
 
+def file_kind(path: Path) -> str:
+    if path.suffix == ".swift":
+        return "sourcecode.swift"
+    if path.suffix == ".plist":
+        return "text.plist.xml"
+    if path.suffix == ".xcprivacy":
+        return "text.plist.xml"
+    if path.suffix == ".xcassets":
+        return "folder.assetcatalog"
+    if path.suffix == ".entitlements":
+        return "text.plist.entitlements"
+    return "text"
+
+
 def main() -> None:
-    swift_files = sorted(APP.rglob("*.swift"))
-    resources = [
-        APP / "Assets.xcassets",
-        APP / "PrivacyInfo.xcprivacy",
-    ]
-    info_plist = APP / "Info.plist"
-    for path in resources + [info_plist]:
+    app_swift = sorted(APP.rglob("*.swift"))
+    shared_swift = sorted(SHARED.rglob("*.swift"))
+    widget_swift = sorted(WIDGET.rglob("*.swift"))
+    app_resources = [APP / "Assets.xcassets", APP / "PrivacyInfo.xcprivacy"]
+    app_side = [APP / "Info.plist", APP / "ScanAnythingAI.entitlements"]
+    widget_side = [WIDGET / "Info.plist", WIDGET / "ScanAnythingWidget.entitlements"]
+    for path in app_resources + app_side + widget_side + app_swift + shared_swift + widget_swift:
         if not path.exists():
             raise SystemExit(f"Missing {path}")
 
     file_refs: dict[Path, str] = {}
-    build_files: list[tuple[str, Path, str]] = []
 
     def ref_for(path: Path) -> str:
         if path not in file_refs:
             file_refs[path] = uid(f"ref:{path.relative_to(ROOT)}")
         return file_refs[path]
 
-    source_builds = []
-    for path in swift_files:
-        ref = ref_for(path)
-        build_id = uid(f"build:{path.relative_to(ROOT)}")
-        source_builds.append((build_id, ref, path.name))
-        build_files.append((build_id, path, "source"))
+    for path in app_swift + shared_swift + widget_swift + app_resources + app_side + widget_side:
+        ref_for(path)
 
-    resource_builds = []
-    for path in resources:
-        ref = ref_for(path)
-        build_id = uid(f"build:{path.relative_to(ROOT)}")
-        resource_builds.append((build_id, ref, path.name))
+    def builds(paths: list[Path], scope: str) -> list[tuple[str, str, str]]:
+        rows = []
+        for path in paths:
+            rows.append((uid(f"build:{scope}:{path.relative_to(ROOT)}"), file_refs[path], path.name))
+        return rows
 
-    info_ref = ref_for(info_plist)
+    app_sources = builds(app_swift + shared_swift, "app")
+    widget_sources = builds(widget_swift + shared_swift, "widget")
+    app_resource_builds = builds(app_resources, "app")
+
     product_ref = uid("product:app")
+    widget_product = uid("product:widget")
     package_ref = uid("package:ScanAnythingCore")
     package_dep = uid("dep:ScanAnythingCore")
     framework_build = uid("build:ScanAnythingCore")
-
+    embed_build = uid("build:embed:widget")
     sources_phase = uid("phase:sources")
     frameworks_phase = uid("phase:frameworks")
     resources_phase = uid("phase:resources")
+    embed_phase = uid("phase:embed")
+    widget_sources_phase = uid("phase:widget:sources")
+    widget_frameworks_phase = uid("phase:widget:frameworks")
+    widget_resources_phase = uid("phase:widget:resources")
     target_id = uid("target:app")
+    widget_target = uid("target:widget")
+    proxy_id = uid("proxy:widget")
+    dependency_id = uid("dependency:widget")
     project_id = uid("project")
     main_group = uid("group:main")
     app_group = uid("group:app")
+    shared_group = uid("group:shared")
+    widget_group = uid("group:widget")
     products_group = uid("group:products")
     project_config_list = uid("configlist:project")
     target_config_list = uid("configlist:target")
+    widget_config_list = uid("configlist:widget")
     project_debug = uid("config:project:debug")
     project_release = uid("config:project:release")
     target_debug = uid("config:target:debug")
     target_release = uid("config:target:release")
+    widget_debug = uid("config:widget:debug")
+    widget_release = uid("config:widget:release")
 
-    # Groups mirror directories under the app folder, plus the project root.
-    dirs = sorted({path.parent for path in list(file_refs) if path.is_file() or path.suffix == ".xcassets"})
-    # Assets is a directory file reference, not a group of children.
-    group_ids: dict[Path, str] = {APP: app_group}
-    for directory in dirs:
-        if directory == APP or not directory.is_relative_to(APP):
-            continue
-        group_ids[directory] = uid(f"group:{directory.relative_to(ROOT)}")
+    roots = {APP: app_group, SHARED: shared_group, WIDGET: widget_group}
+    group_ids: dict[Path, str] = dict(roots)
+    for path in file_refs:
+        parent = path.parent
+        while parent not in roots and parent != ROOT:
+            group_ids.setdefault(parent, uid(f"group:{parent.relative_to(ROOT)}"))
+            parent = parent.parent
 
     def children_of(directory: Path) -> list[str]:
         lines = []
@@ -102,64 +127,89 @@ def main() -> None:
     objects: list[str] = []
 
     objects.append("/* Begin PBXBuildFile section */")
-    for build_id, ref, name in source_builds:
+    for build_id, ref, name in app_sources + widget_sources:
         objects.append(f"\t\t{build_id} /* {name} in Sources */ = {{isa = PBXBuildFile; fileRef = {ref} /* {name} */; }};")
-    for build_id, ref, name in resource_builds:
+    for build_id, ref, name in app_resource_builds:
         objects.append(f"\t\t{build_id} /* {name} in Resources */ = {{isa = PBXBuildFile; fileRef = {ref} /* {name} */; }};")
     objects.append(f"\t\t{framework_build} /* ScanAnythingCore in Frameworks */ = {{isa = PBXBuildFile; productRef = {package_dep} /* ScanAnythingCore */; }};")
+    objects.append(
+        f"\t\t{embed_build} /* ScanAnythingWidget.appex in Embed Foundation Extensions */ = {{isa = PBXBuildFile; fileRef = {widget_product} /* ScanAnythingWidget.appex */; settings = {{ATTRIBUTES = (RemoveHeadersOnCopy, ); }}; }};"
+    )
     objects.append("/* End PBXBuildFile section */")
+    objects.append("")
+
+    objects.append("/* Begin PBXContainerItemProxy section */")
+    objects.append(f"\t\t{proxy_id} /* PBXContainerItemProxy */ = {{")
+    objects.append("\t\t\tisa = PBXContainerItemProxy;")
+    objects.append(f"\t\t\tcontainerPortal = {project_id} /* Project object */;")
+    objects.append("\t\t\tproxyType = 1;")
+    objects.append(f"\t\t\tremoteGlobalIDString = {widget_target};")
+    objects.append("\t\t\tremoteInfo = ScanAnythingWidget;")
+    objects.append("\t\t};")
+    objects.append("/* End PBXContainerItemProxy section */")
+    objects.append("")
+
+    objects.append("/* Begin PBXCopyFilesBuildPhase section */")
+    objects.append(f"\t\t{embed_phase} /* Embed Foundation Extensions */ = {{")
+    objects.append("\t\t\tisa = PBXCopyFilesBuildPhase;")
+    objects.append("\t\t\tbuildActionMask = 2147483647;")
+    objects.append('\t\t\tdstPath = "";')
+    objects.append("\t\t\tdstSubfolderSpec = 13;")
+    objects.append("\t\t\tfiles = (")
+    objects.append(f"\t\t\t\t{embed_build} /* ScanAnythingWidget.appex in Embed Foundation Extensions */,")
+    objects.append("\t\t\t);")
+    objects.append('\t\t\tname = "Embed Foundation Extensions";')
+    objects.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
+    objects.append("\t\t};")
+    objects.append("/* End PBXCopyFilesBuildPhase section */")
     objects.append("")
 
     objects.append("/* Begin PBXFileReference section */")
     for path, ref in sorted(file_refs.items(), key=lambda item: str(item[0])):
-        name = path.name
-        rel = path.relative_to(ROOT).as_posix()
-        if path.suffix == ".swift":
-            kind = "sourcecode.swift"
-        elif path.suffix == ".plist":
-            kind = "text.plist.xml"
-        elif path.suffix == ".xcprivacy":
-            kind = "text.plist.xml"
-        elif path.suffix == ".xcassets":
-            kind = "folder.assetcatalog"
-        else:
-            kind = "text"
         objects.append(
-            f"\t\t{ref} /* {name} */ = {{isa = PBXFileReference; lastKnownFileType = {kind}; path = {quote(name)}; sourceTree = \"<group>\"; }};"
+            f"\t\t{ref} /* {path.name} */ = {{isa = PBXFileReference; lastKnownFileType = {file_kind(path)}; path = {quote(path.name)}; sourceTree = \"<group>\"; }};"
         )
     objects.append(
         f"\t\t{product_ref} /* ScanAnythingAI.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScanAnythingAI.app; sourceTree = BUILT_PRODUCTS_DIR; }};"
     )
+    objects.append(
+        f"\t\t{widget_product} /* ScanAnythingWidget.appex */ = {{isa = PBXFileReference; explicitFileType = \"wrapper.app-extension\"; includeInIndex = 0; path = ScanAnythingWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; }};"
+    )
     objects.append("/* End PBXFileReference section */")
     objects.append("")
 
+    def phase(phase_id: str, isa: str, comment: str, rows: list[tuple[str, str, str]], label: str) -> None:
+        objects.append(f"\t\t{phase_id} /* {comment} */ = {{")
+        objects.append(f"\t\t\tisa = {isa};")
+        objects.append("\t\t\tbuildActionMask = 2147483647;")
+        objects.append("\t\t\tfiles = (")
+        for build_id, _, name in rows:
+            objects.append(f"\t\t\t\t{build_id} /* {name} in {label} */,")
+        objects.append("\t\t\t);")
+        objects.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
+        objects.append("\t\t};")
+
     objects.append("/* Begin PBXFrameworksBuildPhase section */")
-    objects.append(f"\t\t{frameworks_phase} /* Frameworks */ = {{")
-    objects.append("\t\t\tisa = PBXFrameworksBuildPhase;")
-    objects.append("\t\t\tbuildActionMask = 2147483647;")
-    objects.append("\t\t\tfiles = (")
-    objects.append(f"\t\t\t\t{framework_build} /* ScanAnythingCore in Frameworks */,")
-    objects.append("\t\t\t);")
-    objects.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
-    objects.append("\t\t};")
+    phase(frameworks_phase, "PBXFrameworksBuildPhase", "Frameworks", [(framework_build, "", "ScanAnythingCore")], "Frameworks")
+    phase(widget_frameworks_phase, "PBXFrameworksBuildPhase", "Frameworks", [], "Frameworks")
     objects.append("/* End PBXFrameworksBuildPhase section */")
     objects.append("")
 
     objects.append("/* Begin PBXGroup section */")
     for directory, group_id in sorted(group_ids.items(), key=lambda item: str(item[0])):
-        name = directory.name
-        objects.append(f"\t\t{group_id} /* {name} */ = {{")
+        objects.append(f"\t\t{group_id} /* {directory.name} */ = {{")
         objects.append("\t\t\tisa = PBXGroup;")
         objects.append("\t\t\tchildren = (")
         objects.extend(children_of(directory))
         objects.append("\t\t\t);")
-        objects.append(f"\t\t\tpath = {quote(name)};")
+        objects.append(f"\t\t\tpath = {quote(directory.name)};")
         objects.append('\t\t\tsourceTree = "<group>";')
         objects.append("\t\t};")
     objects.append(f"\t\t{products_group} /* Products */ = {{")
     objects.append("\t\t\tisa = PBXGroup;")
     objects.append("\t\t\tchildren = (")
     objects.append(f"\t\t\t\t{product_ref} /* ScanAnythingAI.app */,")
+    objects.append(f"\t\t\t\t{widget_product} /* ScanAnythingWidget.appex */,")
     objects.append("\t\t\t);")
     objects.append("\t\t\tname = Products;")
     objects.append('\t\t\tsourceTree = "<group>";')
@@ -168,6 +218,8 @@ def main() -> None:
     objects.append("\t\t\tisa = PBXGroup;")
     objects.append("\t\t\tchildren = (")
     objects.append(f"\t\t\t\t{app_group} /* ScanAnythingAI */,")
+    objects.append(f"\t\t\t\t{shared_group} /* Shared */,")
+    objects.append(f"\t\t\t\t{widget_group} /* ScanAnythingWidget */,")
     objects.append(f"\t\t\t\t{products_group} /* Products */,")
     objects.append("\t\t\t);")
     objects.append('\t\t\tsourceTree = "<group>";')
@@ -183,10 +235,12 @@ def main() -> None:
     objects.append(f"\t\t\t\t{sources_phase} /* Sources */,")
     objects.append(f"\t\t\t\t{frameworks_phase} /* Frameworks */,")
     objects.append(f"\t\t\t\t{resources_phase} /* Resources */,")
+    objects.append(f"\t\t\t\t{embed_phase} /* Embed Foundation Extensions */,")
     objects.append("\t\t\t);")
     objects.append("\t\t\tbuildRules = (")
     objects.append("\t\t\t);")
     objects.append("\t\t\tdependencies = (")
+    objects.append(f"\t\t\t\t{dependency_id} /* PBXTargetDependency */,")
     objects.append("\t\t\t);")
     objects.append("\t\t\tname = ScanAnythingAI;")
     objects.append("\t\t\tpackageProductDependencies = (")
@@ -195,6 +249,23 @@ def main() -> None:
     objects.append("\t\t\tproductName = ScanAnythingAI;")
     objects.append(f"\t\t\tproductReference = {product_ref} /* ScanAnythingAI.app */;")
     objects.append('\t\t\tproductType = "com.apple.product-type.application";')
+    objects.append("\t\t};")
+    objects.append(f"\t\t{widget_target} /* ScanAnythingWidget */ = {{")
+    objects.append("\t\t\tisa = PBXNativeTarget;")
+    objects.append(f"\t\t\tbuildConfigurationList = {widget_config_list} /* Build configuration list for PBXNativeTarget \"ScanAnythingWidget\" */;")
+    objects.append("\t\t\tbuildPhases = (")
+    objects.append(f"\t\t\t\t{widget_sources_phase} /* Sources */,")
+    objects.append(f"\t\t\t\t{widget_frameworks_phase} /* Frameworks */,")
+    objects.append(f"\t\t\t\t{widget_resources_phase} /* Resources */,")
+    objects.append("\t\t\t);")
+    objects.append("\t\t\tbuildRules = (")
+    objects.append("\t\t\t);")
+    objects.append("\t\t\tdependencies = (")
+    objects.append("\t\t\t);")
+    objects.append("\t\t\tname = ScanAnythingWidget;")
+    objects.append("\t\t\tproductName = ScanAnythingWidget;")
+    objects.append(f"\t\t\tproductReference = {widget_product} /* ScanAnythingWidget.appex */;")
+    objects.append('\t\t\tproductType = "com.apple.product-type.app-extension";')
     objects.append("\t\t};")
     objects.append("/* End PBXNativeTarget section */")
     objects.append("")
@@ -208,6 +279,9 @@ def main() -> None:
     objects.append("\t\t\t\tLastUpgradeCheck = 1600;")
     objects.append("\t\t\t\tTargetAttributes = {")
     objects.append(f"\t\t\t\t\t{target_id} = {{")
+    objects.append("\t\t\t\t\t\tCreatedOnToolsVersion = 16.0;")
+    objects.append("\t\t\t\t\t};")
+    objects.append(f"\t\t\t\t\t{widget_target} = {{")
     objects.append("\t\t\t\t\t\tCreatedOnToolsVersion = 16.0;")
     objects.append("\t\t\t\t\t};")
     objects.append("\t\t\t\t};")
@@ -229,35 +303,31 @@ def main() -> None:
     objects.append('\t\t\tprojectRoot = "";')
     objects.append("\t\t\ttargets = (")
     objects.append(f"\t\t\t\t{target_id} /* ScanAnythingAI */,")
+    objects.append(f"\t\t\t\t{widget_target} /* ScanAnythingWidget */,")
     objects.append("\t\t\t);")
     objects.append("\t\t};")
     objects.append("/* End PBXProject section */")
     objects.append("")
 
     objects.append("/* Begin PBXResourcesBuildPhase section */")
-    objects.append(f"\t\t{resources_phase} /* Resources */ = {{")
-    objects.append("\t\t\tisa = PBXResourcesBuildPhase;")
-    objects.append("\t\t\tbuildActionMask = 2147483647;")
-    objects.append("\t\t\tfiles = (")
-    for build_id, _, name in resource_builds:
-        objects.append(f"\t\t\t\t{build_id} /* {name} in Resources */,")
-    objects.append("\t\t\t);")
-    objects.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
-    objects.append("\t\t};")
+    phase(resources_phase, "PBXResourcesBuildPhase", "Resources", app_resource_builds, "Resources")
+    phase(widget_resources_phase, "PBXResourcesBuildPhase", "Resources", [], "Resources")
     objects.append("/* End PBXResourcesBuildPhase section */")
     objects.append("")
 
     objects.append("/* Begin PBXSourcesBuildPhase section */")
-    objects.append(f"\t\t{sources_phase} /* Sources */ = {{")
-    objects.append("\t\t\tisa = PBXSourcesBuildPhase;")
-    objects.append("\t\t\tbuildActionMask = 2147483647;")
-    objects.append("\t\t\tfiles = (")
-    for build_id, _, name in source_builds:
-        objects.append(f"\t\t\t\t{build_id} /* {name} in Sources */,")
-    objects.append("\t\t\t);")
-    objects.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
-    objects.append("\t\t};")
+    phase(sources_phase, "PBXSourcesBuildPhase", "Sources", app_sources, "Sources")
+    phase(widget_sources_phase, "PBXSourcesBuildPhase", "Sources", widget_sources, "Sources")
     objects.append("/* End PBXSourcesBuildPhase section */")
+    objects.append("")
+
+    objects.append("/* Begin PBXTargetDependency section */")
+    objects.append(f"\t\t{dependency_id} /* PBXTargetDependency */ = {{")
+    objects.append("\t\t\tisa = PBXTargetDependency;")
+    objects.append(f"\t\t\ttarget = {widget_target} /* ScanAnythingWidget */;")
+    objects.append(f"\t\t\ttargetProxy = {proxy_id} /* PBXContainerItemProxy */;")
+    objects.append("\t\t};")
+    objects.append("/* End PBXTargetDependency section */")
     objects.append("")
 
     shared_settings = """
@@ -301,6 +371,7 @@ def main() -> None:
     target_base = """
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ScanAnythingAI/ScanAnythingAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -321,59 +392,62 @@ def main() -> None:
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 """
+    widget_base = """
+				CODE_SIGN_ENTITLEMENTS = ScanAnythingWidget/ScanAnythingWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScanAnythingWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Scan Anything";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.scananything.app.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+"""
+
+    def configuration(config_id: str, name: str, body: str) -> None:
+        objects.append(f"\t\t{config_id} /* {name} */ = {{")
+        objects.append("\t\t\tisa = XCBuildConfiguration;")
+        objects.append("\t\t\tbuildSettings = {")
+        objects.append(body.rstrip())
+        objects.append("\t\t\t};")
+        objects.append(f"\t\t\tname = {name};")
+        objects.append("\t\t};")
 
     objects.append("/* Begin XCBuildConfiguration section */")
-    objects.append(f"\t\t{project_debug} /* Debug */ = {{")
-    objects.append("\t\t\tisa = XCBuildConfiguration;")
-    objects.append("\t\t\tbuildSettings = {")
-    objects.append(shared_settings.rstrip())
-    objects.append("\t\t\t\tONLY_ACTIVE_ARCH = YES;")
-    objects.append("\t\t\t};")
-    objects.append("\t\t\tname = Debug;")
-    objects.append("\t\t};")
-    objects.append(f"\t\t{project_release} /* Release */ = {{")
-    objects.append("\t\t\tisa = XCBuildConfiguration;")
-    objects.append("\t\t\tbuildSettings = {")
-    objects.append(release_shared.rstrip())
-    objects.append("\t\t\t};")
-    objects.append("\t\t\tname = Release;")
-    objects.append("\t\t};")
-    objects.append(f"\t\t{target_debug} /* Debug */ = {{")
-    objects.append("\t\t\tisa = XCBuildConfiguration;")
-    objects.append("\t\t\tbuildSettings = {")
-    objects.append(target_base.rstrip())
-    objects.append("\t\t\t};")
-    objects.append("\t\t\tname = Debug;")
-    objects.append("\t\t};")
-    objects.append(f"\t\t{target_release} /* Release */ = {{")
-    objects.append("\t\t\tisa = XCBuildConfiguration;")
-    objects.append("\t\t\tbuildSettings = {")
-    objects.append(target_base.rstrip())
-    objects.append("\t\t\t};")
-    objects.append("\t\t\tname = Release;")
-    objects.append("\t\t};")
+    configuration(project_debug, "Debug", shared_settings + "\t\t\t\tONLY_ACTIVE_ARCH = YES;\n")
+    configuration(project_release, "Release", release_shared)
+    configuration(target_debug, "Debug", target_base)
+    configuration(target_release, "Release", target_base)
+    configuration(widget_debug, "Debug", widget_base)
+    configuration(widget_release, "Release", widget_base)
     objects.append("/* End XCBuildConfiguration section */")
     objects.append("")
 
+    def config_list(list_id: str, comment: str, debug_id: str, release_id: str) -> None:
+        objects.append(f"\t\t{list_id} /* {comment} */ = {{")
+        objects.append("\t\t\tisa = XCConfigurationList;")
+        objects.append("\t\t\tbuildConfigurations = (")
+        objects.append(f"\t\t\t\t{debug_id} /* Debug */,")
+        objects.append(f"\t\t\t\t{release_id} /* Release */,")
+        objects.append("\t\t\t);")
+        objects.append("\t\t\tdefaultConfigurationIsVisible = 0;")
+        objects.append("\t\t\tdefaultConfigurationName = Release;")
+        objects.append("\t\t};")
+
     objects.append("/* Begin XCConfigurationList section */")
-    objects.append(f"\t\t{project_config_list} /* Build configuration list for PBXProject \"ScanAnythingAI\" */ = {{")
-    objects.append("\t\t\tisa = XCConfigurationList;")
-    objects.append("\t\t\tbuildConfigurations = (")
-    objects.append(f"\t\t\t\t{project_debug} /* Debug */,")
-    objects.append(f"\t\t\t\t{project_release} /* Release */,")
-    objects.append("\t\t\t);")
-    objects.append("\t\t\tdefaultConfigurationIsVisible = 0;")
-    objects.append("\t\t\tdefaultConfigurationName = Release;")
-    objects.append("\t\t};")
-    objects.append(f"\t\t{target_config_list} /* Build configuration list for PBXNativeTarget \"ScanAnythingAI\" */ = {{")
-    objects.append("\t\t\tisa = XCConfigurationList;")
-    objects.append("\t\t\tbuildConfigurations = (")
-    objects.append(f"\t\t\t\t{target_debug} /* Debug */,")
-    objects.append(f"\t\t\t\t{target_release} /* Release */,")
-    objects.append("\t\t\t);")
-    objects.append("\t\t\tdefaultConfigurationIsVisible = 0;")
-    objects.append("\t\t\tdefaultConfigurationName = Release;")
-    objects.append("\t\t};")
+    config_list(project_config_list, 'Build configuration list for PBXProject "ScanAnythingAI"', project_debug, project_release)
+    config_list(target_config_list, 'Build configuration list for PBXNativeTarget "ScanAnythingAI"', target_debug, target_release)
+    config_list(widget_config_list, 'Build configuration list for PBXNativeTarget "ScanAnythingWidget"', widget_debug, widget_release)
     objects.append("/* End XCConfigurationList section */")
     objects.append("")
 
@@ -410,11 +484,10 @@ def main() -> None:
             "",
         ]
     )
-    proj_dir = PROJECT
-    proj_dir.mkdir(parents=True, exist_ok=True)
-    (proj_dir / "project.pbxproj").write_text(pbx, encoding="utf-8")
+    PROJECT.mkdir(parents=True, exist_ok=True)
+    (PROJECT / "project.pbxproj").write_text(pbx, encoding="utf-8")
 
-    scheme_dir = proj_dir / "xcshareddata" / "xcschemes"
+    scheme_dir = PROJECT / "xcshareddata" / "xcschemes"
     scheme_dir.mkdir(parents=True, exist_ok=True)
     scheme = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Scheme
@@ -424,6 +497,20 @@ def main() -> None:
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
       <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "{widget_target}"
+               BuildableName = "ScanAnythingWidget.appex"
+               BlueprintName = "ScanAnythingWidget"
+               ReferencedContainer = "container:ScanAnythingAI.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
@@ -494,7 +581,7 @@ def main() -> None:
 </Scheme>
 """
     (scheme_dir / "ScanAnythingAI.xcscheme").write_text(scheme, encoding="utf-8")
-    print(f"Wrote {proj_dir / 'project.pbxproj'} with {len(swift_files)} Swift files")
+    print(f"Wrote {PROJECT / 'project.pbxproj'} with {len(app_swift) + len(shared_swift)} app Swift files and {len(widget_swift)} widget Swift files")
 
 
 if __name__ == "__main__":

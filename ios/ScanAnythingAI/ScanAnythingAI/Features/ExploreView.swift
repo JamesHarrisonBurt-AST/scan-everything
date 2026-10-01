@@ -10,6 +10,7 @@ struct ExploreView: View {
     @Query private var progressRows: [QuestProgress]
 
     private var profile: ExplorerProfile? { profiles.first }
+    @ScaledMetric(relativeTo: .largeTitle) private var heroSize: CGFloat = 40
 
     var body: some View {
         NavigationStack {
@@ -31,12 +32,16 @@ struct ExploreView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 24)
             }
-            .background(Theme.canvas)
+            .journalCanvas()
             .navigationDestination(for: UUID.self) { id in
                 DiscoveryDetailView(discoveryID: id)
             }
         }
+        .environment(\.heroNamespace, reduceMotion ? nil : hero)
     }
+
+    @Namespace private var hero
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -45,8 +50,9 @@ struct ExploreView: View {
                 .tracking(1.4)
                 .foregroundStyle(Theme.muted)
             Text(profile.map { "Level \(ExplorerLevels.level(for: $0.xp).level)" } ?? "Welcome")
-                .font(.system(size: 34, weight: .bold, design: .serif))
+                .font(.system(size: heroSize, weight: .bold, design: .serif))
                 .foregroundStyle(Theme.ink)
+                .shadow(color: Theme.amber.opacity(0.25), radius: 12, y: 4)
             Text(profile?.displayName ?? "Explorer")
                 .font(.system(.title3, design: .serif))
                 .foregroundStyle(Theme.amberText)
@@ -63,17 +69,23 @@ struct ExploreView: View {
         Button(action: openScanner) {
             VStack(spacing: 8) {
                 Image(systemName: "viewfinder")
-                    .font(.system(size: 36, weight: .light))
+                    .font(.system(size: 42, weight: .light))
+                    .shadow(color: .black.opacity(0.2), radius: 6, y: 3)
                 Text("DISCOVER")
-                    .font(.system(.title2, design: .rounded, weight: .heavy))
+                    .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                 Text("Point your camera at anything")
-                    .font(.system(.subheadline, design: .rounded))
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
                     .opacity(0.85)
             }
             .foregroundStyle(Color(red: 0.1, green: 0.07, blue: 0.04))
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 168)
-            .background(Theme.amberGradient, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .frame(minHeight: 188)
+            .background(Theme.amberGradient, in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 32, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.35), lineWidth: 1)
+            )
+            .shadow(color: Theme.amber.opacity(0.55), radius: 24, y: 12)
         }
         .buttonStyle(.plain)
         .accessibilityHint("Opens the camera")
@@ -219,6 +231,7 @@ struct ExploreView: View {
 
 struct DiscoveryCard: View {
     let discovery: DiscoveryRecord
+    @Environment(\.heroNamespace) private var heroNamespace
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -226,6 +239,7 @@ struct DiscoveryCard: View {
                 DiscoveryThumbnail(filename: discovery.imageFilename)
                     .frame(height: 120)
                     .frame(maxWidth: .infinity)
+                    .heroMatched(id: discovery.id, namespace: heroNamespace)
                 if discovery.rarity != .common {
                     RarityPill(rarity: discovery.rarity)
                         .padding(8)

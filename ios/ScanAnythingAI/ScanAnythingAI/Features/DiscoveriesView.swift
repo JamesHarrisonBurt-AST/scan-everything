@@ -41,17 +41,13 @@ struct DiscoveriesView: View {
         )
     }
 
-    private var pins: [DiscoveryRecord] {
-        filtered.filter { $0.latitude != nil && $0.longitude != nil }
-    }
-
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("My discoveries")
-                            .font(.system(size: 32, weight: .bold, design: .serif))
+                            .font(.system(size: 36, weight: .bold, design: .serif))
                             .foregroundStyle(Theme.ink)
                         Text("\(discoveries.count) in the journal")
                             .font(.subheadline)
@@ -62,12 +58,13 @@ struct DiscoveriesView: View {
                     filterRow
                     if showMap {
                         map
+                    } else {
+                        grid
                     }
-                    grid
                 }
                 .padding(20)
             }
-            .background(Theme.canvas)
+            .journalCanvas()
             .navigationDestination(for: UUID.self) { DiscoveryDetailView(discoveryID: $0) }
             .sheet(isPresented: $showNewCollection) { newCollectionSheet }
             .sheet(isPresented: collectionSheetPresented) {
@@ -76,7 +73,13 @@ struct DiscoveriesView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button {
+                        showSeenBefore = true
+                    } label: {
+                        Image(systemName: "sparkle.magnifyingglass")
+                    }
+                    .accessibilityLabel("Have I scanned this before?")
                     Button {
                         showMap.toggle()
                     } label: {
@@ -86,7 +89,15 @@ struct DiscoveriesView: View {
                 }
             }
         }
+        .environment(\.heroNamespace, reduceMotion ? nil : hero)
+        .sheet(isPresented: $showSeenBefore) {
+            SeenBeforeSheet()
+        }
     }
+
+    @Namespace private var hero
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var showSeenBefore = false
 
     private var searchField: some View {
         HStack(spacing: 8) {
@@ -172,32 +183,7 @@ struct DiscoveriesView: View {
     }
 
     private var map: some View {
-        Map {
-            ForEach(pins) { discovery in
-                Marker(
-                    discovery.title,
-                    systemImage: "viewfinder",
-                    coordinate: CLLocationCoordinate2D(
-                        latitude: discovery.latitude ?? 0,
-                        longitude: discovery.longitude ?? 0
-                    )
-                )
-                .tint(Theme.amber)
-            }
-        }
-        .mapStyle(.standard(elevation: .flat))
-        .frame(height: 240)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .accessibilityLabel("Map of discoveries with a saved location")
-        .overlay {
-            if pins.isEmpty {
-                Text("No locations yet. Turn on location tags in Profile.")
-                    .font(.caption)
-                    .foregroundStyle(Theme.ink)
-                    .padding(10)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            }
-        }
+        FindsMap(discoveries: filtered)
     }
 
     @ViewBuilder
@@ -241,7 +227,7 @@ struct DiscoveriesView: View {
                 Spacer()
             }
             .padding(20)
-            .background(Theme.canvas)
+            .journalCanvas()
             .navigationTitle("New collection")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -278,7 +264,7 @@ struct CollectionDetailSheet: View {
                     .padding(20)
                 }
             }
-            .background(Theme.canvas)
+            .journalCanvas()
             .navigationTitle(collection.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

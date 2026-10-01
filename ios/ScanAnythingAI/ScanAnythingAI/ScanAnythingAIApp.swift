@@ -30,6 +30,7 @@ enum AppTab: Hashable {
 
 struct RootView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.scenePhase) private var scenePhase
     @Query private var profiles: [ExplorerProfile]
     @State private var tab: AppTab = .explore
     @State private var showScanner = false
@@ -55,7 +56,8 @@ struct RootView: View {
                         .tint(Theme.amber)
                 }
                 .task {
-                    _ = ScanLibrary.ensureProfile(context)
+                    let profile = ScanLibrary.ensureProfile(context)
+                    ScanLibrary.publishWidget(profile)
                 }
             }
         }
@@ -80,6 +82,8 @@ struct RootView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             CuratorTabBar(tab: $tab) { showScanner = true }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 4)
         }
         .fullScreenCover(isPresented: $showScanner) {
             ScannerView { discoveryID in
@@ -92,6 +96,22 @@ struct RootView: View {
                 DiscoveryDetailView(discoveryID: route.id)
             }
         }
+        .onOpenURL { url in
+            guard url.scheme == "scananything" else { return }
+            showScanner = true
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { openScannerIfRequested() }
+        }
+        .onAppear { openScannerIfRequested() }
+        .onReceive(NotificationCenter.default.publisher(for: .scanAnythingOpenScanner)) { _ in
+            showScanner = true
+        }
+    }
+
+    private func openScannerIfRequested() {
+        guard ScannerLaunch.consume() else { return }
+        showScanner = true
     }
 }
 
@@ -107,11 +127,21 @@ struct CuratorTabBar: View {
             tabButton(.quests, title: "Quests", symbol: "target")
             tabButton(.profile, title: "Profile", symbol: "person")
         }
-        .padding(.horizontal, 8)
-        .padding(.top, 10)
-        .padding(.bottom, 6)
-        .background(.ultraThinMaterial)
-        .overlay(alignment: .top) { Rectangle().fill(Theme.stroke).frame(height: 1) }
+        .padding(.horizontal, 6)
+        .padding(.top, 8)
+        .padding(.bottom, 8)
+        .background {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(.ultraThinMaterial)
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(Theme.card.opacity(0.72))
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(colors: [Theme.amber.opacity(0.7), Theme.stroke, Theme.violet.opacity(0.45)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                    lineWidth: 1
+                )
+        }
+        .shadow(color: Color.black.opacity(0.35), radius: 18, y: 8)
     }
 
     private func tabButton(_ value: AppTab, title: String, symbol: String) -> some View {
@@ -140,15 +170,10 @@ struct CuratorTabBar: View {
             onScan()
         }) {
             VStack(spacing: 4) {
-                Image(systemName: "viewfinder")
-                    .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(Color(red: 0.09, green: 0.07, blue: 0.04))
-                    .frame(width: 62, height: 62)
-                    .background(Theme.amberGradient, in: Circle())
-                    .shadow(color: Theme.amber.opacity(0.35), radius: 12, y: 6)
-                    .offset(y: -16)
+                ScanOrb()
+                    .offset(y: -18)
                 Text("Discover")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(.caption2.weight(.bold))
                     .foregroundStyle(Theme.amberText)
             }
             .frame(maxWidth: .infinity)
@@ -156,5 +181,38 @@ struct CuratorTabBar: View {
         .buttonStyle(.plain)
         .accessibilityLabel("Discover")
         .accessibilityHint("Opens the camera to identify an object")
+    }
+}
+
+private struct ScanOrb: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulse = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Theme.amber.opacity(0.55), lineWidth: 6)
+                .frame(width: pulse && !reduceMotion ? 86 : 70, height: pulse && !reduceMotion ? 86 : 70)
+                .opacity(pulse && !reduceMotion ? 0.15 : 0.85)
+            Circle()
+                .fill(Theme.amber.opacity(0.35))
+                .frame(width: 74, height: 74)
+                .blur(radius: 8)
+            Image(systemName: "viewfinder")
+                .font(.system(size: 28, weight: .semibold))
+                .foregroundStyle(Color(red: 0.09, green: 0.07, blue: 0.04))
+                .frame(width: 64, height: 64)
+                .background(Theme.amberGradient, in: Circle())
+                .overlay(Circle().strokeBorder(Color.white.opacity(0.45), lineWidth: 1))
+                .shadow(color: Theme.amber.opacity(0.85), radius: 16, y: 4)
+        }
+        .frame(width: 88, height: 64)
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                pulse = true
+            }
+        }
+        .accessibilityHidden(true)
     }
 }

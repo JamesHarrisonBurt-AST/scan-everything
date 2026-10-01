@@ -136,6 +136,62 @@ final class CoreTests: XCTestCase {
 
         let empty = OnDeviceSynthesis.analysis(from: .empty)
         XCTAssertLessThan(empty.confidence, 40)
+
+        let plant = OnDeviceSynthesis.analysis(from: VisionHints(textLines: ["Monstera leaf", "bright window"]))
+        XCTAssertEqual(plant.category, "plant")
+        XCTAssertEqual(plant.name, "Monstera leaf")
+        XCTAssertTrue(plant.details.contains("without sending the photo"))
+
+        let prompt = OnDeviceGuide.prompt(for: VisionHints(textLines: ["Monstera leaf"], barcodePayload: "012345678905", barcodeSymbology: "EAN-13"))
+        XCTAssertTrue(prompt.contains("Monstera leaf"))
+        XCTAssertTrue(prompt.contains("012345678905"))
+        XCTAssertTrue(prompt.contains("JSON"))
+        XCTAssertTrue(OnDeviceGuide.instructions.contains("rarity"))
+    }
+
+    func testNearbyFilterAndPinClusters() {
+        let origin = GeoPoint(latitude: 37.0, longitude: -122.0)
+        let close = MapPin(id: "close", coordinate: GeoPoint(latitude: 37.0009, longitude: -122.0))
+        let neighbor = MapPin(id: "neighbor", coordinate: GeoPoint(latitude: 37.0016, longitude: -122.0))
+        let walk = MapPin(id: "walk", coordinate: GeoPoint(latitude: 37.02, longitude: -122.0))
+        let far = MapPin(id: "far", coordinate: GeoPoint(latitude: 37.4, longitude: -122.0))
+        let pins = [close, neighbor, walk, far]
+
+        XCTAssertEqual(GeoDistance.meters(from: GeoPoint(latitude: 0, longitude: 0), to: GeoPoint(latitude: 1, longitude: 0)), 111_195, accuracy: 50)
+        XCTAssertLessThan(GeoDistance.meters(from: origin, to: close.coordinate), 200)
+        XCTAssertGreaterThan(GeoDistance.meters(from: origin, to: walk.coordinate), 1_000)
+        XCTAssertLessThan(GeoDistance.meters(from: origin, to: walk.coordinate), 5_000)
+
+        XCTAssertEqual(NearbyPins.filter(pins, around: origin, radius: .anywhere).map(\.id), ["close", "neighbor", "walk", "far"])
+        XCTAssertEqual(NearbyPins.filter(pins, around: origin, radius: .oneKilometer).map(\.id), ["close", "neighbor"])
+        XCTAssertEqual(NearbyPins.filter(pins, around: origin, radius: .fiveKilometers).map(\.id), ["close", "neighbor", "walk"])
+        XCTAssertTrue(NearbyPins.filter(pins, around: nil, radius: .oneKilometer).isEmpty)
+        XCTAssertEqual(NearbyRadius.twentyFiveKilometers.meters, 25_000)
+        XCTAssertEqual(NearbyRadius.anywhere.title, "Anywhere")
+
+        let clusters = MapClustering.cluster(pins)
+        let grouped = clusters.first { $0.memberIDs.contains("close") }
+        XCTAssertEqual(Set(grouped?.memberIDs ?? []), ["close", "neighbor"])
+        XCTAssertEqual(clusters.filter(\.isGroup).count, 1)
+        XCTAssertEqual(clusters.first { $0.memberIDs == ["walk"] }?.count, 1)
+        XCTAssertEqual(clusters.first { $0.memberIDs == ["far"] }?.count, 1)
+        let again = MapClustering.cluster([neighbor, close])
+        XCTAssertEqual(again.map(\.id), clusters.filter(\.isGroup).map(\.id))
+    }
+
+    func testSeenBeforeRanksClosestPrints() {
+        let hits = SeenBefore.rank(distances: [
+            (id: "far", distance: 2.4),
+            (id: "similar", distance: 0.8),
+            (id: "same", distance: 0.2),
+            (id: "edge", distance: SeenBefore.similarCutoff),
+            (id: "bad", distance: .nan)
+        ])
+        XCTAssertEqual(hits.map(\.id), ["same", "similar", "edge"])
+        XCTAssertEqual(hits[0].kind, .same)
+        XCTAssertEqual(hits[1].kind, .similar)
+        XCTAssertEqual(SeenBefore.rank(distances: [(id: "a", distance: 0.1)], limit: 0), [])
+        XCTAssertEqual(SeenBeforeHit.Kind.same.title, "Same object")
     }
 
     func testShareCardKeepsTheFindShort() {

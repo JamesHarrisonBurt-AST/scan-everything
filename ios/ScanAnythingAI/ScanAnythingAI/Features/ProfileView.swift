@@ -35,7 +35,7 @@ struct ProfileView: View {
                 }
                 .padding(20)
             }
-            .background(Theme.canvas)
+            .journalCanvas()
             .navigationDestination(for: LegalDocument.self) { document in
                 LegalView(document: document)
             }
@@ -86,6 +86,7 @@ struct ProfileView: View {
                 let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
                 profile.displayName = trimmed.isEmpty ? "Explorer" : trimmed
                 try? context.save()
+                ScanLibrary.publishWidget(profile)
                 Haptics.notify(.success)
             }
             .buttonStyle(QuietButtonStyle())
@@ -186,7 +187,10 @@ struct ProfileView: View {
                 .onChange(of: form.hapticsEnabled) { _, _ in form.savePreferences() }
             Toggle("Tag finds with location", isOn: $form.tagLocation)
                 .onChange(of: form.tagLocation) { _, _ in form.savePreferences() }
-            Text("Location is used only when you save a scan, and only if this is on.")
+            Text("Location is saved with a scan only when this is on. The Finds map can also use it to show what is near you.")
+                .font(.caption)
+                .foregroundStyle(Theme.muted)
+            Text("Add the streak widget from the Home Screen or Lock Screen. In Control Center, the Scan button opens the camera.")
                 .font(.caption)
                 .foregroundStyle(Theme.muted)
             Toggle("Look up barcodes", isOn: $form.lookupBarcodes)

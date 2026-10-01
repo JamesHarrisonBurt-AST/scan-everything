@@ -67,6 +67,7 @@ final class DiscoveryRecord {
     var barcodePayload: String
     var barcodeSymbology: String
     var sourceRaw: String
+    var featurePrint: Data?
     var createdAt: Date
 
     @Relationship(deleteRule: .cascade, inverse: \ChatMessageRecord.discovery)
@@ -104,6 +105,7 @@ final class DiscoveryRecord {
         barcodePayload: String = "",
         barcodeSymbology: String = "",
         sourceRaw: String = "ai",
+        featurePrint: Data? = nil,
         createdAt: Date = .now,
         messages: [ChatMessageRecord] = []
     ) {
@@ -138,6 +140,7 @@ final class DiscoveryRecord {
         self.barcodePayload = barcodePayload
         self.barcodeSymbology = barcodeSymbology
         self.sourceRaw = sourceRaw
+        self.featurePrint = featurePrint
         self.createdAt = createdAt
         self.messages = messages
     }
