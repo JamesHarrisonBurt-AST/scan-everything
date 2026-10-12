@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Sparkles, Send, Clock, AlertTriangle, Wrench, Lightbulb, Package, ChevronRight, FolderPlus } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Sparkles, Send, Clock, AlertTriangle, Wrench, Lightbulb, Package, ChevronRight, FolderPlus, GitCompare, WifiOff } from 'lucide-react';
+import ShareCard from '@/components/share/ShareCard';
+import { cacheDiscovery, useOnlineStatus } from '@/lib/offlineCache';
 import { base44 } from '@/api/base44Client';
 import DiscoveryCard from '@/components/discovery/DiscoveryCard';
 import { RARITY_STYLES } from '@/lib/gamification';
@@ -20,6 +22,8 @@ export default function DiscoveryDetail() {
   const [loading, setLoading] = useState(true);
   const [collections, setCollections] = useState([]);
   const [showCollectionSheet, setShowCollectionSheet] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
+  const online = useOnlineStatus();
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -29,6 +33,7 @@ export default function DiscoveryDetail() {
         if (items.length === 0) { setLoading(false); return; }
         const d = items[0];
         setDiscovery(d);
+        cacheDiscovery(d);
         setThreadId(d.ai_thread_id || null);
         if (d.ai_thread_id) {
           const msgs = await base44.entities.AIMessage.filter({ thread_id: d.ai_thread_id });
@@ -128,14 +133,26 @@ export default function DiscoveryDetail() {
           <button onClick={toggleFavorite} className="w-10 h-10 rounded-full glass-card flex items-center justify-center touch-target">
             <Heart className={`w-4 h-4 ${discovery.favorited ? 'text-rose-500 fill-rose-500' : 'text-foreground'}`} />
           </button>
-          <button onClick={share} className="w-10 h-10 rounded-full glass-card flex items-center justify-center touch-target">
+          <button onClick={() => setShowShareCard(true)} className="w-10 h-10 rounded-full glass-card flex items-center justify-center touch-target">
             <Share2 className="w-4 h-4 text-foreground" />
+          </button>
+          <button onClick={() => navigate(`/compare?a=${id}`)} className="w-10 h-10 rounded-full glass-card flex items-center justify-center touch-target">
+            <GitCompare className="w-4 h-4 text-foreground" />
           </button>
           <button onClick={() => setShowCollectionSheet(true)} className="w-10 h-10 rounded-full glass-card flex items-center justify-center touch-target">
             <FolderPlus className="w-4 h-4 text-foreground" />
           </button>
         </div>
       </div>
+
+      {!online && (
+        <div className="px-4 mt-3">
+          <div className="rounded-xl p-2.5 flex items-center gap-2" style={{ background: 'hsl(340 70% 25% / 0.15)', border: '1px solid hsl(340 70% 50% / 0.25)' }}>
+            <WifiOff className="w-3.5 h-3.5 text-rose-400" />
+            <span className="text-[11px] text-rose-300">Offline — showing cached data</span>
+          </div>
+        </div>
+      )}
 
       <div className="px-4 mt-4 space-y-4">
         {/* Confidence + Rarity */}
@@ -252,6 +269,11 @@ export default function DiscoveryDetail() {
           </div>
         )}
       </div>
+
+      {/* Share card */}
+      {showShareCard && discovery && (
+        <ShareCard discovery={discovery} onClose={() => setShowShareCard(false)} />
+      )}
 
       {/* Collection sheet */}
       {showCollectionSheet && (

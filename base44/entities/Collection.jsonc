@@ -14,6 +14,20 @@
     "color": {
       "type": "string",
       "default": "amber"
+    },
+    "tags": {
+      "type": "string",
+      "description": "JSON array of tags"
+    },
+    "sort_preference": {
+      "type": "string",
+      "enum": [
+        "recent",
+        "oldest",
+        "alpha",
+        "rarity"
+      ],
+      "default": "recent"
     }
   },
   "required": [

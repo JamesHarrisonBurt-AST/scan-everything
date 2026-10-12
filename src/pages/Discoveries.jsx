@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Plus, Folder, Heart, Clock, LayoutGrid, X, Package } from 'lucide-react';
+import { Search, Plus, Folder, Heart, Clock, LayoutGrid, X, Package, Calendar, GitCompare, Bell } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import DiscoveryCard from '@/components/discovery/DiscoveryCard';
 import EmptyState from '@/components/common/EmptyState';
@@ -76,6 +76,17 @@ export default function Discoveries() {
           <div className="px-4 pt-safe-12 pb-3">
             <h1 className="font-heading text-2xl font-extrabold text-foreground">My Discoveries</h1>
             <p className="text-xs text-muted-foreground mt-0.5">{discoveries.length} objects found</p>
+            <div className="flex gap-2 mt-3">
+              <button onClick={() => navigate('/journal')} className="flex-1 h-10 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 touch-target" style={{ background: 'hsl(35 95% 55% / 0.08)', border: '1px solid hsl(35 95% 55% / 0.2)', color: 'hsl(35 95% 65%)' }}>
+                <Calendar className="w-3.5 h-3.5" /> Journal
+              </button>
+              <button onClick={() => navigate('/compare')} className="flex-1 h-10 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 touch-target" style={{ background: 'hsl(175 65% 42% / 0.08)', border: '1px solid hsl(175 65% 42% / 0.2)', color: 'hsl(175 65% 52%)' }}>
+                <GitCompare className="w-3.5 h-3.5" /> Compare
+              </button>
+              <button onClick={() => navigate('/reminders')} className="flex-1 h-10 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 touch-target" style={{ background: 'hsl(263 70% 58% / 0.08)', border: '1px solid hsl(263 70% 58% / 0.2)', color: '#c084fc' }}>
+                <Bell className="w-3.5 h-3.5" /> Reminders
+              </button>
+            </div>
           </div>
 
           {/* Search */}

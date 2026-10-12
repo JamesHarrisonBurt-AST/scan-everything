@@ -15,6 +15,9 @@ const DiscoveryDetail = lazy(() => import('./pages/DiscoveryDetail'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
 const OAuthConsent = lazy(() => import('./pages/OAuthConsent'));
+const Journal = lazy(() => import('./pages/Journal'));
+const Compare = lazy(() => import('./pages/Compare'));
+const Reminders = lazy(() => import('./pages/Reminders'));
 
 const PageLoader = () => (
   <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'hsl(220 18% 5%)' }}>
@@ -56,6 +59,9 @@ function AnimatedRoutes() {
           <Route path="privacy-policy" element={<LazyRoute><PrivacyPolicy /></LazyRoute>} />
           <Route path="terms-of-use" element={<LazyRoute><TermsOfUse /></LazyRoute>} />
           <Route path="oauth-consent" element={<LazyRoute><OAuthConsent /></LazyRoute>} />
+          <Route path="journal" element={<LazyRoute><Journal /></LazyRoute>} />
+          <Route path="compare" element={<LazyRoute><Compare /></LazyRoute>} />
+          <Route path="reminders" element={<LazyRoute><Reminders /></LazyRoute>} />
           <Route path="*" element={<LazyRoute><PageNotFound /></LazyRoute>} />
         </Route>
       </Routes>

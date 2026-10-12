@@ -1,0 +1,57 @@
+{
+  "name": "Reminder",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Reminder title"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "revisit_collection",
+        "scan_category"
+      ],
+      "description": "revisit_collection = revisit a saved collection; scan_category = scan more of a category"
+    },
+    "collection_id": {
+      "type": "string",
+      "description": "Collection to revisit (for revisit_collection type)"
+    },
+    "category": {
+      "type": "string",
+      "description": "Category to scan (for scan_category type)"
+    },
+    "remind_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the reminder is due"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "title",
+    "type",
+    "remind_at"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

@@ -87,6 +87,10 @@ export default function ARCamera() {
   };
 
   const analyzeImage = async (file) => {
+    if (!navigator.onLine) {
+      setError('You are offline. Scanning requires an internet connection.');
+      return;
+    }
     setAnalyzing(true);
     setError(null);
     setResult(null);
