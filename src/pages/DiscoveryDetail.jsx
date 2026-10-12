@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Heart, Share2, Sparkles, Send, Clock, AlertTriangle, Wrench, Lightbulb, Package, ChevronRight, FolderPlus, GitCompare, WifiOff } from 'lucide-react';
 import ShareCard from '@/components/share/ShareCard';
+import MarketplaceComparison from '@/components/discovery/MarketplaceComparison';
 import { cacheDiscovery, useOnlineStatus } from '@/lib/offlineCache';
 import { base44 } from '@/api/base44Client';
 import DiscoveryCard from '@/components/discovery/DiscoveryCard';
@@ -187,6 +188,9 @@ export default function DiscoveryDetail() {
             </div>
           </div>
         )}
+
+        {/* Marketplace Comparison */}
+        <MarketplaceComparison discovery={discovery} onUpdate={(data) => setDiscovery({ ...discovery, ...data })} />
 
         {/* Interesting Facts */}
         {facts.length > 0 && (

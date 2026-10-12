@@ -108,6 +108,35 @@
     "ai_thread_id": {
       "type": "string",
       "description": "Reference to AIThread for follow-up questions"
+    },
+    "marketplace_lowest_price": {
+      "type": "number",
+      "description": "Lowest price found across marketplaces"
+    },
+    "marketplace_avg_price": {
+      "type": "number",
+      "description": "Average price across marketplaces"
+    },
+    "marketplace_currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "marketplace_listings": {
+      "type": "string",
+      "description": "JSON array of marketplace listings"
+    },
+    "marketplace_worth_low": {
+      "type": "number",
+      "description": "Low end of estimated fair market value"
+    },
+    "marketplace_worth_high": {
+      "type": "number",
+      "description": "High end of estimated fair market value"
+    },
+    "marketplace_searched_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When marketplace search was last performed"
     }
   },
   "required": [
